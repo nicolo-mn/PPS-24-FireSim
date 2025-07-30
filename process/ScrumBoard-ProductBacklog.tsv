@@ -1,0 +1,19 @@
+Title	Priority	Assignees	Status	Estimate	Size	Sprint
+Creation of enums and classes about cells (CellType, CellState etc.)	P0	mRickk	Ready		S	Sprint 1
+GUI mockup with matrix and initial popup (wind management buttons if there's time)	P0	nicolo-mn	Ready		M	Sprint 1
+Implement SimUpdater loop without buttons management	P0		Backlog		M	
+Implement preliminary stages of SimUpdater (e.g. map generation, fire placement, etc.)	P0		Backlog		S	
+Add SimUpdater interface, implementing logic independent from view and model	P0	juriGug	Ready		S	Sprint 1
+Basic map creation algorithm	P1	mRickk	Ready		M	Sprint 1
+Implement SimController to receive messages from view	P1	juriGug	Ready		S	Sprint 1
+Manage FireFighter logic	P1		Backlog		L	
+Fire diffusion	P1		Backlog		M	
+Fire placing logic in view (i.e. cells get colored, and get uncolored if selected again)	P1		Backlog		M	
+Fire placing logic in controller/model	P1		Backlog		M	
+Implement start, stop, pause, resume :(	P1		Backlog		L	
+FireFighter view	P1		Backlog		M	
+Link view and model map	P1		Backlog		S	
+GUI parameter selectors buttons	P1		Backlog			
+Connect view buttons that manage parameters (width, height, humidity etc.)	P2		Backlog		S	
+Program bootstrap (main, MVC setup)	P2		Backlog		S	
+Simulation speed management	P2		Backlog		M	
