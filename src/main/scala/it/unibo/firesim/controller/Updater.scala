@@ -1,6 +1,6 @@
 package it.unibo.firesim.controller
 
-trait Updater {
+trait Updater:
   def setUpdateCallback(cb: () => Unit): Unit
   def start(): Unit
   def stop(): Unit
@@ -8,4 +8,3 @@ trait Updater {
   def resume(): Unit
   def isRunning: Boolean
   def isPaused: Boolean
-}
