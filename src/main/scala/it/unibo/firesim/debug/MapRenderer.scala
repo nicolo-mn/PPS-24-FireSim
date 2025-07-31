@@ -10,8 +10,8 @@ object MapRenderer extends App {
   val matrix = model.generateMap(60, 90)
 
   private def render(cellType: CellType): String = cellType match {
-    case CellType.Forest   => Console.GREEN + "█" + Console.RESET
-    case CellType.Grass    => Console.GREEN + "░" + Console.RESET
+    case CellType.Forest   => Console.GREEN + "░" + Console.RESET
+    case CellType.Grass    => Console.GREEN + "▓" + Console.RESET
     case CellType.Empty    => Console.WHITE + "□" + Console.RESET
     case CellType.Station  => Console.YELLOW + "■" + Console.RESET
   }
