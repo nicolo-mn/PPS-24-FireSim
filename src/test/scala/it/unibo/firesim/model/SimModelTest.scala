@@ -21,7 +21,19 @@ class SimModelTest extends AnyFlatSpec with Matchers {
     val cellTypes = matrix.cells.flatten.map(_.cellType).distinct
     val cellStates = matrix.cells.flatten.map(_.state).distinct
 
-    cellTypes should contain allElementsOf CellType.values.toSeq
+    cellTypes should contain allElementsOf Seq(CellType.Forest, CellType.Grass, CellType.Station) // Empty not included
     cellStates should be (Vector(CellState.Intact))
   }
+
+  it should "generate a small map with at least one fire station and one forest" in {
+    val model = SimModel()
+    val matrix = model.generateMap(5, 5)
+
+    val fireStations = matrix.cells.flatten.count(_.cellType == CellType.Station)
+    val forests = matrix.cells.flatten.count(_.cellType == CellType.Forest)
+
+    fireStations should be > 0
+    forests should be > 0
+  }
+
 }
