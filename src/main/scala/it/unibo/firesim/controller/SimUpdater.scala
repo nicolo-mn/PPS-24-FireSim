@@ -75,6 +75,12 @@ class SimUpdater(tickMs: Long = 100) extends Updater with Runnable:
     if running && paused then paused = false
   }
 
-  override def isRunning: Boolean = ???
+  /**
+   * Checks whether the updater is currently running.
+   */
+  override def isRunning: Boolean = running
 
-  override def isPaused: Boolean = ???
+  /**
+   * Checks whether the updater is currently paused.
+   */
+  override def isPaused: Boolean = paused
