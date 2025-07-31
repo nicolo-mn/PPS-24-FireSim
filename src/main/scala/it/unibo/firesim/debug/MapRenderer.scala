@@ -9,7 +9,7 @@ object MapRenderer extends App {
   val model = SimModel()
   val matrix = model.generateMap(60, 90)
 
-  def render(cellType: CellType): String = cellType match {
+  private def render(cellType: CellType): String = cellType match {
     case CellType.Forest   => Console.GREEN + "█" + Console.RESET
     case CellType.Grass    => Console.GREEN + "░" + Console.RESET
     case CellType.Empty    => Console.WHITE + "□" + Console.RESET

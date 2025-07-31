@@ -1,6 +1,7 @@
 package it.unibo.firesim.model
 
 import it.unibo.firesim.model.cell.CellState.{Burnt, Intact}
+import it.unibo.firesim.model.cell.CellType.Forest
 import it.unibo.firesim.model.cell.{Cell, CellState, CellType}
 
 import scala.annotation.tailrec
@@ -21,13 +22,30 @@ class SimModel(random: Random = Random()) {
     val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount)
 
-    val minForestSize = 10
-    val maxForestSize = 50
+    val minForestSize = 30
+    val maxForestSize = 100
+    val forestGrowthProbability = 0.7 // 70%
     val withForests = forestSeeds.foldLeft(matrix) { (matrix, seed) =>
-      growForestCluster(matrix, seed, random.between(minForestSize, maxForestSize))
+      growCluster(matrix, seed, random.between(minForestSize, maxForestSize), forestGrowthProbability, CellType.Forest)
     }
 
-    val withGrass = growGrassAroundForests(withForests)
+    val grassSeeds: Seq[(Int, Int)] =
+      (0 until withForests.rows).flatMap { r =>
+        (0 until withForests.cols).flatMap { c =>
+          if (withForests(r, c).cellType == CellType.Forest) {
+            neighbors(r, c, withForests).filter { case (nr, nc) => withForests(nr, nc).cellType == CellType.Empty }
+          } else {
+            Seq.empty
+          }
+        }
+      }
+
+    val minGrassSpreadDistance = 10
+    val maxGrassSpreadDistance = 40
+    val grassGrowthFrequency = 0.8 // 80%
+    val withGrass = grassSeeds.foldLeft(withForests) { (matrix, seed) =>
+      growCluster(matrix, seed, random.between(minGrassSpreadDistance, maxGrassSpreadDistance), grassGrowthFrequency, CellType.Grass)
+    }
 
     val stationSeedsFrequency = 0.0002 // 0.02%
     val stationSeedsCount = ((rows * cols) * stationSeedsFrequency).toInt
@@ -42,42 +60,30 @@ class SimModel(random: Random = Random()) {
 
   private def generateSparseSeeds(rows: Int, cols: Int, count: Int, matrix: Matrix): Seq[(Int, Int)] = {
     LazyList.continually((random.nextInt(rows), random.nextInt(cols)))
-      .filter((r, c) => matrix(r,c).cellType == CellType.Empty)
+      .filter((r, c) => matrix(r, c).cellType == CellType.Empty)
       .distinct
       .take(count)
       .toList
   }
 
-  private def growForestCluster(matrix: Matrix, seed: (Int, Int), clusterSize: Int): Matrix = {
+  def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
+    Seq((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)).filter((nr, nc) => matrix.inBounds(nr, nc))
 
-    def neighbors(r: Int, c: Int): Seq[(Int, Int)] =
-      Seq((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)).filter((nr, nc) => matrix.inBounds(nr, nc))
+  private def growCluster(matrix: Matrix, seed: (Int, Int), clusterSize: Int, growthProbability: Double, growthType: CellType): Matrix = {
 
     @tailrec
     def expand(queue: Seq[(Int, Int)], visited: Set[(Int, Int)], count: Int, m: Matrix): Matrix =
       if count >= clusterSize || queue.isEmpty then m
       else {
         val (r, c) = queue.head
-        val newMatrix = m.update(r, c, Cell(r, c, CellType.Forest, CellState.Intact))
-        val next = neighbors(r, c).filterNot(visited.contains).filter((r, c) => m(r, c).cellType == CellType.Empty)
-        expand(queue.tail ++ next, visited + ((r,c)), count + 1, newMatrix)
+        val newMatrix = m.update(r, c, Cell(r, c, growthType, CellState.Intact))
+        val next = neighbors(r, c, newMatrix)
+          .filterNot(visited.contains)
+          .filter((r, c) => m(r, c).cellType == CellType.Empty)
+          .filter(_ => random.nextDouble() < growthProbability)
+        expand(queue.tail ++ next, visited + ((r, c)), count + 1, newMatrix)
       }
 
     expand(Seq(seed), Set.empty, 0, matrix)
-  }
-
-  private def growGrassAroundForests(matrix: Matrix): Matrix = {
-
-    val newCells = for {
-      r <- 0 until matrix.rows
-      c <- 0 until matrix.cols
-      if matrix(r, c).cellType == CellType.Forest
-      (nr, nc) <- (-1 to 1).flatMap(dr => (-1 to 1).map(dc => (r + dr, c + dc)))
-      if matrix.inBounds(nr, nc) && matrix(nr, nc).cellType == CellType.Empty
-    } yield (nr, nc)
-
-    newCells.distinct.foldLeft(matrix) { case (m, (r, c)) =>
-      m.update(r, c, Cell(r, c, CellType.Grass, CellState.Intact))
-    }
   }
 }
