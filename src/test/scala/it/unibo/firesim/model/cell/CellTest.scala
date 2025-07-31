@@ -7,8 +7,8 @@ class CellTest extends AnyFlatSpec with Matchers {
 
   "Cell" should "be created with correct position, type and state" in {
     val cell = Cell(0, 1, CellType.Forest, CellState.Intact)
-    cell.x should be(0)
-    cell.y should be(1)
+    cell.row should be(0)
+    cell.col should be(1)
     cell.position should be((0, 1))
     cell.cellType should be(CellType.Forest)
     cell.state should be(CellState.Intact)

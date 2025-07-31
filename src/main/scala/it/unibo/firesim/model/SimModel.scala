@@ -12,7 +12,7 @@ class SimModel {
    */
   def generateMap(rows: Int, cols: Int): Matrix = {
     Matrix(
-      Array.tabulate(rows, cols) { (row, col) =>
+      Vector.tabulate(rows, cols) { (row, col) =>
         Cell(row, col, CellType.Empty, CellState.Intact)
       }
     )
