@@ -7,14 +7,14 @@ import org.scalatest.time.{Millis, Seconds, Span}
 
 import java.util.concurrent.atomic.AtomicInteger
 
-class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually {
+class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually:
 
   implicit override val patienceConfig =
     PatienceConfig(timeout = Span(2, Seconds), interval = Span(50, Millis))
 
-  "SimUpdater" should "invoke callback periodically when running" in {
+  "Updater" should "invoke callback periodically when running" in {
     val counter = new AtomicInteger(0)
-    val updater = new SimUpdater(50)  // tick ogni 50 ms
+    val updater: Updater = new SimUpdater(50) // tick ogni 50 ms
     updater.setUpdateCallback(() => counter.incrementAndGet())
     updater.start()
 
@@ -25,4 +25,20 @@ class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually {
 
     updater.stop()
   }
-}
+  it should "not invoke callback when paused" in {
+    val counter = new AtomicInteger(0)
+    val updater = new SimUpdater(50)
+    updater.setUpdateCallback(() => counter.incrementAndGet())
+    updater.start()
+
+    eventually {
+      counter.get() should be >= 1
+    }
+    updater.pause()
+    val beforePause = counter.get()
+
+    Thread.sleep(200)
+    counter.get() shouldEqual beforePause
+
+    updater.stop()
+  }
