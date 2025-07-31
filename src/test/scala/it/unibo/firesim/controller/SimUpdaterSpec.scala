@@ -66,3 +66,24 @@ class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually:
 
     updater.stop()
   }
+
+
+  it should "report correct states via isRunning and isPaused" in {
+    val updater = new SimUpdater(100)
+    updater.isRunning shouldBe false
+    updater.isPaused shouldBe false
+
+    updater.start()
+    updater.isRunning shouldBe true
+    updater.isPaused shouldBe false
+
+    updater.pause()
+    updater.isPaused shouldBe true
+
+    updater.resume()
+    updater.isPaused shouldBe false
+
+    updater.stop()
+    updater.isRunning shouldBe false
+  }
+
