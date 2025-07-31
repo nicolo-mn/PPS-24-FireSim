@@ -1,4 +1,4 @@
-package it.unibo.firesim.model
+package it.unibo.firesim.model.cell
 
 /**
  * Represents a cell in the simulation grid.

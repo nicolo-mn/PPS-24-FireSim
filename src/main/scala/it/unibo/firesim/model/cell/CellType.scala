@@ -1,4 +1,4 @@
-package it.unibo.firesim.model
+package it.unibo.firesim.model.cell
 
 /** Enumeration of possible cell types in the simulation.
   *

@@ -1,4 +1,4 @@
-package it.unibo.firesim.model
+package it.unibo.firesim.model.cell
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
