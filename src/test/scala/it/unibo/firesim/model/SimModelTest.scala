@@ -22,6 +22,6 @@ class SimModelTest extends AnyFlatSpec with Matchers {
     val cellStates = matrix.cells.flatten.map(_.state).distinct
 
     cellTypes should contain allElementsOf CellType.values.toSeq
-    cellStates should be (CellState.Intact)
+    cellStates should be (Vector(CellState.Intact))
   }
 }

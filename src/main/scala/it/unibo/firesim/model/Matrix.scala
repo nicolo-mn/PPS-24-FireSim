@@ -14,4 +14,7 @@ case class Matrix(cells: Vector[Vector[Cell]]) {
 
   def update(r: Int, c: Int, newCell: Cell): Matrix =
     Matrix(cells.updated(r, cells(r).updated(c, newCell)))
+    
+  def inBounds(r: Int, c: Int): Boolean =
+    r >= 0 && r < rows && c >= 0 && c < cols
 }
