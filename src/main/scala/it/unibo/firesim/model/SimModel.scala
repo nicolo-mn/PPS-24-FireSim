@@ -18,7 +18,7 @@ class SimModel(random: Random = Random()) {
   def generateMap(rows: Int, cols: Int): Matrix = {
     val matrix = Matrix(Vector.tabulate(rows, cols) { (r, c) => Cell(r, c, CellType.Empty, CellState.Intact) })
 
-    val forestSeedFrequency = 0.01 // 1%
+    val forestSeedFrequency = 0.02 // 2%
     val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount)
 
