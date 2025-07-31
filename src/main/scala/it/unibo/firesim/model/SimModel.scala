@@ -1,7 +1,5 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.CellState.{Burnt, Intact}
-import it.unibo.firesim.model.cell.CellType.Forest
 import it.unibo.firesim.model.cell.{Cell, CellState, CellType}
 
 import scala.annotation.tailrec
