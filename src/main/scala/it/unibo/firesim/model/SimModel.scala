@@ -19,7 +19,7 @@ class SimModel(random: Random = Random()) {
     val matrix = Matrix(Vector.tabulate(rows, cols) { (r, c) => Cell(r, c, CellType.Empty, CellState.Intact) })
 
     val forestSeedFrequency = 0.01 // 1%
-    val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt
+    val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount)
 
     val minForestSize = 30
@@ -48,7 +48,7 @@ class SimModel(random: Random = Random()) {
     }
 
     val stationSeedsFrequency = 0.0002 // 0.02%
-    val stationSeedsCount = ((rows * cols) * stationSeedsFrequency).toInt
+    val stationSeedsCount = ((rows * cols) * stationSeedsFrequency).toInt max 1
     val stationSeeds = generateSparseSeeds(rows, cols, stationSeedsCount, withGrass)
     val withStations = stationSeeds.foldLeft(withGrass)((m, pos) => m.update(pos._1, pos._2, Cell(pos._1, pos._2, CellType.Station, CellState.Intact)))
 
@@ -59,11 +59,11 @@ class SimModel(random: Random = Random()) {
     Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))
 
   private def generateSparseSeeds(rows: Int, cols: Int, count: Int, matrix: Matrix): Seq[(Int, Int)] = {
-    LazyList.continually((random.nextInt(rows), random.nextInt(cols)))
-      .filter((r, c) => matrix(r, c).cellType == CellType.Empty)
-      .distinct
-      .take(count)
-      .toList
+    val emptyCells = (0 until rows).flatMap { r =>
+      (0 until cols).collect { case c if matrix(r, c).cellType == CellType.Empty => (r, c) }
+    }
+    if emptyCells.isEmpty then return Seq((random.nextInt(rows), random.nextInt(cols)))
+    random.shuffle(emptyCells).take(count)
   }
 
   def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
