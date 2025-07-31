@@ -42,3 +42,27 @@ class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually:
 
     updater.stop()
   }
+
+  it should "resume invoking callback after a pause" in {
+    val counter = new AtomicInteger(0)
+    val updater = new SimUpdater(60)
+    updater.setUpdateCallback(() => counter.incrementAndGet())
+    updater.start()
+
+    eventually {
+      counter.get() should be >= 2
+    }
+    updater.pause()
+    val pausedCount = counter.get()
+
+    Thread.sleep(150)
+    counter.get() shouldEqual pausedCount
+
+    updater.resume()
+
+    eventually {
+      counter.get() should be > pausedCount
+    }
+
+    updater.stop()
+  }
