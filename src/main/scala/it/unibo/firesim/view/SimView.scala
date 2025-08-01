@@ -198,12 +198,13 @@ class SimView:
   private def askForGridSize(): Int =
     Dialog.showInput(null, "Enter grid size:", initial = "10") match
       case None => sys.exit(0)
-      case Some(input) if input.toIntOption.isDefined && input.toInt > 0 =>
+      case Some(input)
+          if input.toIntOption.isDefined && input.toInt >= minimumGridSize =>
         input.toInt
       case Some(input) =>
         Dialog.showMessage(
           null,
-          "Grid size must be a number greater than 0.",
+          s"Grid size must be a number greater than ${minimumGridSize - 1}.",
           title = "Input Error",
           Dialog.Message.Error
         )
