@@ -16,5 +16,6 @@ lazy val root = (project in file("."))
     coverageEnabled := true,
     libraryDependencies += "junit" % "junit" % "4.13.2" % Test,
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test",
+    libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
     assembly / mainClass := Some("it.unibo.firesim.main"),
   )
