@@ -4,7 +4,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import it.unibo.firesim.*
 import it.unibo.firesim.debug.MockSimModel
-class SimControllerSpec extends AnyFlatSpec with Matchers {
+
+class SimControllerSpec extends AnyFlatSpec with Matchers:
 
   "SimController" should "set wind speed in model when SetWindSpeed message is handled" in {
     val model = new MockSimModel
@@ -15,6 +16,3 @@ class SimControllerSpec extends AnyFlatSpec with Matchers {
 
     model.getSimParams.windSpeed shouldBe 7.5
   }
-
-
-}
