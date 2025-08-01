@@ -65,8 +65,7 @@ class SimUpdater(tickMs: Long = 100) extends Updater with Runnable:
     * update callback after a pause.
     */
   override def pauseResume(): Unit = synchronized {
-    if running && !paused then paused = true
-    else paused = false
+    if running then paused = !paused
   }
 
   /** Checks whether the updater is currently running.
