@@ -34,7 +34,7 @@ class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually:
     eventually {
       counter.get() should be >= 1
     }
-    updater.pause()
+    updater.pauseResume()
     val beforePause = counter.get()
 
     Thread.sleep(200)
@@ -52,13 +52,13 @@ class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually:
     eventually {
       counter.get() should be >= 2
     }
-    updater.pause()
+    updater.pauseResume()
     val pausedCount = counter.get()
 
     Thread.sleep(150)
     counter.get() shouldEqual pausedCount
 
-    updater.resume()
+    updater.pauseResume()
 
     eventually {
       counter.get() should be > pausedCount
@@ -66,7 +66,6 @@ class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually:
 
     updater.stop()
   }
-
 
   it should "report correct states via isRunning and isPaused" in {
     val updater = new SimUpdater(100)
@@ -77,13 +76,12 @@ class SimUpdaterSpec extends AnyFlatSpec with Matchers with Eventually:
     updater.isRunning shouldBe true
     updater.isPaused shouldBe false
 
-    updater.pause()
+    updater.pauseResume()
     updater.isPaused shouldBe true
 
-    updater.resume()
+    updater.pauseResume()
     updater.isPaused shouldBe false
 
     updater.stop()
     updater.isRunning shouldBe false
   }
-

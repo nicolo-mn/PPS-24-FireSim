@@ -61,26 +61,18 @@ class SimUpdater(tickMs: Long = 100) extends Updater with Runnable:
         // Log or handle exceptions from the callback as needed
         ex.printStackTrace()
 
-  /** Pauses the execution of the update callback until resume() is called. Has
-    * no effect if not running or already paused.
+  /** Pauses the execution of the update callback or Resumes execution of the
+    * update callback after a pause.
     */
-  override def pause(): Unit = synchronized {
+  override def pauseResume(): Unit = synchronized {
     if running && !paused then paused = true
+    else paused = false
   }
 
-  /** Resumes execution of the update callback after a pause. Has no effect if
-    * not running or not paused.
+  /** Checks whether the updater is currently running.
     */
-  def resume(): Unit = synchronized {
-    if running && paused then paused = false
-  }
-
-  /**
-   * Checks whether the updater is currently running.
-   */
   override def isRunning: Boolean = running
 
-  /**
-   * Checks whether the updater is currently paused.
-   */
+  /** Checks whether the updater is currently paused.
+    */
   override def isPaused: Boolean = paused
