@@ -16,3 +16,13 @@ class SimControllerSpec extends AnyFlatSpec with Matchers:
 
     model.getSimParams.windSpeed shouldBe 7.5
   }
+
+  it should "start the simulation when StartSimulation message is handled" in {
+    val model = new MockSimModel
+    val updater = new SimUpdater()
+    val controller = new SimController(model, updater)
+
+    controller.handleViewMessage(StartSimulation)
+
+    updater.isRunning shouldBe true
+  }
