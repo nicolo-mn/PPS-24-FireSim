@@ -51,3 +51,12 @@ class SimModelTest extends AnyFlatSpec with Matchers:
 
     emptyCellsCount should be < (totalCellsCount * 0.1).toInt
   }
+
+  it should "Impostazione e recupero dei parametri funziona" in {
+    val model = new SimModel()
+    model.setWindSpeed(5.0)
+    model.setHumidity(75.0)
+    val params = model.getSimParams
+    assert(params.windSpeed == 5.0)
+    assert(params.humidity == 75.0)
+  }
