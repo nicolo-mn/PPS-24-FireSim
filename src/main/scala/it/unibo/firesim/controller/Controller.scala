@@ -2,7 +2,7 @@ package it.unibo.firesim.controller
 
 import it.unibo.firesim.debug.SimParams
 
-trait Controller {
+trait Controller:
   def handleViewMessage(msg: ViewMessage): Unit
   def setWindSpeed(speed: Double): Unit
   def setWindAngle(angle: Double): Unit
@@ -16,4 +16,3 @@ trait Controller {
   def pauseResumeSimulation(): Unit
   def stopSimulation(): Unit
   def setView(): Unit
-}
