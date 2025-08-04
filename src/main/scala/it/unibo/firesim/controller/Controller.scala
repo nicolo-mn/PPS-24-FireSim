@@ -1,6 +1,6 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.debug.SimParams
+import it.unibo.firesim.model.SimParams
 
 trait Controller:
   def handleViewMessage(msg: ViewMessage): Unit

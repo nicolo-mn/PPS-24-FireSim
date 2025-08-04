@@ -1,7 +1,6 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.debug.MockSimModel
-import it.unibo.firesim.debug.SimParams
+import it.unibo.firesim.model.{SimParams, SimModel}
 
 /** SimController coordinates the interactions between the simulation model, the
   * updater (tick scheduler), and the view. It safely updates the model
@@ -13,7 +12,7 @@ import it.unibo.firesim.debug.SimParams
   *   The simulation updater handling the ticks.
   */
 class SimController(
-    model: MockSimModel,
+    model: SimModel,
     updater: SimUpdater
 ) extends Controller:
 

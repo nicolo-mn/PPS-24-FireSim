@@ -1,6 +1,6 @@
 package it.unibo.firesim.debug
 
-case class SimParams(
+case class Params(
     windSpeed: Double,
     windAngle: Double,
     temperature: Double,
@@ -10,9 +10,9 @@ case class SimParams(
 type SimMap = Vector[Vector[Int]]
 
 class MockSimModel:
-  private var params: SimParams = SimParams(1.0, 0.0, 25.0, 50.0)
+  private var params: Params = Params(1.0, 0.0, 25.0, 50.0)
 
-  def getSimParams: SimParams = params
+  def getSimParams: Params = params
 
   def setWindSpeed(speed: Double): Unit =
     params = params.copy(windSpeed = speed)

@@ -3,12 +3,12 @@ package it.unibo.firesim.controller
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import it.unibo.firesim.*
-import it.unibo.firesim.debug.MockSimModel
+import it.unibo.firesim.model.SimModel
 
 class SimControllerSpec extends AnyFlatSpec with Matchers:
 
   "SimController" should "set wind speed in model when SetWindSpeed message is handled" in {
-    val model = new MockSimModel
+    val model = new SimModel()
     val updater = new SimUpdater()
     val controller = new SimController(model, updater)
 
@@ -18,7 +18,7 @@ class SimControllerSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "start the simulation when StartSimulation message is handled" in {
-    val model = new MockSimModel
+    val model = new SimModel()
     val updater = new SimUpdater()
     val controller = new SimController(model, updater)
 
