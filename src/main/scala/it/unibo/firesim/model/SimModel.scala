@@ -129,7 +129,6 @@ class SimModel(
 
   def getSimParams: SimParams = simParams
 
-  // Setter per ogni campo
   def setWindSpeed(speed: Double): Unit =
     simParams = simParams.copy(windSpeed = speed)
 
@@ -141,6 +140,12 @@ class SimModel(
 
   def setHumidity(humidity: Double): Unit =
     simParams = simParams.copy(humidity = humidity)
+
+  def placeCell(pos: (Int, Int), cellType: CellType): Unit = ???
+
+  def updateState(params: SimParams): (Matrix, Seq[Cell]) = ???
+
+  def extinguishCells(burntCells: Seq[Cell]): Unit = ???
 
   private def generateSeeds(rows: Int, cols: Int, count: Int): Seq[(Int, Int)] =
     Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))
