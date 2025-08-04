@@ -11,7 +11,7 @@ trait Controller:
   def getSimParams: SimParams
   def generateMap(width: Int, height: Int): Unit
   def placeFire(pos: (Int, Int)): Unit
-  def placeBarrier(startPos: (Int, Int), finishPos: (Int, Int)): Unit
+  def placeBarrier(pos: (Int, Int)): Unit
   def startSimulation(): Unit
   def pauseResumeSimulation(): Unit
   def stopSimulation(): Unit

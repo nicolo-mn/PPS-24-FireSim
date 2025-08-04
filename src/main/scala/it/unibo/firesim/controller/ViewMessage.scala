@@ -84,8 +84,8 @@ case class PlaceFire(pos: (Int, Int)) extends ViewMessage:
   * @param finishPos
   *   The (x, y) finishing coordinates of the barrier.
   */
-case class PlaceBarrier(startPos: (Int, Int), finishPos: (Int, Int))
+case class PlaceBarrier(pos: (Int, Int))
     extends ViewMessage:
 
   def execute(controller: SimController): Unit =
-    controller.placeBarrier(startPos, finishPos)
+    controller.placeBarrier(pos)
