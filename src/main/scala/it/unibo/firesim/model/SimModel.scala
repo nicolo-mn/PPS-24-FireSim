@@ -5,7 +5,10 @@ import it.unibo.firesim.model.cell.{Cell, CellState, CellType}
 import scala.annotation.tailrec
 import scala.util.Random
 
-class SimModel(random: Random = Random()):
+class SimModel(
+    random: Random = Random(),
+    private var simParams: SimParams = SimParams(1.0, 0.0, 25.0, 50.0)
+):
 
   /** Generates a map with the specified number of rows and columns.
     *
@@ -77,9 +80,6 @@ class SimModel(random: Random = Random()):
 
     withStations
 
-  private def generateSeeds(rows: Int, cols: Int, count: Int): Seq[(Int, Int)] =
-    Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))
-
   private def generateSparseSeeds(
       rows: Int,
       cols: Int,
@@ -126,3 +126,21 @@ class SimModel(random: Random = Random()):
         expand(queue.tail ++ next, visited + ((r, c)), count + 1, newMatrix)
 
     expand(Seq(seed), Set.empty, 0, matrix)
+
+  def getSimParams: SimParams = simParams
+
+  // Setter per ogni campo
+  def setWindSpeed(speed: Double): Unit =
+    simParams = simParams.copy(windSpeed = speed)
+
+  def setWindAngle(angle: Double): Unit =
+    simParams = simParams.copy(windAngle = angle)
+
+  def setTemperature(temp: Double): Unit =
+    simParams = simParams.copy(temperature = temp)
+
+  def setHumidity(humidity: Double): Unit =
+    simParams = simParams.copy(humidity = humidity)
+
+  private def generateSeeds(rows: Int, cols: Int, count: Int): Seq[(Int, Int)] =
+    Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))
