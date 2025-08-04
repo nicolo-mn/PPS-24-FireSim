@@ -3,7 +3,7 @@ package it.unibo.firesim.model.cell
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class CellTest extends AnyFlatSpec with Matchers {
+class CellTest extends AnyFlatSpec with Matchers:
 
   "Cell" should "be created with correct position, type and state" in {
     val cell = Cell(0, 1, CellType.Forest, CellState.Intact)
@@ -19,4 +19,3 @@ class CellTest extends AnyFlatSpec with Matchers {
     cell.state should be(CellState.Burning(4))
     cell.state shouldNot be(CellState.Burning(5))
   }
-}
