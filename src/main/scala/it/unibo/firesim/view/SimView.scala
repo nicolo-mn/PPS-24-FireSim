@@ -193,6 +193,8 @@ class SimView:
       gridCells.zip(updatedColors).foreach((b, c) =>
         b.color = c; b.repaint()
       )
+      
+  //TODO!! Traduci da stringa a colore
 
   @tailrec
   private def askForGridSize(): Int =

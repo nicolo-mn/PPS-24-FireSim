@@ -8,11 +8,8 @@ trait Controller:
   def setWindAngle(angle: Double): Unit
   def setTemperature(temp: Double): Unit
   def setHumidity(humidity: Double): Unit
-  def getSimParams: SimParams
   def generateMap(width: Int, height: Int): Unit
-  def placeFire(pos: (Int, Int)): Unit
-  def placeBarrier(pos: (Int, Int)): Unit
+  def placeCell(pos: (Int, Int), cellViewType: CellViewType): Unit
   def startSimulation(): Unit
   def pauseResumeSimulation(): Unit
   def stopSimulation(): Unit
-  def setView(): Unit
