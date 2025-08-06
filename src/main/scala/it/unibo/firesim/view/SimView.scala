@@ -2,6 +2,8 @@ package it.unibo.firesim.view
 
 import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
+import it.unibo.firesim.controller.CellViewType
+import it.unibo.firesim.controller.CellViewType.Burnt
 
 import scala.swing.event.{ButtonClicked, ValueChanged}
 import java.awt.{Color, Dimension}
@@ -185,16 +187,24 @@ class SimView:
     centerOnScreen()
     visible = true
 
-  def setViewMap(updatedColors: Seq[Color]): Unit =
+  def setViewMap(updatedColors: Seq[CellViewType]): Unit =
     if updatedColors.length != gridCells.length then
       // TODO: log error
       return
     else
       gridCells.zip(updatedColors).foreach((b, c) =>
-        b.color = c; b.repaint()
+        b.color = getCellColor(c); b.repaint()
       )
       
-  //TODO!! Traduci da stringa a colore
+  private def getCellColor(cellViewType: CellViewType): Color =
+    cellViewType match
+      case CellViewType.Fire => Color.red
+      case CellViewType.Empty => Color.white
+      case CellViewType.Forest => Color.green.darker()
+      case CellViewType.Grass => Color.green.brighter()
+      case CellViewType.Station => Color.yellow
+      case CellViewType.Burnt => Color.gray.darker()
+      case null => Color.lightGray
 
   @tailrec
   private def askForGridSize(): Int =
