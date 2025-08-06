@@ -1,6 +1,7 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.model.{SimParams, SimModel}
+import it.unibo.firesim.model.{SimModel, SimParams}
+import it.unibo.firesim.view.SimView
 
 /** SimController coordinates the interactions between the simulation model, the
   * updater (tick scheduler), and the view. It safely updates the model
@@ -12,6 +13,8 @@ import it.unibo.firesim.model.{SimParams, SimModel}
 class SimController(
     model: SimModel
 ) extends Controller:
+
+  private val simView = new SimView(this)
 
   private var windSpeed: Double = model.getSimParams.windSpeed
   private var windAngle: Double = model.getSimParams.windAngle

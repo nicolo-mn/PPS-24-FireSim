@@ -2,8 +2,7 @@ package it.unibo.firesim.view
 
 import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
-import it.unibo.firesim.controller.CellViewType
-import it.unibo.firesim.controller.CellViewType.Burnt
+import it.unibo.firesim.controller.{CellViewType, SimController}
 
 import scala.swing.event.{ButtonClicked, ValueChanged}
 import java.awt.{Color, Dimension}
@@ -11,15 +10,15 @@ import javax.swing.JPanel
 import scala.annotation.tailrec
 
 class GridButton(
+    private val pos : (Int, Int),
+    private val simController: SimController,
     var color: Color,
     private val soilTypeSelector: ComboBox[String]
 ) extends Button:
   background = color
   reactions += {
     case ButtonClicked(_) =>
-      // TODO: notify controller instead
-      color = Color.red
-      repaint()
+      simController.placeCell(pos, CellViewType.fromString(soilTypeSelector.item).getOrElse(CellViewType.Empty))
   }
 
   override def paintComponent(g: Graphics2D): Unit =
@@ -27,7 +26,7 @@ class GridButton(
     g.setColor(color)
     g.fillRect(0, 0, size.width, size.height)
 
-class SimView:
+class SimView(private val simController: SimController):
   private val gridSize: Int = askForGridSize()
 
   // TODO: notify controller
@@ -38,12 +37,11 @@ class SimView:
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
   soilTypeSelector.selection.item = fireSoilStr
 
-  private val gridCells: Seq[GridButton] = Seq.fill(
-    gridSize * gridSize
-  )(new GridButton(Color.white, soilTypeSelector))
+  var gridCells: Seq[Seq[GridButton]] =
+    Seq.tabulate(gridSize, gridSize)((i, j) => new GridButton((i, j), simController, Color.white, soilTypeSelector))
 
   private val gridPanel = new GridPanel(gridSize, gridSize):
-    contents ++= gridCells
+    contents ++= gridCells.flatten
     // The wrapped peer needs to be overridden as the grid's parent bypasses the homonymous scala method to handle resizing
     override lazy val peer: JPanel =
       new JPanel(new java.awt.GridLayout(gridSize, gridSize)):
@@ -188,11 +186,11 @@ class SimView:
     visible = true
 
   def setViewMap(updatedColors: Seq[CellViewType]): Unit =
-    if updatedColors.length != gridCells.length then
+    if updatedColors.length != gridSize * gridSize then
       // TODO: log error
       return
     else
-      gridCells.zip(updatedColors).foreach((b, c) =>
+      gridCells.flatten.zip(updatedColors).foreach((b, c) =>
         b.color = getCellColor(c); b.repaint()
       )
       
