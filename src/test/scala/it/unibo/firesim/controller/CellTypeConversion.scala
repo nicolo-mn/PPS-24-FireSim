@@ -19,3 +19,10 @@ class CellTypeConversion extends AnyFlatSpec with Matchers:
 
     convertedCellType shouldBe CellType.Forest
   }
+
+  "CellTypeConverter" should "convert CellType to CellViewType correctly" in {
+    val forestCell = CellType.Forest
+    val convertedCellViewType = CellTypeConverter.toView(forestCell)
+
+    convertedCellViewType shouldBe CellViewType.Forest
+  }
