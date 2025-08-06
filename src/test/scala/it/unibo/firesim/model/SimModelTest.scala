@@ -1,6 +1,6 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.{CellState, CellType}
+import it.unibo.firesim.model.cell.CellType
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -19,14 +19,12 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     val matrix = model.generateMap(100, 100)
 
     val cellTypes = matrix.cells.flatten.map(_.cellType).distinct
-    val cellStates = matrix.cells.flatten.map(_.state).distinct
 
     cellTypes should contain allElementsOf Seq(
       CellType.Forest,
       CellType.Grass,
       CellType.Station
     ) // Empty not included
-    cellStates should be(Vector(CellState.Intact))
   }
 
   it should "generate a small map with at least one fire station and one forest" in {

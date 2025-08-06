@@ -1,6 +1,6 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.{Cell, CellState, CellType}
+import it.unibo.firesim.model.cell.{Cell, CellType}
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -21,7 +21,7 @@ class SimModel(
     */
   def generateMap(rows: Int, cols: Int): Matrix =
     val matrix = Matrix(Vector.tabulate(rows, cols) { (r, c) =>
-      Cell(r, c, CellType.Empty, CellState.Intact)
+      Cell(r, c, CellType.Empty)
     })
 
     val forestSeedFrequency = 0.02 // 2%
@@ -74,7 +74,7 @@ class SimModel(
       m.update(
         pos._1,
         pos._2,
-        Cell(pos._1, pos._2, CellType.Station, CellState.Intact)
+        Cell(pos._1, pos._2, CellType.Station)
       )
     )
 
@@ -118,7 +118,7 @@ class SimModel(
       if count >= clusterSize || queue.isEmpty then m
       else
         val (r, c) = queue.head
-        val newMatrix = m.update(r, c, Cell(r, c, growthType, CellState.Intact))
+        val newMatrix = m.update(r, c, Cell(r, c, growthType))
         val next = neighbors(r, c, newMatrix)
           .filterNot(visited.contains)
           .filter((r, c) => m(r, c).cellType == CellType.Empty)

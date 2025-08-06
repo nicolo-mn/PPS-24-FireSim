@@ -10,10 +10,11 @@ object MapRenderer extends App:
   val matrix = model.generateMap(60, 90)
 
   private def render(cellType: CellType): String = cellType match
-    case CellType.Forest  => Console.GREEN + "░" + Console.RESET
-    case CellType.Grass   => Console.GREEN + "▓" + Console.RESET
-    case CellType.Empty   => Console.WHITE + "□" + Console.RESET
-    case CellType.Station => Console.YELLOW + "■" + Console.RESET
+    case CellType.Forest  => Console.GREEN + "F" + Console.RESET
+    case CellType.Grass   => Console.GREEN + "G" + Console.RESET
+    case CellType.Empty   => Console.WHITE + "E" + Console.RESET
+    case CellType.Station => Console.YELLOW + "S" + Console.RESET
+    case _                => Console.WHITE + "x" + Console.RESET
 
   matrix.cells.foreach { row =>
     println(row.map(cell => render(cell.cellType)).mkString(" "))

@@ -7,14 +7,11 @@ package it.unibo.firesim.model.cell
   *   the column of the cell
   * @param cellType
   *   the type of the cell
-  * @param state
-  *   the current state of the cell
   */
 case class Cell(
     row: Int,
     col: Int,
-    cellType: CellType,
-    state: CellState
+    cellType: CellType
 ):
 
   /** @return the position of the cell as a tuple (x, y). */
