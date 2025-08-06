@@ -11,3 +11,12 @@ object CellTypeConverter:
     case CellViewType.Station => CellType.Station
 //    case CellViewType.Burnt => CellType.Burnt
     case _ => throw new IllegalArgumentException(s"Unknown CellViewType: $viewType")
+
+  def toView(modelType: CellType): CellViewType = modelType match
+    case CellType.Grass => CellViewType.Grass
+    case CellType.Forest => CellViewType.Forest
+    case CellType.Empty => CellViewType.Empty
+    case CellType.Station => CellViewType.Station
+    //    case CellType.Burning(_) => CellViewType.Fire
+    //    case CellType.Burnt => CellViewType.Burnt
+    case _ => throw new IllegalArgumentException(s"Unknown CellType: $modelType")
