@@ -18,7 +18,7 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     val model = SimModel()
     val matrix = model.generateMap(100, 100)
 
-    val cellTypes = matrix.cells.flatten.map(_.cellType).distinct
+    val cellTypes = matrix.flatten.map(_.cellType).distinct
 
     cellTypes should contain allElementsOf Seq(
       CellType.Forest,
@@ -32,8 +32,8 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     val matrix = model.generateMap(5, 5)
 
     val fireStations =
-      matrix.cells.flatten.count(_.cellType == CellType.Station)
-    val forests = matrix.cells.flatten.count(_.cellType == CellType.Forest)
+      matrix.flatten.count(_.cellType == CellType.Station)
+    val forests = matrix.flatten.count(_.cellType == CellType.Forest)
 
     fireStations should be > 0
     forests should be > 0
@@ -44,7 +44,7 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     val matrix = model.generateMap(100, 100)
 
     val emptyCellsCount =
-      matrix.cells.flatten.count(_.cellType == CellType.Empty)
+      matrix.flatten.count(_.cellType == CellType.Empty)
     val totalCellsCount = matrix.rows * matrix.cols
 
     emptyCellsCount should be < (totalCellsCount * 0.1).toInt

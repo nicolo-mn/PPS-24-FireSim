@@ -20,9 +20,9 @@ class SimModel(
     *   A Matrix containing the generated cells
     */
   def generateMap(rows: Int, cols: Int): Matrix =
-    val matrix = Matrix(Vector.tabulate(rows, cols) { (r, c) =>
+    val matrix = Vector.tabulate(rows, cols) { (r, c) =>
       Cell(r, c, CellType.Empty)
-    })
+    }
 
     val forestSeedFrequency = 0.02 // 2%
     val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt max 1
@@ -44,9 +44,9 @@ class SimModel(
     val grassSeeds: Seq[(Int, Int)] =
       (0 until withForests.rows).flatMap { r =>
         (0 until withForests.cols).flatMap { c =>
-          if withForests(r, c).cellType == CellType.Forest then
+          if withForests(r)(c).cellType == CellType.Forest then
             neighbors(r, c, withForests).filter { case (nr, nc) =>
-              withForests(nr, nc).cellType == CellType.Empty
+              withForests(nr)(nc).cellType == CellType.Empty
             }
           else
             Seq.empty
@@ -88,7 +88,7 @@ class SimModel(
   ): Seq[(Int, Int)] =
     val emptyCells = (0 until rows).flatMap { r =>
       (0 until cols).collect {
-        case c if matrix(r, c).cellType == CellType.Empty => (r, c)
+        case c if matrix(r)(c).cellType == CellType.Empty => (r, c)
       }
     }
     if emptyCells.isEmpty then
@@ -121,7 +121,7 @@ class SimModel(
         val newMatrix = m.update(r, c, Cell(r, c, growthType))
         val next = neighbors(r, c, newMatrix)
           .filterNot(visited.contains)
-          .filter((r, c) => m(r, c).cellType == CellType.Empty)
+          .filter((r, c) => m(r)(c).cellType == CellType.Empty)
           .filter(_ => random.nextDouble() < growthProbability)
         expand(queue.tail ++ next, visited + ((r, c)), count + 1, newMatrix)
 

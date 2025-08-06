@@ -2,23 +2,20 @@ package it.unibo.firesim.model
 
 import it.unibo.firesim.model.cell.Cell
 
-/** Represents a matrix of cells.
-  *
-  * @param cells
-  *   2D array of cells
-  */
-case class Matrix(cells: Vector[Vector[Cell]]):
-  val rows: Int = cells.length
-  val cols: Int = if cells.isEmpty then 0 else cells(0).length
+type Matrix = Vector[Vector[Cell]]
 
-  /** @param r
-    *   Row index
-    * @param c
-    *   Column index
+extension (matrix: Matrix)
+  /** Matrix rows
     * @return
-    *   The cell at the specified position (r,c)
+    *   number of rows in the matrix
     */
-  def apply(r: Int, c: Int): Cell = cells(r)(c)
+  def rows: Int = ???
+
+  /** Matrix columns
+    * @return
+    *   number of columns in the matrix
+    */
+  def cols: Int = ???
 
   /** @param r
     *   Row index
@@ -29,8 +26,7 @@ case class Matrix(cells: Vector[Vector[Cell]]):
     * @return
     *   A new Matrix with the updated cell
     */
-  def update(r: Int, c: Int, newCell: Cell): Matrix =
-    Matrix(cells.updated(r, cells(r).updated(c, newCell)))
+  def update(r: Int, c: Int, newCell: Cell): Matrix = ???
 
   /** @param r
     *   Row index
@@ -39,5 +35,4 @@ case class Matrix(cells: Vector[Vector[Cell]]):
     * @return
     *   True if the indices (r, c) are within the bounds of the matrix
     */
-  def inBounds(r: Int, c: Int): Boolean =
-    r >= 0 && r < rows && c >= 0 && c < cols
+  def inBounds(r: Int, c: Int): Boolean = ???
