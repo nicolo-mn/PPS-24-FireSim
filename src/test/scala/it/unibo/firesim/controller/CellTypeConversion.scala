@@ -8,6 +8,13 @@ class CellTypeConversion extends AnyFlatSpec with Matchers:
 
   "CellViewType" should "be found with string constant" in {
     val forestCell = CellViewType.fromString(forestSoilStr)
-    
+
     forestCell shouldBe Some(CellViewType.Forest)
+  }
+
+  "SimController" should "convert CellViewType to CellType correctly" in {
+    val forestViewCell = CellViewType.Forest
+    val convertedCellType = CellTypeConverter.toModel(forestViewCell)
+
+    convertedCellType shouldBe CellType.Forest
   }
