@@ -1,6 +1,7 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.config.UIConfig.forestSoilStr
+import it.unibo.firesim.model.cell.CellType
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -12,7 +13,7 @@ class CellTypeConversion extends AnyFlatSpec with Matchers:
     forestCell shouldBe Some(CellViewType.Forest)
   }
 
-  "SimController" should "convert CellViewType to CellType correctly" in {
+  "CellTypeConverter" should "convert CellViewType to CellType correctly" in {
     val forestViewCell = CellViewType.Forest
     val convertedCellType = CellTypeConverter.toModel(forestViewCell)
 
