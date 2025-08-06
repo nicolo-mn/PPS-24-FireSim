@@ -1,0 +1,13 @@
+package it.unibo.firesim.controller
+
+import it.unibo.firesim.config.UIConfig.{emptySoilStr, fireSoilStr, forestSoilStr, grassSoilStr}
+
+enum CellViewType(val soilType: String):
+  case Fire extends CellViewType(fireSoilStr)
+  case Grass extends CellViewType(grassSoilStr)
+  case Forest extends CellViewType(forestSoilStr)
+  case Empty extends CellViewType(emptySoilStr)
+
+object CellViewType:
+  def fromString(s: String): Option[CellViewType] =
+    values.find(_.soilType == s)
