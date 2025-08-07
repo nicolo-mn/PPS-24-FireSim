@@ -13,3 +13,4 @@ trait Controller:
   def startSimulation(): Unit
   def pauseResumeSimulation(): Unit
   def stopSimulation(): Unit
+  def loop(tickMs: Long): Unit
