@@ -74,5 +74,7 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val updatedCellsOnFire = Seq((1, 0))
     fireFighter.act(initialCellsOnFire)
     fireFighter.act(initialCellsOnFire)
-    fireFighter.act(updatedCellsOnFire).extinguishedCells.isEmpty should be(true)
+    fireFighter.act(updatedCellsOnFire).extinguishedCells.isEmpty should be(
+      true
+    )
   }
