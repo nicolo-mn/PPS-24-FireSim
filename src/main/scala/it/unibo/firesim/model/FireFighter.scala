@@ -43,8 +43,8 @@ class FireFighter(
 
   private var loaded = true
   private var position = station
-  private val directions: Seq[(Int, Int)] = adjacentCellsInRay(1, true)
-  private val actionableCells = adjacentCellsInRay(fireFighterRay, true)
+  private val directions: Seq[(Int, Int)] = adjacentCellsInRay(1)
+  private val actionableCells = adjacentCellsInRay(fireFighterRay)
 
   /** Moves the firefighter towards the closest fire or the station in case it
     * needs to reload, extinguishing cells when on a cell on fire
@@ -88,12 +88,8 @@ class FireFighter(
     // Chebyshev distance as 8-direction movements are allowed
     math.max(math.abs(p1._1 - p2._1), math.abs(p1._2 - p2._2))
 
-  private def adjacentCellsInRay(
-      ray: Int,
-      includeCenter: Boolean
-  ): Seq[(Int, Int)] =
+  private def adjacentCellsInRay(ray: Int): Seq[(Int, Int)] =
     for
       dr <- -ray to ray
       dc <- -ray to ray
-      if includeCenter || (dr != 0 || dc != 0) // handle center
     yield (dr, dc)
