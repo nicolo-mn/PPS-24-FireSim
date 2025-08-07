@@ -13,32 +13,32 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
   "FireFighter" should "move towards the closest fire" in {
     val fireFighter = FireFighter(rows, cols, station)
     val cellsOnFire = Seq((3, 0), (0, 4))
-    fireFighter.act(cellsOnFire).position should equal(1, 0)
-    fireFighter.act(cellsOnFire).position should equal(2, 0)
+    fireFighter.act(cellsOnFire).position should be((1, 0))
+    fireFighter.act(cellsOnFire).position should be((2, 0))
   }
 
   it should "extinguish cell only when it reaches a cell on fire" in {
     val fireFighter = FireFighter(rows, cols, station)
     val cellsOnFire = Seq((2, 0))
-    fireFighter.act(cellsOnFire) should equal(FireFighterUpdate((1, 0), Seq()))
-    fireFighter.act(cellsOnFire) should equal(FireFighterUpdate(
+    fireFighter.act(cellsOnFire) should be(FireFighterUpdate((1, 0), Seq()))
+    fireFighter.act(cellsOnFire) should be(FireFighterUpdate(
       (2, 0),
       cellsOnFire
     ))
   }
 
-  it should "adjust it direction if closer cell are set on fire" in {
+  it should "adjust it direction if closer cells are set on fire" in {
     val fireFighter = FireFighter(rows, cols, station)
     val initialCellsOnFire = Seq((4, 0))
-    val updatedCellsOnFire = initialCellsOnFire :+ (1, 2)
-    fireFighter.act(initialCellsOnFire).position should equal(1, 0)
-    fireFighter.act(updatedCellsOnFire).position should equal(1, 1)
+    val updatedCellsOnFire = initialCellsOnFire :+ (2, 1)
+    fireFighter.act(initialCellsOnFire).position should be((1, 0))
+    fireFighter.act(updatedCellsOnFire).position should be((2, 1))
   }
 
   it should "extinguish all cells on fire in its range" in {
     val fireFighter = FireFighter(rows, cols, station)
     val cellsOnFire = Seq((0, 1), (0, 2), (1, 2))
-    fireFighter.act(cellsOnFire) should equal(FireFighterUpdate(
+    fireFighter.act(cellsOnFire) should be(FireFighterUpdate(
       (0, 1),
       cellsOnFire
     ))
@@ -47,7 +47,7 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
   it should "give priority to cells on fire with an higher number of neighbors" in {
     val fireFighter = FireFighter(rows, cols, station)
     val cellsOnFire = Seq((1, 0), (1, 1), (1, 2))
-    fireFighter.act(cellsOnFire) should equal(FireFighterUpdate(
+    fireFighter.act(cellsOnFire) should be(FireFighterUpdate(
       (1, 1),
       cellsOnFire
     ))
@@ -59,11 +59,11 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val furthestFire = (0, 3)
     val initialCellsOnFire = Seq(closestFire, furthestFire)
     val updatedCellsOnFire = Seq(furthestFire)
-    fireFighter.act(initialCellsOnFire).position should equal(1, 0)
-    fireFighter.act(initialCellsOnFire).position should equal(2, 0)
-    fireFighter.act(updatedCellsOnFire).position should equal(1, 0)
-    fireFighter.act(updatedCellsOnFire).position should equal(station)
-    fireFighter.act(updatedCellsOnFire).position should equal(0, 1)
-    fireFighter.act(updatedCellsOnFire).position should equal(0, 2)
-    fireFighter.act(updatedCellsOnFire).position should equal(0, 3)
+    fireFighter.act(initialCellsOnFire).position should be((1, 0))
+    fireFighter.act(initialCellsOnFire).position should be((2, 0))
+    fireFighter.act(updatedCellsOnFire).position should be((1, 0))
+    fireFighter.act(updatedCellsOnFire).position should be(station)
+    fireFighter.act(updatedCellsOnFire).position should be((0, 1))
+    fireFighter.act(updatedCellsOnFire).position should be((0, 2))
+    fireFighter.act(updatedCellsOnFire).position should be((0, 3))
   }
