@@ -20,12 +20,12 @@ class MatrixTest extends AnyFlatSpec with Matchers:
   it should "return the correct cell for each position" in {
     val matrix =
       Vector.tabulate(3, 3)((row, col) => Cell(row, col, CellType.Forest))
-    matrix(0)(0) should equal(Cell(0, 0, CellType.Forest))
+    matrix(0)(0) should be(Cell(0, 0, CellType.Forest))
   }
 
   it should "update cells correctly" in {
     val matrix = Vector.tabulate(3, 3)((row, col) =>
       Cell(row, col, CellType.Forest)
     ).update(0, 0, Cell(0, 0, CellType.Station))
-    matrix(0)(0) should equal(Cell(0, 0, CellType.Station))
+    matrix(0)(0) should be(Cell(0, 0, CellType.Station))
   }
