@@ -67,3 +67,12 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     fireFighter.act(updatedCellsOnFire).position should be((0, 2))
     fireFighter.act(updatedCellsOnFire).position should be((0, 3))
   }
+
+  it should "not extinguish cells while unloaded" in {
+    val fireFighter = FireFighter(rows, cols, station)
+    val initialCellsOnFire = Seq((2, 0))
+    val updatedCellsOnFire = Seq((1, 0))
+    fireFighter.act(initialCellsOnFire)
+    fireFighter.act(initialCellsOnFire)
+    fireFighter.act(updatedCellsOnFire).extinguishedCells.isEmpty should be(true)
+  }
