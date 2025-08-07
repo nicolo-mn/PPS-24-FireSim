@@ -25,8 +25,7 @@ class SimController(
 
   @volatile private var running: Boolean = false
   @volatile private var paused: Boolean = false
-  @volatile private var initialized: Boolean = false
-  @volatile private var stopped: Boolean = false
+  @volatile private var mapGenerated: Boolean = false
 
   private val simView = new SimView(this)
   private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellViewType)]()
@@ -47,7 +46,7 @@ class SimController(
   override def setHumidity(humidity: Double): Unit = this.humidity = humidity
 
   override def generateMap(width: Int, height: Int): Unit = lock.synchronized {
-    initialized = true
+    mapGenerated = true
     lock.notifyAll()
   }
 
@@ -55,7 +54,7 @@ class SimController(
     placeQueue.put((pos, cellViewType))
 
   override def startSimulation(): Unit = lock.synchronized {
-    if initialized then
+    if mapGenerated then
       running = true
       paused = false
       lock.notifyAll()
@@ -66,8 +65,7 @@ class SimController(
   override def stopSimulation(): Unit = lock.synchronized {
     running = false
     paused = false
-    initialized = false
-    stopped = true
+    mapGenerated = false
     placeQueue.clear()
     lock.notifyAll()
   }
