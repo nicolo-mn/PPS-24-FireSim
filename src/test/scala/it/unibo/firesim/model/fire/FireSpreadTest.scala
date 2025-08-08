@@ -87,3 +87,15 @@ class FireSpreadTest extends AnyFunSuite with Matchers:
     val value = defaultRandomProvider()
     value should (be >= 0.0 and be <= 1.0)
   }
+
+  test("windAndHumidityAdjusted applies penalty if humidity is high") {
+    val cell = Cell(0, 0, CellType.Forest)
+    val matrix = Vector(Vector(cell.copy(cellType = CellType.Burning(0))))
+    val lowHumidity = SimParams(1, 0, 30, 30)
+    val highHumidity = SimParams(1, 0, 30, 90)
+
+    val low = windAndHumidityAdjusted(cell, lowHumidity, 0, 0, matrix)
+    val high = windAndHumidityAdjusted(cell, highHumidity, 0, 0, matrix)
+
+    high should be < low
+  }
