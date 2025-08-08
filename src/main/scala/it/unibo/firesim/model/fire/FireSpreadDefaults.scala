@@ -15,3 +15,8 @@ given defaultProbabilityCalc: ProbabilityCalc = (cell, params, r, c, matrix) =>
   val temperatureFactor = (params.temperature - 15.0) / 25.0
   base * humidityFactor * temperatureFactor
 
+given defaultBurnDuration: BurnDurationPolicy = (start, current) =>
+  (current - start) >= 3
+
+given defaultRandomProvider: RandomProvider = () =>
+  scala.util.Random.nextDouble()
