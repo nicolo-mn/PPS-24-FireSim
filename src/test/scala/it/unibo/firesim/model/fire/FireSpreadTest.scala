@@ -66,3 +66,14 @@ class FireSpreadTest extends AnyFunSuite with Matchers:
     forestProb should be <= 1.0
     grassProb should be >= 0.0
   }
+
+  test("defaultBurnDuration returns true after 3 cycles") {
+    defaultBurnDuration(5, 8) shouldBe true 
+    defaultBurnDuration(5, 7) shouldBe false
+  }
+
+  test("defaultRandomProvider returns value between 0.0 and 1.0") {
+    val value = defaultRandomProvider()
+    value should (be >= 0.0 and be <= 1.0)
+  }
+
