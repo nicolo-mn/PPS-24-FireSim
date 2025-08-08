@@ -3,9 +3,11 @@ package it.unibo.firesim.model.fire
 import it.unibo.firesim.model.{Matrix, SimParams}
 import it.unibo.firesim.model.cell.CellType
 
-
-def fireSpread(matrix: Matrix, params: SimParams, currentCycle: Int)
-              (using prob: ProbabilityCalc, burn: BurnDurationPolicy, rand: RandomProvider): Matrix =
+def fireSpread(matrix: Matrix, params: SimParams, currentCycle: Int)(using
+    prob: ProbabilityCalc,
+    burn: BurnDurationPolicy,
+    rand: RandomProvider
+): Matrix =
   matrix.zipWithIndex.map { (row, r) =>
     row.zipWithIndex.map { (cell, c) =>
       cell.cellType match
