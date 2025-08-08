@@ -4,10 +4,11 @@ import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
 import it.unibo.firesim.controller.{CellViewType, SimController}
 
-import scala.swing.event.{ButtonClicked, ValueChanged}
+import scala.swing.event.{ButtonClicked, ValueChanged, WindowClosing}
 import java.awt.{Color, Dimension}
 import javax.swing.JPanel
 import scala.annotation.tailrec
+import scala.swing.MenuBar.NoMenuBar.listenTo
 
 class GridButton(
     private val pos : (Int, Int),
@@ -175,7 +176,7 @@ class SimView(private val simController: SimController):
     horizontalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
     verticalScrollBarPolicy = ScrollPane.BarPolicy.Never
 
-  new MainFrame:
+  private val mainFrame = new MainFrame:
     title = "FireSim"
     preferredSize = new Dimension(defaultWidth, defaultHeight)
     minimumSize = new Dimension(minWidth, minHeight)
@@ -184,6 +185,22 @@ class SimView(private val simController: SimController):
       layout(boardConstraint) = BorderPanel.Position.Center
     centerOnScreen()
     visible = true
+
+  listenTo(mainFrame)
+  mainFrame.reactions += {
+    case _: WindowClosing =>
+      val response = Dialog.showConfirmation(
+        mainFrame,
+        "Are you sure you want to quit the simulation?",
+        optionType = Dialog.Options.YesNo,
+        title = "Confirm Exit"
+      )
+
+      if response == Dialog.Result.Yes then
+        simController.closing()
+        mainFrame.dispose()
+  }
+
 
   def setViewMap(updatedColors: Seq[CellViewType]): Unit =
     if updatedColors.length != gridSize * gridSize then

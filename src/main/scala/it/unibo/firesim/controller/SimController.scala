@@ -26,6 +26,7 @@ class SimController(
   @volatile private var running: Boolean = false
   @volatile private var paused: Boolean = false
   @volatile private var mapGenerated: Boolean = false
+  @volatile private var isClosing: Boolean = false
 
   private val simView = new SimView(this)
   private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellViewType)]()
@@ -70,7 +71,12 @@ class SimController(
     lock.notifyAll()
   }
 
-  override def loop(tickMs: Long = 100): Unit = ???
+  override def closing(): Unit = isClosing = true
+
+  override def loop(tickMs: Long = 100): Unit =
+    while(!isClosing) {
+
+    }
 
   /** Logic to be executed at each simulation tick.
     */
