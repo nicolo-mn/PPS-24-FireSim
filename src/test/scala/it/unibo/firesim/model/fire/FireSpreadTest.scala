@@ -36,9 +36,7 @@ class FireSpreadTest extends AnyFunSuite with Matchers:
     val params = SimParams(0, 0, 20, 50)
   
     given prob: ProbabilityCalc = (_, _, _, _, _) => 0.0
-  
     given burn: BurnDurationPolicy = (start, current) => (current - start) >= 3
-  
     given rand: RandomProvider = () => 1.0
   
     fireSpread(matrix, params, 3)(using prob, burn, rand)(0)(0).cellType shouldBe CellType.Burnt
@@ -50,9 +48,7 @@ class FireSpreadTest extends AnyFunSuite with Matchers:
     val params = SimParams(0, 0, 20, 50)
   
     given prob: ProbabilityCalc = (_, _, _, _, _) => 0.0
-  
     given burn: BurnDurationPolicy = (_, _) => false
-  
     given rand: RandomProvider = () => 0.0
   
     fireSpread(matrix, params, 1)(using prob, burn, rand)(0)(0).cellType shouldBe CellType.Grass
