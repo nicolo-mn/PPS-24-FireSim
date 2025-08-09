@@ -28,7 +28,7 @@ class GridButton(
     g.fillRect(0, 0, size.width, size.height)
 
 class SimView(private val simController: SimController):
-  private val gridSize: Int = askForGridSize()
+  private var gridSize: Int = askForGridSize()
   //TODO: notify controller
   simController.generateMap(gridSize, gridSize)
 
@@ -39,11 +39,9 @@ class SimView(private val simController: SimController):
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
   soilTypeSelector.selection.item = fireSoilStr
 
-  var gridCells: Seq[Seq[GridButton]] =
-    Seq.tabulate(gridSize, gridSize)((i, j) => new GridButton((i, j), simController, Color.white, soilTypeSelector))
+  var gridCells: Seq[Seq[GridButton]] = Seq.empty
 
   private val gridPanel = new GridPanel(gridSize, gridSize):
-    contents ++= gridCells.flatten
     // The wrapped peer needs to be overridden as the grid's parent bypasses the homonymous scala method to handle resizing
     override lazy val peer: JPanel =
       new JPanel(new java.awt.GridLayout(gridSize, gridSize)):
@@ -59,6 +57,8 @@ class SimView(private val simController: SimController):
           val s = if w > h then h else w
           new Dimension(s, s)
     override def preferredSize: Dimension = peer.getPreferredSize
+
+  generateGrid(gridSize, gridSize)
 
   // Put the grid as the only element of a GridBagPanel to keep it centered
   private val boardConstraint: Panel = new GridBagPanel:
@@ -95,6 +95,9 @@ class SimView(private val simController: SimController):
       soilTypeSelector.selection.item = fireSoilStr
       //TODO: notify controller
       simController.stopSimulation()
+      gridSize = askForGridSize()
+      generateGrid(gridSize, gridSize)
+      simController.generateMap(gridSize, gridSize)
   }
 
   pauseResumeButton.reactions += {
@@ -246,3 +249,14 @@ class SimView(private val simController: SimController):
           Dialog.Message.Error
         )
         askForGridSize()
+
+  private def generateGrid(rows: Int, cols: Int): Unit =
+    gridCells = Seq.tabulate(rows, cols) { (i, j) =>
+      new GridButton((i, j), simController, Color.white, soilTypeSelector)
+    }
+
+    gridPanel.contents.clear()
+    gridPanel.peer.setLayout(new java.awt.GridLayout(rows, cols))
+    gridPanel.contents ++= gridCells.flatten
+    gridPanel.revalidate()
+    gridPanel.repaint()
