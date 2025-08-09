@@ -2,6 +2,7 @@ package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.cell.CellType
 import it.unibo.firesim.model.{SimModel, SimParams}
+import it.unibo.firesim.util.Logger
 import it.unibo.firesim.view.SimView
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -67,6 +68,8 @@ class SimController(
   override def stopSimulation(): Unit = lock.synchronized {
     running = false
     mapGenerated = false
+    width = 0
+    height = 0
     placeQueue.clear()
     lock.notifyAll()
   }
@@ -83,11 +86,12 @@ class SimController(
     while !isClosing do
       lock.synchronized {
         while !mapGenerated do
-          lock.wait()
           if width > 0 && height > 0 then
             simView.setViewMap(model.generateMap(height, width).cells
               .flatten.map(c => CellTypeConverter.toView(c.cellType)))
             mapGenerated = true
+            Logger.log(getClass, "map generated successfully")
+          lock.wait()
       }
 
       while mapGenerated do
