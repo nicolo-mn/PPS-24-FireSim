@@ -25,7 +25,6 @@ class SimController(
   private var humidity: Double = model.getSimParams.humidity
 
   @volatile private var running: Boolean = false
-  @volatile private var paused: Boolean = false
   @volatile private var mapGenerated: Boolean = false
   @volatile private var isClosing: Boolean = false
   @volatile private var width, height: Int = 0
@@ -60,26 +59,30 @@ class SimController(
   override def startSimulation(): Unit = lock.synchronized {
     if mapGenerated then
       running = true
-      paused = false
       lock.notifyAll()
   }
 
-  override def pauseResumeSimulation(): Unit = paused = !paused
+  override def pauseResumeSimulation(): Unit = running = !running
 
   override def stopSimulation(): Unit = lock.synchronized {
     running = false
-    paused = false
     mapGenerated = false
     placeQueue.clear()
     lock.notifyAll()
   }
 
-  override def closing(): Unit = isClosing = true
+  override def closing(): Unit = lock.synchronized {
+    isClosing = true
+    running = false
+    mapGenerated = false
+    placeQueue.clear()
+    lock.notifyAll()
+  }
 
   override def loop(tickMs: Long = 100): Unit =
     while !isClosing do
       lock.synchronized {
-        while !mapGenerated || !running do
+        while !mapGenerated do
           lock.wait()
           if width > 0 && height > 0 then
             simView.setViewMap(model.generateMap(height, width).cells
@@ -87,18 +90,21 @@ class SimController(
             mapGenerated = true
       }
 
-      while running && mapGenerated do
+      while mapGenerated do
         val t0 = System.currentTimeMillis()
 
-        if !paused then
-          onTick()
-          handleQueuedCells()
+        if running then onTick()
+
+        handleQueuedCells()
+
+        //TODO: update view map with updated map from model
 
         val elapsed = System.currentTimeMillis() - t0
         val remaining = tickMs - elapsed
         Thread.sleep(math.max(0, remaining))
 
-  private def onTick(): Unit = ???
+  private def onTick(): Unit =
+    model.updateState(SimParams(windSpeed, windAngle, temperature, humidity))
 
   private def handleQueuedCells(): Unit =
     placeQueue.forEach((pos, cellType) => model.placeCell(pos, cellType))
