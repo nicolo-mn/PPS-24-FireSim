@@ -1,5 +1,6 @@
 package it.unibo.firesim.controller
 
+import it.unibo.firesim.model.cell.CellType
 import it.unibo.firesim.model.{SimModel, SimParams}
 import it.unibo.firesim.view.SimView
 
@@ -27,9 +28,10 @@ class SimController(
   @volatile private var paused: Boolean = false
   @volatile private var mapGenerated: Boolean = false
   @volatile private var isClosing: Boolean = false
+  @volatile private var width, height: Int = 0
 
   private val simView = new SimView(this)
-  private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellViewType)]()
+  private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellType)]()
 
   /** Handles a message from the view by executing the corresponding action on
     * this controller.
@@ -47,12 +49,13 @@ class SimController(
   override def setHumidity(humidity: Double): Unit = this.humidity = humidity
 
   override def generateMap(width: Int, height: Int): Unit = lock.synchronized {
-    mapGenerated = true
+    this.width = width
+    this.height = height
     lock.notifyAll()
   }
 
   override def placeCell(pos: (Int, Int), cellViewType: CellViewType): Unit =
-    placeQueue.put((pos, cellViewType))
+    placeQueue.put((pos, CellTypeConverter.toModel(cellViewType)))
 
   override def startSimulation(): Unit = lock.synchronized {
     if mapGenerated then
@@ -74,11 +77,31 @@ class SimController(
   override def closing(): Unit = isClosing = true
 
   override def loop(tickMs: Long = 100): Unit =
-    while(!isClosing) {
+    while !isClosing do
+      lock.synchronized {
+        while !mapGenerated || !running do
+          lock.wait()
+          if width > 0 && height > 0 then
+            simView.setViewMap(model.generateMap(height, width).cells
+              .flatten.map(c => CellTypeConverter.toView(c.cellType)))
+            mapGenerated = true
+      }
 
-    }
+      while running && mapGenerated do
+        val t0 = System.currentTimeMillis()
 
-  /** Logic to be executed at each simulation tick.
-    */
+        if !paused then
+          onTick()
+          handleQueuedCells()
+
+        val elapsed = System.currentTimeMillis() - t0
+        val remaining = tickMs - elapsed
+        Thread.sleep(math.max(0, remaining))
+
   private def onTick(): Unit = ???
+
+  private def handleQueuedCells(): Unit =
+    placeQueue.forEach((pos, cellType) => model.placeCell(pos, cellType))
+    placeQueue.clear()
+
 
