@@ -29,8 +29,9 @@ class GridButton(
 
 class SimView(private val simController: SimController):
   private val gridSize: Int = askForGridSize()
+  //TODO: notify controller
+  simController.generateMap(gridSize, gridSize)
 
-  // TODO: notify controller
   private val mapEditAvailableSoils =
     Seq(fireSoilStr, emptySoilStr, forestSoilStr, grassSoilStr)
 
@@ -79,7 +80,8 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(inGameAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-    // TODO: notify controller
+      //TODO: notify controller
+      simController.startSimulation()
   }
 
   resetButton.reactions += {
@@ -91,12 +93,14 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-    // TODO: notify controller
+      //TODO: notify controller
+      simController.stopSimulation()
   }
 
   pauseResumeButton.reactions += {
     case ButtonClicked(_) =>
     // TODO: notify controller
+    simController.pauseResumeSimulation()
   }
 
   private val humidityLabel =
@@ -119,6 +123,7 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         humidityLabel.text = humidityLabelText + value + humidityUnit
       // TODO: handle value changes
+        simController.setHumidity(value.toDouble)
     }
 
   private val temperatureSlider: Slider = new Slider:
@@ -129,6 +134,7 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         temperatureLabel.text = temperatureLabelText + value + temperatureUnit
       // TODO: handle value changes
+        simController.setTemperature(value.toDouble)
     }
 
   private val windDirectionSlider: Slider = new Slider:
@@ -137,9 +143,9 @@ class SimView(private val simController: SimController):
     value = defaultWindDirection
     reactions += {
       case ValueChanged(_) =>
-        windDirectionLabel.text =
-          windDirectionLabelText + value + windDirectionUnit
+        windDirectionLabel.text = windDirectionLabelText + value + windDirectionUnit
       // TODO: handle value changes
+        simController.setWindAngle(value.toDouble)
     }
 
   private val windIntensitySlider: Slider = new Slider:
@@ -148,9 +154,9 @@ class SimView(private val simController: SimController):
     value = defaultWindIntensity
     reactions += {
       case ValueChanged(_) =>
-        windIntensityLabel.text =
-          windIntensityLabelText + value + windIntensityUnit
+        windIntensityLabel.text = windIntensityLabelText + value + windIntensityUnit
       // TODO: handle value changes
+        simController.setWindSpeed(value.toDouble)
     }
 
   private val controlsPanel = new FlowPanel():
@@ -202,12 +208,16 @@ class SimView(private val simController: SimController):
   }
 
 
-  def setViewMap(updatedColors: Seq[CellViewType]): Unit =
-    if updatedColors.length != gridSize * gridSize then
+  def setViewMap(updatedGridCells: Seq[CellViewType]): Unit =
+    if updatedGridCells.length != gridSize * gridSize then
       // TODO: log error
-      return
+      Dialog.showMessage(mainFrame,
+        "Expected Seq[CellViewType] of length " + gridSize * gridSize
+        + ", found " + updatedGridCells.length + "instead",
+        messageType = Dialog.Message.Error,
+        title = "ERROR")
     else
-      gridCells.flatten.zip(updatedColors).foreach((b, c) =>
+      gridCells.flatten.zip(updatedGridCells).foreach((b, c) =>
         b.color = getCellColor(c); b.repaint()
       )
       
