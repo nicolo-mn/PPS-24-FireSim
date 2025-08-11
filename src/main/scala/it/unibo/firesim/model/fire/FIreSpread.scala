@@ -1,14 +1,14 @@
 package it.unibo.firesim.model.fire
 
 import it.unibo.firesim.model.{Matrix, SimParams}
-import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.cell.{Cell, CellType}
 
 def fireSpread(matrix: Matrix, params: SimParams, currentCycle: Int)(using
     prob: ProbabilityCalc,
     burn: BurnDurationPolicy,
     rand: RandomProvider
-): Matrix =
-  matrix.zipWithIndex.map { (row, r) =>
+): (Matrix, Seq[Cell]) =
+  val newMatrix = matrix.zipWithIndex.map { (row, r) =>
     row.zipWithIndex.map { (cell, c) =>
       cell.cellType match
         case Burning(start) =>
@@ -17,11 +17,22 @@ def fireSpread(matrix: Matrix, params: SimParams, currentCycle: Int)(using
           else cell
 
         case cellType if cellType.isFlammable =>
-          val hasBurningNeighbor = matrix.burningNeighbors(r, c).nonEmpty
-          if hasBurningNeighbor && rand() < prob(cell, params, r, c, matrix)
+          if matrix.hasBurningNeighbor(
+              r,
+              c
+            ) && rand() < prob(cell, params, r, c, matrix)
           then cell.copy(cellType = CellType.Burning(currentCycle))
           else cell
 
         case _ => cell
     }
   }
+
+  (newMatrix, computeChangedCells(matrix, newMatrix))
+
+def computeChangedCells(oldM: Matrix, newM: Matrix): Seq[Cell] =
+  for
+    (oldRow, newRow) <- oldM.zip(newM)
+    (oldCell, newCell) <- oldRow.zip(newRow)
+    if oldCell.cellType != newCell.cellType
+  yield newCell

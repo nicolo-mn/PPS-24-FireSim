@@ -18,7 +18,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     given burn: BurnDurationPolicy = (_, _) => false
     given rand: RandomProvider = () => 0.0
 
-    val result = fireSpread(matrix, params, 1)
+    val (result, changes) = fireSpread(matrix, params, 1)
     result(0)(0).cellType shouldBe CellType.Burning(1)
     result(1)(0).cellType shouldBe CellType.Burning(1)
   }
@@ -31,11 +31,9 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     given burn: BurnDurationPolicy = (start, current) => (current - start) >= 3
     given rand: RandomProvider = () => 1.0
 
-    fireSpread(
-      matrix,
-      params,
-      3
-    )(using prob, burn, rand)(0)(0).cellType shouldBe CellType.Burnt
+    val (newM2, _) =
+      fireSpread(matrix, params, 3)(using prob, burn, rand)
+    newM2(0)(0).cellType shouldBe CellType.Burnt
   }
 
   it should "not burn a cell if probability is zero" in {
@@ -48,11 +46,9 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     given burn: BurnDurationPolicy = (_, _) => false
     given rand: RandomProvider = () => 0.0
 
-    fireSpread(
-      matrix,
-      params,
-      1
-    )(using prob, burn, rand)(0)(0).cellType shouldBe CellType.Grass
+    val (newM3, _) =
+      fireSpread(matrix, params, 1)(using prob, burn, rand)
+    newM3(0)(0).cellType shouldBe CellType.Grass
   }
 
   "defaultProbabilityCalc" should "give higher probability for forest than grass" in {
@@ -69,8 +65,8 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     grassProb should be >= 0.0
   }
 
-  "defaultBurnDuration" should "return true only after 3 cycles" in {
-    defaultBurnDuration(5, 8) shouldBe true
+  "defaultBurnDuration" should "return true only after 10 cycles" in {
+    defaultBurnDuration(5, 16) shouldBe true
     defaultBurnDuration(5, 7) shouldBe false
 
   }

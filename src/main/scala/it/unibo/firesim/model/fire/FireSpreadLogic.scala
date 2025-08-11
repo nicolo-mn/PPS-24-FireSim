@@ -13,19 +13,37 @@ extension (cellType: CellType)
     case CellType.Forest | CellType.Grass => true
     case _                                => false
 
+  def isBurning: Boolean = cellType match
+    case CellType.Burning(_) => true
+    case _                   => false
+
+private val neighborDeltas: Vector[(Int, Int)] =
+  (for
+    dr <- -1 to 1;
+    dc <- -1 to 1 if !(dr == 0 && dc == 0)
+  yield (dr, dc)).toVector
+
 extension (matrix: Matrix)
 
-  def burningNeighbors(r: Int, c: Int): Seq[Cell] =
-    for
-      dr <- -1 to 1
-      dc <- -1 to 1
-      if !(dr == 0 && dc == 0)
-      nr = r + dr
-      nc = c + dc
-      if matrix.inBounds(nr, nc)
-      cell = matrix(nr)(nc)
-      if cell.cellType.isInstanceOf[CellType.Burning]
-    yield cell
+  def burningNeighbors(r: Int, c: Int): Vector[Cell] =
+    neighborDeltas.collect {
+      case (dr, dc)
+          if {
+            val nr = r + dr
+            val nc = c + dc
+            matrix.inBounds(nr, nc) && matrix(nr)(nc).cellType.isBurning
+          } =>
+        val nr = r + dr
+        val nc = c + dc
+        matrix(nr)(nc)
+    }
+
+  def hasBurningNeighbor(r: Int, c: Int): Boolean =
+    neighborDeltas.exists { case (dr, dc) =>
+      val nr = r + dr
+      val nc = c + dc
+      matrix.inBounds(nr, nc) && matrix(nr)(nc).cellType.isBurning
+    }
 
 extension (cycle: Int)
 

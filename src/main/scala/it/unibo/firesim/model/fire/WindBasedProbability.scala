@@ -3,8 +3,8 @@ package it.unibo.firesim.model.fire
 import it.unibo.firesim.model.inBounds
 import it.unibo.firesim.model.cell.CellType
 
-given windAndHumidityAdjusted: ProbabilityCalc =
-humidityAware(directionalWindProbabilityDynamic(defaultProbabilityCalc))
+def windAndHumidityAdjusted(base: ProbabilityCalc): ProbabilityCalc =
+  humidityAware(directionalWindProbabilityDynamic(base))
 
 def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
   (cell, params, r, c, matrix) =>
@@ -12,10 +12,11 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
     val rr = r + dir.dr
     val cc = c + dir.dc
 
-    val windBoost =
-      if matrix.inBounds(rr, cc) && matrix(rr)(cc).cellType.isInstanceOf[CellType.Burning]
-      then 1.5 else 1.0
+    val neighborIsBurning =
+      matrix.inBounds(rr, cc) && matrix(rr)(cc).cellType.isBurning
 
+    val speedFactor = 1.0 + math.tanh(params.windSpeed / 10.0) * 0.5
+    val windBoost = if neighborIsBurning then speedFactor else 1.0
     val baseProb = base(cell, params, r, c, matrix)
     math.min(baseProb * windBoost, 1.0)
 
@@ -33,7 +34,8 @@ enum WindDirection(val dr: Int, val dc: Int):
   case SouthWest extends WindDirection(1, -1)
   case South extends WindDirection(1, 0)
   case SouthEast extends WindDirection(1, 1)
-  
+
 private def fromAngle(angle: Double): WindDirection =
-  val normalized = ((angle + 22.5) % 360).toInt / 45
-  WindDirection.values(normalized)
+  val a0 = ((angle % 360) + 360) % 360
+  val bin = ((a0 + 22.5) / 45.0).toInt % 8
+  WindDirection.values(bin)

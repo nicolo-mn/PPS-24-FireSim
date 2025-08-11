@@ -11,12 +11,13 @@ private def baseFlammability(cell: Cell): Double =
 
 given defaultProbabilityCalc: ProbabilityCalc = (cell, params, r, c, matrix) =>
   val base = baseFlammability(cell)
-  val humidityFactor = 1.0 - params.humidity / 100.0
-  val temperatureFactor = (params.temperature - 15.0) / 25.0
-  base * humidityFactor * temperatureFactor
+  val humidityFactor = math.max(0.0, 1.0 - params.humidity / 100.0)
+  val temperatureFactor = math.max(0.0, (params.temperature - 15.0) / 25.0)
+  val p = base * humidityFactor * temperatureFactor
+  math.max(0.0, math.min(p, 1.0))
 
 given defaultBurnDuration: BurnDurationPolicy = (start, current) =>
-  (current - start) >= 3
+  (current - start) >= 10
 
 given defaultRandomProvider: RandomProvider = () =>
   scala.util.Random.nextDouble()
