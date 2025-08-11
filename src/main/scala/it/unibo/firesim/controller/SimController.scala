@@ -135,7 +135,7 @@ class SimController(
       lock.synchronized {
         while !mapGenerated do
           if width > 0 && height > 0 then
-            simView.setViewMap(model.generateMap(height, width).cells
+            simView.setViewMap(model.generateMap(height, width)
               .flatten.map(c => CellTypeConverter.toView(c.cellType)))
             mapGenerated = true
             Logger.log(getClass, "map generated successfully")
