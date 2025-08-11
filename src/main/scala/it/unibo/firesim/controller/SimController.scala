@@ -1,6 +1,11 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.model.{SimParams, SimModel}
+import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.{SimModel, SimParams}
+import it.unibo.firesim.util.Logger
+import it.unibo.firesim.view.SimView
+
+import java.util.concurrent.LinkedBlockingQueue
 
 /** SimController coordinates the interactions between the simulation model, the
   * updater (tick scheduler), and the view. It safely updates the model
@@ -8,64 +13,153 @@ import it.unibo.firesim.model.{SimParams, SimModel}
   *
   * @param model
   *   The simulation model.
-  * @param updater
-  *   The simulation updater handling the ticks.
   */
 class SimController(
-    model: SimModel,
-    updater: SimUpdater
+    model: SimModel
 ) extends Controller:
 
-  private val mutex = new Object
+  private val lock = Object()
 
-  /** Handles a message from the view by executing the corresponding action on
-    * this controller.
-    * @param msg
-    *   The message to process.
+  private var windSpeed: Double = model.getSimParams.windSpeed
+  private var windAngle: Double = model.getSimParams.windAngle
+  private var temperature: Double = model.getSimParams.temperature
+  private var humidity: Double = model.getSimParams.humidity
+
+  @volatile private var running: Boolean = false
+  @volatile private var mapGenerated: Boolean = false
+  @volatile private var isClosing: Boolean = false
+  @volatile private var width, height: Int = 0
+
+  private val simView = new SimView(this)
+  private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellType)]()
+
+  /** Handles a message from the view by executing the corresponding action on this controller.
+   *
+    * @param msg The message to process.
     */
-  def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
+  override def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
 
-  /** Utility function to update the model with thread safety.
-    * @param setter
-    *   The model setter function.
-    * @param value
-    *   The value to set.
-    * @tparam T
-    */
-  private def updateModel[T](setter: T => Unit, value: T): Unit =
-    mutex.synchronized { setter(value) }
+  /**
+   * Asynchronously sets the wind speed from view to model.
+   *
+   * @param speed The wind speed to update.
+   */
+  override def setWindSpeed(speed: Double): Unit = this.windSpeed = speed
 
-  def setWindSpeed(speed: Double): Unit = updateModel(model.setWindSpeed, speed)
-  def setWindAngle(angle: Double): Unit = updateModel(model.setWindAngle, angle)
+  /**
+   * Asynchronously sets the wind angle from view to model.
+   *
+   * @param angle The angle to update.
+   */
+  override def setWindAngle(angle: Double): Unit = this.windAngle = angle
 
-  def setTemperature(temp: Double): Unit =
-    updateModel(model.setTemperature, temp)
+  /**
+   * Asynchronously sets the temperature from view to model.
+   *
+   * @param temp The temperature to update.
+   */
+  override def setTemperature(temp: Double): Unit = this.temperature = temp
 
-  def setHumidity(humidity: Double): Unit =
-    updateModel(model.setHumidity, humidity)
+  /**
+   * Asynchronously sets the humidity from view to model.
+   *
+   * @param humidity The humidity to update.
+   */
+  override def setHumidity(humidity: Double): Unit = this.humidity = humidity
 
-  def getSimParams: SimParams = mutex.synchronized {
-    model.getSimParams
+  /**
+   * Asynchronously makes model generate a map.
+   *
+   * @param width  The width of the map.
+   * @param height The height of the map.
+   */
+  override def generateMap(width: Int, height: Int): Unit = lock.synchronized {
+    this.width = width
+    this.height = height
+    lock.notifyAll()
   }
 
-  def generateMap(width: Int, height: Int): Unit = ???
-  def placeFire(pos: (Int, Int)): Unit = ???
-  def placeBarrier(pos: (Int, Int)): Unit = ???
+  /**
+   * Asynchronously makes model try to place a cell.
+   *
+   * @param pos          The position of the cell.
+   * @param cellViewType The type of cell.
+   */
+  override def placeCell(pos: (Int, Int), cellViewType: CellViewType): Unit =
+    placeQueue.put((pos, CellTypeConverter.toModel(cellViewType)))
 
-  def startSimulation(): Unit = updater.start()
-  def pauseResumeSimulation(): Unit = updater.pauseResume()
-  def stopSimulation(): Unit = updater.stop()
-
-  /** Sets the view and the callback to be called by the updater on each
-    * simulation tick.
-    */
-  def setView(): Unit =
-    updater.setUpdateCallback(() => onTick())
-
-  /** Logic to be executed at each simulation tick.
-    */
-  private def onTick(): Unit = mutex.synchronized {
-    try {} catch
-      case ex: Exception =>
-        ex.printStackTrace()
+  /**
+   * Notifies controller that the simulation has been started.
+   */
+  override def startSimulation(): Unit = lock.synchronized {
+    if mapGenerated then
+      running = true
+      lock.notifyAll()
   }
+
+  /**
+   * Notifies controller that the simulation has been paused.
+   */
+  override def pauseResumeSimulation(): Unit = running = !running
+
+  /**
+   * Notifies controller that the simulation has been stopped.
+   */
+  override def stopSimulation(): Unit = lock.synchronized {
+    running = false
+    mapGenerated = false
+    width = 0
+    height = 0
+    placeQueue.clear()
+    lock.notifyAll()
+  }
+
+  /**
+   * Notifies controller that the program is closing.
+   */
+  override def closing(): Unit = lock.synchronized {
+    isClosing = true
+    running = false
+    mapGenerated = false
+    placeQueue.clear()
+    lock.notifyAll()
+  }
+
+  /**
+   * Main game loop. Once is called the main thread will stay in this loop until the program is closed.
+   *
+   * @param tickMs The milliseconds every tick should last: could be more (simulation has delays) but not less.
+   */
+  override def loop(tickMs: Long = 100): Unit =
+    while !isClosing do
+      lock.synchronized {
+        while !mapGenerated do
+          if width > 0 && height > 0 then
+            simView.setViewMap(model.generateMap(height, width).cells
+              .flatten.map(c => CellTypeConverter.toView(c.cellType)))
+            mapGenerated = true
+            Logger.log(getClass, "map generated successfully")
+          lock.wait()
+      }
+
+      while mapGenerated do
+        val t0 = System.currentTimeMillis()
+
+        if running then onTick()
+
+        handleQueuedCells()
+
+        //TODO: update view map with updated map from model
+
+        val elapsed = System.currentTimeMillis() - t0
+        val remaining = tickMs - elapsed
+        Thread.sleep(math.max(0, remaining))
+
+  private def onTick(): Unit =
+    model.updateState(SimParams(windSpeed, windAngle, temperature, humidity))
+
+  private def handleQueuedCells(): Unit =
+    placeQueue.forEach((pos, cellType) => model.placeCell(pos, cellType))
+    placeQueue.clear()
+
+

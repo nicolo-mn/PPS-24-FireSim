@@ -75,17 +75,6 @@ case object StopSimulation extends ViewMessage:
   * @param pos
   *   The (x, y) coordinates where the fire should be placed.
   */
-case class PlaceFire(pos: (Int, Int)) extends ViewMessage:
-  def execute(controller: SimController): Unit = controller.placeFire(pos)
+case class PlaceCell(pos: (Int, Int), cellViewType: CellViewType) extends ViewMessage:
+  def execute(controller: SimController): Unit = controller.placeCell(pos, cellViewType)
 
-/** Message to place a barrier on the map between two positions.
-  * @param startPos
-  *   The (x, y) starting coordinates of the barrier.
-  * @param finishPos
-  *   The (x, y) finishing coordinates of the barrier.
-  */
-case class PlaceBarrier(pos: (Int, Int))
-    extends ViewMessage:
-
-  def execute(controller: SimController): Unit =
-    controller.placeBarrier(pos)

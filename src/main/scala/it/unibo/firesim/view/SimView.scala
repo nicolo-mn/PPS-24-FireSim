@@ -2,22 +2,24 @@ package it.unibo.firesim.view
 
 import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
+import it.unibo.firesim.controller.{CellViewType, SimController}
 
-import scala.swing.event.{ButtonClicked, ValueChanged}
+import scala.swing.event.{ButtonClicked, ValueChanged, WindowClosing}
 import java.awt.{Color, Dimension}
 import javax.swing.JPanel
 import scala.annotation.tailrec
+import scala.swing.MenuBar.NoMenuBar.listenTo
 
 class GridButton(
+    private val pos : (Int, Int),
+    private val simController: SimController,
     var color: Color,
     private val soilTypeSelector: ComboBox[String]
 ) extends Button:
   background = color
   reactions += {
     case ButtonClicked(_) =>
-      // TODO: notify controller instead
-      color = Color.red
-      repaint()
+      simController.placeCell(pos, CellViewType.fromString(soilTypeSelector.item).getOrElse(CellViewType.Empty))
   }
 
   override def paintComponent(g: Graphics2D): Unit =
@@ -25,10 +27,11 @@ class GridButton(
     g.setColor(color)
     g.fillRect(0, 0, size.width, size.height)
 
-class SimView:
-  private val gridSize: Int = askForGridSize()
+class SimView(private val simController: SimController):
+  private var gridSize: Int = askForGridSize()
+  //TODO: notify controller
+  simController.generateMap(gridSize, gridSize)
 
-  // TODO: notify controller
   private val mapEditAvailableSoils =
     Seq(fireSoilStr, emptySoilStr, forestSoilStr, grassSoilStr)
 
@@ -36,12 +39,9 @@ class SimView:
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
   soilTypeSelector.selection.item = fireSoilStr
 
-  private val gridCells: Seq[GridButton] = Seq.fill(
-    gridSize * gridSize
-  )(new GridButton(Color.white, soilTypeSelector))
+  var gridCells: Seq[Seq[GridButton]] = Seq.empty
 
   private val gridPanel = new GridPanel(gridSize, gridSize):
-    contents ++= gridCells
     // The wrapped peer needs to be overridden as the grid's parent bypasses the homonymous scala method to handle resizing
     override lazy val peer: JPanel =
       new JPanel(new java.awt.GridLayout(gridSize, gridSize)):
@@ -57,6 +57,8 @@ class SimView:
           val s = if w > h then h else w
           new Dimension(s, s)
     override def preferredSize: Dimension = peer.getPreferredSize
+
+  generateGrid(gridSize, gridSize)
 
   // Put the grid as the only element of a GridBagPanel to keep it centered
   private val boardConstraint: Panel = new GridBagPanel:
@@ -78,7 +80,8 @@ class SimView:
         ComboBox.newConstantModel(inGameAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-    // TODO: notify controller
+      //TODO: notify controller
+      simController.startSimulation()
   }
 
   resetButton.reactions += {
@@ -90,12 +93,17 @@ class SimView:
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-    // TODO: notify controller
+      //TODO: notify controller
+      simController.stopSimulation()
+      gridSize = askForGridSize()
+      generateGrid(gridSize, gridSize)
+      simController.generateMap(gridSize, gridSize)
   }
 
   pauseResumeButton.reactions += {
     case ButtonClicked(_) =>
     // TODO: notify controller
+    simController.pauseResumeSimulation()
   }
 
   private val humidityLabel =
@@ -118,6 +126,7 @@ class SimView:
       case ValueChanged(_) =>
         humidityLabel.text = humidityLabelText + value + humidityUnit
       // TODO: handle value changes
+        simController.setHumidity(value.toDouble)
     }
 
   private val temperatureSlider: Slider = new Slider:
@@ -128,6 +137,7 @@ class SimView:
       case ValueChanged(_) =>
         temperatureLabel.text = temperatureLabelText + value + temperatureUnit
       // TODO: handle value changes
+        simController.setTemperature(value.toDouble)
     }
 
   private val windDirectionSlider: Slider = new Slider:
@@ -136,9 +146,9 @@ class SimView:
     value = defaultWindDirection
     reactions += {
       case ValueChanged(_) =>
-        windDirectionLabel.text =
-          windDirectionLabelText + value + windDirectionUnit
+        windDirectionLabel.text = windDirectionLabelText + value + windDirectionUnit
       // TODO: handle value changes
+        simController.setWindAngle(value.toDouble)
     }
 
   private val windIntensitySlider: Slider = new Slider:
@@ -147,9 +157,9 @@ class SimView:
     value = defaultWindIntensity
     reactions += {
       case ValueChanged(_) =>
-        windIntensityLabel.text =
-          windIntensityLabelText + value + windIntensityUnit
+        windIntensityLabel.text = windIntensityLabelText + value + windIntensityUnit
       // TODO: handle value changes
+        simController.setWindSpeed(value.toDouble)
     }
 
   private val controlsPanel = new FlowPanel():
@@ -175,7 +185,7 @@ class SimView:
     horizontalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
     verticalScrollBarPolicy = ScrollPane.BarPolicy.Never
 
-  new MainFrame:
+  private val mainFrame = new MainFrame:
     title = "FireSim"
     preferredSize = new Dimension(defaultWidth, defaultHeight)
     minimumSize = new Dimension(minWidth, minHeight)
@@ -185,14 +195,44 @@ class SimView:
     centerOnScreen()
     visible = true
 
-  def setViewMap(updatedColors: Seq[Color]): Unit =
-    if updatedColors.length != gridCells.length then
-      // TODO: log error
-      return
-    else
-      gridCells.zip(updatedColors).foreach((b, c) =>
-        b.color = c; b.repaint()
+  listenTo(mainFrame)
+  mainFrame.reactions += {
+    case _: WindowClosing =>
+      val response = Dialog.showConfirmation(
+        mainFrame,
+        "Are you sure you want to quit the simulation?",
+        optionType = Dialog.Options.YesNo,
+        title = "Confirm Exit"
       )
+
+      if response == Dialog.Result.Yes then
+        simController.closing()
+        mainFrame.dispose()
+  }
+
+
+  def setViewMap(updatedGridCells: Seq[CellViewType]): Unit =
+    if updatedGridCells.length != gridSize * gridSize then
+      // TODO: log error
+      Dialog.showMessage(mainFrame,
+        "Expected Seq[CellViewType] of length " + gridSize * gridSize
+        + ", found " + updatedGridCells.length + "instead",
+        messageType = Dialog.Message.Error,
+        title = "ERROR")
+    else
+      gridCells.flatten.zip(updatedGridCells).foreach((b, c) =>
+        b.color = getCellColor(c); b.repaint()
+      )
+      
+  private def getCellColor(cellViewType: CellViewType): Color =
+    cellViewType match
+      case CellViewType.Fire => Color.red
+      case CellViewType.Empty => Color.white
+      case CellViewType.Forest => Color.green.darker()
+      case CellViewType.Grass => Color.green.brighter()
+      case CellViewType.Station => Color.yellow
+      case CellViewType.Burnt => Color.gray.darker()
+      case null => Color.lightGray
 
   @tailrec
   private def askForGridSize(): Int =
@@ -209,3 +249,14 @@ class SimView:
           Dialog.Message.Error
         )
         askForGridSize()
+
+  private def generateGrid(rows: Int, cols: Int): Unit =
+    gridCells = Seq.tabulate(rows, cols) { (i, j) =>
+      new GridButton((i, j), simController, Color.white, soilTypeSelector)
+    }
+
+    gridPanel.contents.clear()
+    gridPanel.peer.setLayout(new java.awt.GridLayout(rows, cols))
+    gridPanel.contents ++= gridCells.flatten
+    gridPanel.revalidate()
+    gridPanel.repaint()
