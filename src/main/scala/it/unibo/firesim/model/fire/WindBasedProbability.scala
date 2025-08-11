@@ -1,10 +1,6 @@
 package it.unibo.firesim.model.fire
 
 import it.unibo.firesim.model.inBounds
-import it.unibo.firesim.model.cell.CellType
-
-given windAndHumidityAdjusted: ProbabilityCalc =
-  humidityAware(directionalWindProbabilityDynamic(defaultProbabilityCalc))
 
 def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
   (cell, params, r, c, matrix) =>

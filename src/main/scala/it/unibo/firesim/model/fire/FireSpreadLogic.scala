@@ -25,19 +25,6 @@ private val neighborDeltas: Vector[(Int, Int)] =
 
 extension (matrix: Matrix)
 
-  def burningNeighbors(r: Int, c: Int): Vector[Cell] =
-    neighborDeltas.collect {
-      case (dr, dc)
-          if {
-            val nr = r + dr
-            val nc = c + dc
-            matrix.inBounds(nr, nc) && matrix(nr)(nc).cellType.isBurning
-          } =>
-        val nr = r + dr
-        val nc = c + dc
-        matrix(nr)(nc)
-    }
-
   def hasBurningNeighbor(r: Int, c: Int): Boolean =
     neighborDeltas.exists { case (dr, dc) =>
       val nr = r + dr

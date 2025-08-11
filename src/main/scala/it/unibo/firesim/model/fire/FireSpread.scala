@@ -7,8 +7,8 @@ def fireSpread(matrix: Matrix, params: SimParams, currentCycle: Int)(using
     prob: ProbabilityCalc,
     burn: BurnDurationPolicy,
     rand: RandomProvider
-): (Matrix, Seq[Cell]) =
-  val newMatrix = matrix.zipWithIndex.map { (row, r) =>
+): Matrix =
+  matrix.zipWithIndex.map { (row, r) =>
     row.zipWithIndex.map { (cell, c) =>
       cell.cellType match
         case Burning(start) =>
@@ -27,8 +27,6 @@ def fireSpread(matrix: Matrix, params: SimParams, currentCycle: Int)(using
         case _ => cell
     }
   }
-
-  (newMatrix, computeChangedCells(matrix, newMatrix))
 
 def computeChangedCells(oldM: Matrix, newM: Matrix): Seq[Cell] =
   for

@@ -4,6 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import it.unibo.firesim.model.{Matrix, SimParams}
 import it.unibo.firesim.model.cell.{Cell, CellType}
+import it.unibo.firesim.model.fire.WindyHumidDefaults.given
 
 class FireSpreadTest extends AnyFlatSpec with Matchers:
 
@@ -18,7 +19,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     given burn: BurnDurationPolicy = (_, _) => false
     given rand: RandomProvider = () => 0.0
 
-    val (result, changes) = fireSpread(matrix, params, 1)
+    val result = fireSpread(matrix, params, 1)
     result(0)(0).cellType shouldBe CellType.Burning(1)
     result(1)(0).cellType shouldBe CellType.Burning(1)
   }
@@ -31,9 +32,8 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     given burn: BurnDurationPolicy = (start, current) => (current - start) >= 3
     given rand: RandomProvider = () => 1.0
 
-    val (newM2, _) =
-      fireSpread(matrix, params, 3)(using prob, burn, rand)
-    newM2(0)(0).cellType shouldBe CellType.Burnt
+    val newM = fireSpread(matrix, params, 3)(using prob, burn, rand)
+    newM(0)(0).cellType shouldBe CellType.Burnt
   }
 
   it should "not burn a cell if probability is zero" in {
@@ -46,9 +46,8 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     given burn: BurnDurationPolicy = (_, _) => false
     given rand: RandomProvider = () => 0.0
 
-    val (newM3, _) =
-      fireSpread(matrix, params, 1)(using prob, burn, rand)
-    newM3(0)(0).cellType shouldBe CellType.Grass
+    val newM = fireSpread(matrix, params, 1)(using prob, burn, rand)
+    newM(0)(0).cellType shouldBe CellType.Grass
   }
 
   "defaultProbabilityCalc" should "give higher probability for forest than grass" in {
@@ -82,8 +81,9 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val lowHumidity = SimParams(1, 0, 30, 30)
     val highHumidity = SimParams(1, 0, 30, 90)
 
-    val low = windAndHumidityAdjusted(cell, lowHumidity, 0, 0, matrix)
-    val high = windAndHumidityAdjusted(cell, highHumidity, 0, 0, matrix)
+    val p = summon[ProbabilityCalc]
+    val low = p(cell, lowHumidity, 0, 0, matrix)
+    val high = p(cell, highHumidity, 0, 0, matrix)
 
     high should be < low
   }
