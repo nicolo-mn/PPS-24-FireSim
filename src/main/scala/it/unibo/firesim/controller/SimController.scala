@@ -5,6 +5,7 @@ import it.unibo.firesim.model.{SimModel, SimParams}
 import it.unibo.firesim.util.Logger
 import it.unibo.firesim.view.SimView
 
+import scala.jdk.CollectionConverters._
 import java.util.concurrent.LinkedBlockingQueue
 
 /** SimController coordinates the interactions between the simulation model, the
@@ -24,6 +25,9 @@ class SimController(
   private var windAngle: Double = model.getSimParams.windAngle
   private var temperature: Double = model.getSimParams.temperature
   private var humidity: Double = model.getSimParams.humidity
+
+  private var matrix: Vector[Vector[CellType]] = Vector.empty
+  private var firefighters: Seq[(Int, Int)] = Seq.empty
 
   @volatile private var running: Boolean = false
   @volatile private var mapGenerated: Boolean = false
@@ -161,5 +165,8 @@ class SimController(
     model.updateState(SimParams(windSpeed, windAngle, temperature, humidity))
 
   private def handleQueuedCells(): Unit =
-    placeQueue.forEach((pos, cellType) => model.placeCell(pos, cellType))
-    placeQueue.clear()
+    val buffer = new java.util.ArrayList[((Int, Int), CellType)]
+    placeQueue.drainTo(buffer)
+    val (newMatrix, newFirefighters) = model.placeCells(buffer.asScala.toSeq)
+    matrix = newMatrix
+    firefighters = newFirefighters

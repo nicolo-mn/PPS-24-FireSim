@@ -12,6 +12,7 @@ class SimModel(
 ):
 
   private var matrix: Matrix = Vector.empty
+  private var firefighters: Seq[(Int, Int)] = Seq.empty
 
   /** Generates a map with the specified number of rows and columns.
     *
@@ -145,7 +146,11 @@ class SimModel(
   def setHumidity(humidity: Double): Unit =
     simParams = simParams.copy(humidity = humidity)
 
-  def placeCell(pos: (Int, Int), cellType: CellType): Unit =
+  def placeCells(cells: Seq[((Int, Int), CellType)]): (Matrix, Seq[(Int, Int)]) =
+    cells.foreach((p, cT) => placeCell(p, cT))
+    (matrix, firefighters)
+
+  private def placeCell(pos: (Int, Int), cellType: CellType): Unit =
     val (r, c) = pos
     val oldCell = matrix(r)(c)
 
