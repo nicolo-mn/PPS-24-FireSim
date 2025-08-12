@@ -11,7 +11,7 @@ import scala.annotation.tailrec
 import scala.swing.MenuBar.NoMenuBar.listenTo
 
 class GridButton(
-    private val pos : (Int, Int),
+    private val pos: (Int, Int),
     private val simController: SimController,
     var color: Color,
     private val soilTypeSelector: ComboBox[String]
@@ -19,7 +19,12 @@ class GridButton(
   background = color
   reactions += {
     case ButtonClicked(_) =>
-      simController.placeCell(pos, CellViewType.fromString(soilTypeSelector.item).getOrElse(CellViewType.Empty))
+      simController.placeCell(
+        pos,
+        CellViewType.fromString(
+          soilTypeSelector.item
+        ).getOrElse(CellViewType.Empty)
+      )
   }
 
   override def paintComponent(g: Graphics2D): Unit =
@@ -29,7 +34,7 @@ class GridButton(
 
 class SimView(private val simController: SimController):
   private var gridSize: Int = askForGridSize()
-  //TODO: notify controller
+  // TODO: notify controller
   simController.generateMap(gridSize, gridSize)
 
   private val mapEditAvailableSoils =
@@ -80,7 +85,7 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(inGameAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-      //TODO: notify controller
+      // TODO: notify controller
       simController.startSimulation()
   }
 
@@ -93,7 +98,7 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-      //TODO: notify controller
+      // TODO: notify controller
       simController.stopSimulation()
       gridSize = askForGridSize()
       generateGrid(gridSize, gridSize)
@@ -102,8 +107,8 @@ class SimView(private val simController: SimController):
 
   pauseResumeButton.reactions += {
     case ButtonClicked(_) =>
-    // TODO: notify controller
-    simController.pauseResumeSimulation()
+      // TODO: notify controller
+      simController.pauseResumeSimulation()
   }
 
   private val humidityLabel =
@@ -125,7 +130,7 @@ class SimView(private val simController: SimController):
     reactions += {
       case ValueChanged(_) =>
         humidityLabel.text = humidityLabelText + value + humidityUnit
-      // TODO: handle value changes
+        // TODO: handle value changes
         simController.setHumidity(value.toDouble)
     }
 
@@ -136,7 +141,7 @@ class SimView(private val simController: SimController):
     reactions += {
       case ValueChanged(_) =>
         temperatureLabel.text = temperatureLabelText + value + temperatureUnit
-      // TODO: handle value changes
+        // TODO: handle value changes
         simController.setTemperature(value.toDouble)
     }
 
@@ -146,8 +151,9 @@ class SimView(private val simController: SimController):
     value = defaultWindDirection
     reactions += {
       case ValueChanged(_) =>
-        windDirectionLabel.text = windDirectionLabelText + value + windDirectionUnit
-      // TODO: handle value changes
+        windDirectionLabel.text =
+          windDirectionLabelText + value + windDirectionUnit
+        // TODO: handle value changes
         simController.setWindAngle(value.toDouble)
     }
 
@@ -157,8 +163,9 @@ class SimView(private val simController: SimController):
     value = defaultWindIntensity
     reactions += {
       case ValueChanged(_) =>
-        windIntensityLabel.text = windIntensityLabelText + value + windIntensityUnit
-      // TODO: handle value changes
+        windIntensityLabel.text =
+          windIntensityLabelText + value + windIntensityUnit
+        // TODO: handle value changes
         simController.setWindSpeed(value.toDouble)
     }
 
@@ -210,29 +217,30 @@ class SimView(private val simController: SimController):
         mainFrame.dispose()
   }
 
-
   def setViewMap(updatedGridCells: Seq[CellViewType]): Unit =
     if updatedGridCells.length != gridSize * gridSize then
       // TODO: log error
-      Dialog.showMessage(mainFrame,
+      Dialog.showMessage(
+        mainFrame,
         "Expected Seq[CellViewType] of length " + gridSize * gridSize
-        + ", found " + updatedGridCells.length + "instead",
+          + ", found " + updatedGridCells.length + "instead",
         messageType = Dialog.Message.Error,
-        title = "ERROR")
+        title = "ERROR"
+      )
     else
       gridCells.flatten.zip(updatedGridCells).foreach((b, c) =>
         b.color = getCellColor(c); b.repaint()
       )
-      
+
   private def getCellColor(cellViewType: CellViewType): Color =
     cellViewType match
-      case CellViewType.Fire => Color.red
-      case CellViewType.Empty => Color.white
-      case CellViewType.Forest => Color.green.darker()
-      case CellViewType.Grass => Color.green.brighter()
+      case CellViewType.Fire    => Color.red
+      case CellViewType.Empty   => Color.white
+      case CellViewType.Forest  => Color.green.darker()
+      case CellViewType.Grass   => Color.green.brighter()
       case CellViewType.Station => Color.yellow
-      case CellViewType.Burnt => Color.gray.darker()
-      case null => Color.lightGray
+      case CellViewType.Burnt   => Color.gray.darker()
+      case null                 => Color.lightGray
 
   @tailrec
   private def askForGridSize(): Int =

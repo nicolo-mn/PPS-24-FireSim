@@ -1,8 +1,8 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.Cell
+import it.unibo.firesim.model.cell.CellType
 
-type Matrix = Vector[Vector[Cell]]
+type Matrix = Vector[Vector[CellType]]
 
 extension (matrix: Matrix)
   /** Matrix rows
@@ -21,13 +21,13 @@ extension (matrix: Matrix)
     *   Row index
     * @param c
     *   Column index
-    * @param newCell
-    *   The new cell to place at (r, c)
+    * @param newCellType
+    *   The new cellType to place at (r, c)
     * @return
     *   A new Matrix with the updated cell
     */
-  def update(r: Int, c: Int, newCell: Cell): Matrix =
-    matrix.updated(r, matrix(r).updated(c, newCell))
+  def update(r: Int, c: Int, newCellType: CellType): Matrix =
+    matrix.updated(r, matrix(r).updated(c, newCellType))
 
   /** @param r
     *   Row index

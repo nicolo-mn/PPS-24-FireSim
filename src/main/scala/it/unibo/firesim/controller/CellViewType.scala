@@ -11,5 +11,6 @@ enum CellViewType(val soilType: String):
   case Station extends CellViewType(stationSoilStr)
 
 object CellViewType:
+
   def fromString(s: String): Option[CellViewType] =
     values.find(_.soilType == s)

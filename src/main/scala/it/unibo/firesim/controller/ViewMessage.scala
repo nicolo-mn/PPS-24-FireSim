@@ -75,6 +75,8 @@ case object StopSimulation extends ViewMessage:
   * @param pos
   *   The (x, y) coordinates where the fire should be placed.
   */
-case class PlaceCell(pos: (Int, Int), cellViewType: CellViewType) extends ViewMessage:
-  def execute(controller: SimController): Unit = controller.placeCell(pos, cellViewType)
+case class PlaceCell(pos: (Int, Int), cellViewType: CellViewType)
+    extends ViewMessage:
 
+  def execute(controller: SimController): Unit =
+    controller.placeCell(pos, cellViewType)

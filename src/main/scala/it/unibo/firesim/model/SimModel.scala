@@ -1,6 +1,6 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.{Cell, CellType}
+import it.unibo.firesim.model.cell.CellType
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -21,7 +21,7 @@ class SimModel(
     */
   def generateMap(rows: Int, cols: Int): Matrix =
     val matrix = Vector.tabulate(rows, cols) { (r, c) =>
-      Cell(r, c, CellType.Empty)
+      CellType.Empty
     }
 
     val forestSeedFrequency = 0.02 // 2%
@@ -44,9 +44,9 @@ class SimModel(
     val grassSeeds: Seq[(Int, Int)] =
       (0 until withForests.rows).flatMap { r =>
         (0 until withForests.cols).flatMap { c =>
-          if withForests(r)(c).cellType == CellType.Forest then
+          if withForests(r)(c) == CellType.Forest then
             neighbors(r, c, withForests).filter { case (nr, nc) =>
-              withForests(nr)(nc).cellType == CellType.Empty
+              withForests(nr)(nc) == CellType.Empty
             }
           else
             Seq.empty
@@ -74,7 +74,7 @@ class SimModel(
       m.update(
         pos._1,
         pos._2,
-        Cell(pos._1, pos._2, CellType.Station)
+        CellType.Station
       )
     )
 
@@ -88,7 +88,7 @@ class SimModel(
   ): Seq[(Int, Int)] =
     val emptyCells = (0 until rows).flatMap { r =>
       (0 until cols).collect {
-        case c if matrix(r)(c).cellType == CellType.Empty => (r, c)
+        case c if matrix(r)(c) == CellType.Empty => (r, c)
       }
     }
     if emptyCells.isEmpty then
@@ -118,10 +118,10 @@ class SimModel(
       if count >= clusterSize || queue.isEmpty then m
       else
         val (r, c) = queue.head
-        val newMatrix = m.update(r, c, Cell(r, c, growthType))
+        val newMatrix = m.update(r, c, growthType)
         val next = neighbors(r, c, newMatrix)
           .filterNot(visited.contains)
-          .filter((r, c) => m(r)(c).cellType == CellType.Empty)
+          .filter((r, c) => m(r)(c) == CellType.Empty)
           .filter(_ => random.nextDouble() < growthProbability)
         expand(queue.tail ++ next, visited + ((r, c)), count + 1, newMatrix)
 
@@ -143,9 +143,9 @@ class SimModel(
 
   def placeCell(pos: (Int, Int), cellType: CellType): Unit = ???
 
-  def updateState(params: SimParams): (Matrix, Seq[Cell]) = ???
+  def updateState(params: SimParams): (Matrix, Seq[(Int, Int)]) = ???
 
-  def extinguishCells(burntCells: Seq[Cell]): Unit = ???
+  def extinguishCells(burntCells: Seq[(Int, Int)]): Unit = ???
 
   private def generateSeeds(rows: Int, cols: Int, count: Int): Seq[(Int, Int)] =
     Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))

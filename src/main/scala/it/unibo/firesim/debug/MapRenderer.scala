@@ -17,5 +17,5 @@ object MapRenderer extends App:
     case _                => Console.WHITE + "x" + Console.RESET
 
   matrix.foreach { row =>
-    println(row.map(cell => render(cell.cellType)).mkString(" "))
+    println(row.map(cellType => render(cellType)).mkString(" "))
   }

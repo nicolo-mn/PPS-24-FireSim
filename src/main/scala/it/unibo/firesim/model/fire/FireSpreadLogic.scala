@@ -1,9 +1,9 @@
 package it.unibo.firesim.model.fire
 
 import it.unibo.firesim.model.{Matrix, SimParams, inBounds}
-import it.unibo.firesim.model.cell.{Cell, CellType}
+import it.unibo.firesim.model.cell.CellType
 
-type ProbabilityCalc = (Cell, SimParams, Int, Int, Matrix) => Double
+type ProbabilityCalc = (CellType, SimParams, Int, Int, Matrix) => Double
 type BurnDurationPolicy = (Int, Int) => Boolean
 type RandomProvider = () => Double
 
@@ -29,7 +29,7 @@ extension (matrix: Matrix)
     neighborDeltas.exists { case (dr, dc) =>
       val nr = r + dr
       val nc = c + dc
-      matrix.inBounds(nr, nc) && matrix(nr)(nc).cellType.isBurning
+      matrix.inBounds(nr, nc) && matrix(nr)(nc).isBurning
     }
 
 extension (cycle: Int)
