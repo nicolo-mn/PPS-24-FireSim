@@ -12,7 +12,7 @@ class SimModel(
 ):
 
   private var matrix: Matrix = Vector.empty
-  private var firefighters: Seq[(Int, Int)] = Seq.empty
+  private val firefighters: Seq[(Int, Int)] = Seq.empty
 
   /** Generates a map with the specified number of rows and columns.
     *
@@ -148,7 +148,8 @@ class SimModel(
   def setHumidity(humidity: Double): Unit =
     simParams = simParams.copy(humidity = humidity)
 
-  def placeCells(cells: Seq[((Int, Int), CellType)]): (Matrix, Seq[(Int, Int)]) =
+  def placeCells(cells: Seq[((Int, Int), CellType)])
+      : (Matrix, Seq[(Int, Int)]) =
     cells.foreach((p, cT) => placeCell(p, cT))
     (matrix, firefighters)
 
@@ -159,13 +160,14 @@ class SimModel(
     if oldCell == cellType || oldCell == Station then return
 
     cellType match
-      case Burning(_) | Burnt => if oldCell == Forest || oldCell == Grass then matrix = matrix.update(r, c, cellType)
+      case Burning(_) | Burnt => if oldCell == Forest || oldCell == Grass then
+          matrix = matrix.update(r, c, cellType)
       case _ => matrix = matrix.update(r, c, cellType)
-
 
   def updateState(params: SimParams): (Matrix, Seq[(Int, Int)]) = ???
 
-  def extinguishCells(burntCells: Seq[(Int, Int)]): Unit = burntCells.foreach(p => placeCell(p, Burnt))
+  def extinguishCells(burntCells: Seq[(Int, Int)]): Unit =
+    burntCells.foreach(p => placeCell(p, Burnt))
 
   private def generateSeeds(rows: Int, cols: Int, count: Int): Seq[(Int, Int)] =
     Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))

@@ -154,7 +154,9 @@ class SimController(
 
         handleQueuedCells()
 
-        simView.setViewMap(matrix.flatten.map(cT => CellTypeConverter.toView(cT)))
+        simView.setViewMap(matrix.flatten.map(cT =>
+          CellTypeConverter.toView(cT)
+        ))
 
         val elapsed = System.currentTimeMillis() - t0
         val remaining = tickMs - elapsed
@@ -168,5 +170,6 @@ class SimController(
     placeQueue.drainTo(buffer)
     val (newMatrix, newFirefighters) = model.placeCells(buffer.asScala.toSeq)
     matrix = newMatrix
-    newFirefighters.foreach((i, j) => matrix = matrix.update(i, j, CellType.Firefighter))
-
+    newFirefighters.foreach((i, j) =>
+      matrix = matrix.update(i, j, CellType.Firefighter)
+    )

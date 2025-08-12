@@ -40,10 +40,11 @@ extension (matrix: Matrix)
     r >= 0 && r < matrix.length &&
       c >= 0 && c < matrix(r).length
 
-  /**
-   * @param cellType The searched type of cells
-   * @return The positions of the cells of that particular type
-   */
+  /** @param cellType
+    *   The searched type of cells
+    * @return
+    *   The positions of the cells of that particular type
+    */
   def positionsOf(cellType: CellType): Seq[(Int, Int)] =
     matrix.zipWithIndex.flatMap { case (row, i) =>
       row.zipWithIndex.collect {
