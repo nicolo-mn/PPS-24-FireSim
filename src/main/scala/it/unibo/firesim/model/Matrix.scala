@@ -39,3 +39,14 @@ extension (matrix: Matrix)
   def inBounds(r: Int, c: Int): Boolean =
     r >= 0 && r < matrix.length &&
       c >= 0 && c < matrix(r).length
+
+  /**
+   * @param cellType The searched type of cells
+   * @return The positions of the cells of that particular type
+   */
+  def positionsOf(cellType: CellType): Seq[(Int, Int)] =
+    matrix.zipWithIndex.flatMap { case (row, i) =>
+      row.zipWithIndex.collect {
+        case (cT, j) if cT == cellType => (i, j)
+      }
+    }
