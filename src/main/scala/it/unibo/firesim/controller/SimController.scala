@@ -1,11 +1,11 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.{SimModel, SimParams}
+import it.unibo.firesim.model.{Matrix, update, SimModel, SimParams}
 import it.unibo.firesim.util.Logger
 import it.unibo.firesim.view.SimView
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import java.util.concurrent.LinkedBlockingQueue
 
 /** SimController coordinates the interactions between the simulation model, the
@@ -26,8 +26,7 @@ class SimController(
   private var temperature: Double = model.getSimParams.temperature
   private var humidity: Double = model.getSimParams.humidity
 
-  private var matrix: Vector[Vector[CellType]] = Vector.empty
-  private var firefighters: Seq[(Int, Int)] = Seq.empty
+  private var matrix: Matrix = Vector.empty
 
   @volatile private var running: Boolean = false
   @volatile private var mapGenerated: Boolean = false
@@ -155,7 +154,7 @@ class SimController(
 
         handleQueuedCells()
 
-        // TODO: update view map with updated map from model
+        simView.setViewMap(matrix.flatten.map(cT => CellTypeConverter.toView(cT)))
 
         val elapsed = System.currentTimeMillis() - t0
         val remaining = tickMs - elapsed
@@ -169,4 +168,5 @@ class SimController(
     placeQueue.drainTo(buffer)
     val (newMatrix, newFirefighters) = model.placeCells(buffer.asScala.toSeq)
     matrix = newMatrix
-    firefighters = newFirefighters
+    newFirefighters.foreach((i, j) => matrix = matrix.update(i, j, CellType.Firefighter))
+
