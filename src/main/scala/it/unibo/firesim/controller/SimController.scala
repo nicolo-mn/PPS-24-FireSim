@@ -144,7 +144,7 @@ class SimController(
               .flatten.map(CellTypeConverter.toView))
             mapGenerated = true
             Logger.log(getClass, "map generated successfully")
-          lock.wait()
+          else lock.wait()
       }
 
       while mapGenerated do
