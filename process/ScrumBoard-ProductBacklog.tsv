@@ -1,16 +1,21 @@
 Title	Priority	Assignees	Status	Estimate	Size	Sprint
 Creation of enums and classes about cells (CellType, CellState etc.)	P0	mRickk	Done		S	Sprint 1
 Initial GUI with sliders for parameters, view map update method and popup to select grid dimension	P0	nicolo-mn	Done		M	Sprint 1
-Manage FireFighter logic	P0	nicolo-mn	Ready		L	Sprint 2
-Fire diffusion	P0	juriGug	Ready		M	Sprint 2
-Implement SimUpdater loop without buttons management	P0	mRickk	Ready		M	Sprint 2
-Implement preliminary stages of SimController (e.g. map generation, fire placement, etc.), Add params management in view and controller	P0	mRickk	Ready		S	Sprint 2
-Fire placing logic in model	P0		Backlog		M	
+Manage FireFighter logic	P0	nicolo-mn	Done		L	Sprint 2
+Fire diffusion	P0	juriGug	Done		M	Sprint 2
+Implement SimUpdater loop without buttons management	P0	mRickk	Done		M	Sprint 2
+Implement preliminary stages of SimController (e.g. map generation, fire placement, etc.), Add params management in view and controller	P0	mRickk	Done		S	Sprint 2
+Cell placing logic in model	P0	mRickk	Ready		S	Sprint 3
 Add SimUpdater interface, implementing logic independent from view and model	P0	juriGug	Done		S	Sprint 1
-Make SimParams and correct SimModel interface (with tests up to date)	P0	juriGug	Ready		S	Sprint 2
+Make SimParams and correct SimModel interface (with tests up to date)	P0	juriGug	Done		S	Sprint 2
+Update state, finish first working SimModel	P0	mRickk	Ready		S	Sprint 3
+Remove Cell, use CellType instead	P0	nicolo-mn	Ready		S	Sprint 3
+Add Rock in CellType, adjust map generation. Add FireFighter cell types and its conversions	P0	nicolo-mn	Ready		S	Sprint 3
+Calculate barrier line from 2 points	P0	juriGug	Ready		S	Sprint 3
+Change SimParams types and update	P0	juriGug	Ready		S	Sprint 3
 Basic map creation algorithm	P1	mRickk	Done		M	Sprint 1
 Implement SimController to receive messages from view	P1	juriGug	Done		S	Sprint 1
-Implement start, stop, pause, resume :(	P1		Backlog		L	
+Implement start, stop, pause, resume	P1		Backlog		L	
 FireFighter view	P1		Backlog		M	
 Link view and model map	P1		Backlog		S	
 GUI parameter selectors buttons	P1	nicolo-mn	Done		S	Sprint 1
