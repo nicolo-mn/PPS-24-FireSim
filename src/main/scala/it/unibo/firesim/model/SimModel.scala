@@ -82,6 +82,8 @@ class SimModel(
       )
     )
 
+    // withStations.positionsOf(Station).foreach(s => firefighters = firefighters :+ FireFighter(rows, cols, s)) //TODO: check how and when to get positions
+
     this.matrix = withStations
     withStations
 
@@ -163,7 +165,7 @@ class SimModel(
 
   def updateState(params: SimParams): (Matrix, Seq[(Int, Int)]) = ???
 
-  def extinguishCells(burntCells: Seq[(Int, Int)]): Unit = ???
+  def extinguishCells(burntCells: Seq[(Int, Int)]): Unit = burntCells.foreach(p => placeCell(p, Burnt))
 
   private def generateSeeds(rows: Int, cols: Int, count: Int): Seq[(Int, Int)] =
     Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))
