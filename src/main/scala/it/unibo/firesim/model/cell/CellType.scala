@@ -11,5 +11,5 @@ package it.unibo.firesim.model.cell
   *   - `Burnt`: the cell has burnt out and is no longer active.
   */
 enum CellType:
-  case Forest, Grass, Empty, Station, Burnt
+  case Forest, Grass, Empty, Station, Burnt, Rock, Firefighter
   case Burning(startCycle: Int)

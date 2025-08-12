@@ -35,4 +35,6 @@ object UIConfig:
   val emptySoilStr: String = "Empty\uD83D\uDED1"
   val burntSoilStr: String = "Burnt"
   val stationSoilStr: String = "Station"
+  val rockSoilStr: String = "Rock"
+  val firefighterStr: String = "Firefighter"
   val minimumGridSize: Int = 6

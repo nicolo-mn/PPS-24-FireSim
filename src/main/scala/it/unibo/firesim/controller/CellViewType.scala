@@ -1,6 +1,6 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.config.UIConfig.{burntSoilStr, emptySoilStr, fireSoilStr, forestSoilStr, grassSoilStr, stationSoilStr}
+import it.unibo.firesim.config.UIConfig.{burntSoilStr, emptySoilStr, fireSoilStr, firefighterStr, forestSoilStr, grassSoilStr, rockSoilStr, stationSoilStr}
 
 enum CellViewType(val soilType: String):
   case Fire extends CellViewType(fireSoilStr)
@@ -9,6 +9,8 @@ enum CellViewType(val soilType: String):
   case Empty extends CellViewType(emptySoilStr)
   case Burnt extends CellViewType(burntSoilStr)
   case Station extends CellViewType(stationSoilStr)
+  case Rock extends CellViewType(rockSoilStr)
+  case Firefighter extends CellViewType(firefighterStr)
 
 object CellViewType:
 

@@ -39,12 +39,12 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     forests should be > 0
   }
 
-  it should "generate a map with low percentage of empty cells" in {
+  it should "generate a map with low percentage of rock cells" in {
     val model = SimModel()
     val matrix = model.generateMap(100, 100)
 
     val emptyCellsCount =
-      matrix.flatten.count(_ == CellType.Empty)
+      matrix.flatten.count(_ == CellType.Rock)
     val totalCellsCount = matrix.rows * matrix.cols
 
     emptyCellsCount should be < (totalCellsCount * 0.1).toInt
