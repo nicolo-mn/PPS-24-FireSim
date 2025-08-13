@@ -8,9 +8,11 @@ import scala.util.Random
 
 class SimModel(
     random: Random = Random(),
-    private var simParams: SimParams = SimParams(1, 0, 25, 50)
+    initial: SimParams = SimParams(1, 0, 25, 50)
 ):
 
+  private val lock = new AnyRef
+  private var params = initial
   private var matrix: Matrix = Vector.empty
   private val firefighters: Seq[(Int, Int)] = Seq.empty
 
@@ -134,19 +136,11 @@ class SimModel(
 
     expand(Seq(seed), Set.empty, 0, matrix)
 
-  def getSimParams: SimParams = simParams
+  def getSimParams: SimParams =
+    lock.synchronized { params }
 
-  def setWindSpeed(speed: Int): Unit =
-    simParams = simParams.copy(windSpeed = speed)
-
-  def setWindAngle(angle: Int): Unit =
-    simParams = simParams.copy(windAngle = angle)
-
-  def setTemperature(temp: Int): Unit =
-    simParams = simParams.copy(temperature = temp)
-
-  def setHumidity(humidity: Int): Unit =
-    simParams = simParams.copy(humidity = humidity)
+  def updateParams(f: SimParams => SimParams): Unit =
+    lock.synchronized { params = f(params) }
 
   def placeCells(cells: Seq[((Int, Int), CellType)])
       : (Matrix, Seq[(Int, Int)]) =
@@ -164,7 +158,7 @@ class SimModel(
           matrix = matrix.update(r, c, cellType)
       case _ => matrix = matrix.update(r, c, cellType)
 
-  def updateState(params: SimParams): (Matrix, Seq[(Int, Int)]) = ???
+  def updateState(): (Matrix, Seq[(Int, Int)]) = ???
 
   def extinguishCells(burntCells: Seq[(Int, Int)]): Unit =
     burntCells.foreach(p => placeCell(p, Burnt))

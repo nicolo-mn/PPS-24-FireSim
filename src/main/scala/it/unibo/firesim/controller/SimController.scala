@@ -1,7 +1,7 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.{Matrix, update, SimModel, SimParams}
+import it.unibo.firesim.model.{Matrix, update, SimModel}
 import it.unibo.firesim.util.Logger
 import it.unibo.firesim.view.SimView
 
@@ -20,11 +20,6 @@ class SimController(
 ) extends Controller:
 
   private val lock = Object()
-
-  private var windSpeed: Int = model.getSimParams.windSpeed
-  private var windAngle: Int = model.getSimParams.windAngle
-  private var temperature: Int = model.getSimParams.temperature
-  private var humidity: Int = model.getSimParams.humidity
 
   private var matrix: Matrix = Vector.empty
 
@@ -49,28 +44,32 @@ class SimController(
     * @param speed
     *   The wind speed to update.
     */
-  override def setWindSpeed(speed: Int): Unit = this.windSpeed = speed
+  override def setWindSpeed(speed: Int): Unit =
+    model.updateParams(_.copy(windSpeed = speed))
 
   /** Asynchronously sets the wind angle from view to model.
     *
     * @param angle
     *   The angle to update.
     */
-  override def setWindAngle(angle: Int): Unit = this.windAngle = angle
+  override def setWindAngle(angle: Int): Unit =
+    model.updateParams(_.copy(windAngle = angle))
 
   /** Asynchronously sets the temperature from view to model.
     *
     * @param temp
     *   The temperature to update.
     */
-  override def setTemperature(temp: Int): Unit = this.temperature = temp
+  override def setTemperature(temp: Int): Unit =
+    model.updateParams(_.copy(temperature = temp))
 
   /** Asynchronously sets the humidity from view to model.
     *
     * @param humidity
     *   The humidity to update.
     */
-  override def setHumidity(humidity: Int): Unit = this.humidity = humidity
+  override def setHumidity(humidity: Int): Unit =
+    model.updateParams(_.copy(humidity = humidity))
 
   /** Asynchronously makes model generate a map.
     *
@@ -163,7 +162,7 @@ class SimController(
         Thread.sleep(math.max(0, remaining))
 
   private def onTick(): Unit =
-    model.updateState(SimParams(windSpeed, windAngle, temperature, humidity))
+    model.updateState()
 
   private def handleQueuedCells(): Unit =
     val buffer = new java.util.ArrayList[((Int, Int), CellType)]

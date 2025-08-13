@@ -52,8 +52,8 @@ class SimModelTest extends AnyFlatSpec with Matchers:
 
   it should "Impostazione e recupero dei parametri funziona" in {
     val model = new SimModel()
-    model.setWindSpeed(5)
-    model.setHumidity(75)
+    model.updateParams(_.copy(windSpeed = 5))
+    model.updateParams(_.copy(humidity = 75))
     val params = model.getSimParams
     assert(params.windSpeed == 5)
     assert(params.humidity == 75)
