@@ -8,7 +8,7 @@ import scala.util.Random
 
 class SimModel(
     random: Random = Random(),
-    private var simParams: SimParams = SimParams(1.0, 0.0, 25.0, 50.0)
+    private var simParams: SimParams = SimParams(1, 0, 25, 50)
 ):
 
   private var matrix: Matrix = Vector.empty
@@ -136,16 +136,16 @@ class SimModel(
 
   def getSimParams: SimParams = simParams
 
-  def setWindSpeed(speed: Double): Unit =
+  def setWindSpeed(speed: Int): Unit =
     simParams = simParams.copy(windSpeed = speed)
 
-  def setWindAngle(angle: Double): Unit =
+  def setWindAngle(angle: Int): Unit =
     simParams = simParams.copy(windAngle = angle)
 
-  def setTemperature(temp: Double): Unit =
+  def setTemperature(temp: Int): Unit =
     simParams = simParams.copy(temperature = temp)
 
-  def setHumidity(humidity: Double): Unit =
+  def setHumidity(humidity: Int): Unit =
     simParams = simParams.copy(humidity = humidity)
 
   def placeCells(cells: Seq[((Int, Int), CellType)])

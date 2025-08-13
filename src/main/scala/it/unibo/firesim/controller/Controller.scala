@@ -15,28 +15,28 @@ trait Controller:
     * @param speed
     *   The wind speed to update.
     */
-  def setWindSpeed(speed: Double): Unit
+  def setWindSpeed(speed: Int): Unit
 
   /** Asynchronously sets the wind angle from view to model.
     *
     * @param angle
     *   The angle to update.
     */
-  def setWindAngle(angle: Double): Unit
+  def setWindAngle(angle: Int): Unit
 
   /** Asynchronously sets the temperature from view to model.
     *
     * @param temp
     *   The temperature to update.
     */
-  def setTemperature(temp: Double): Unit
+  def setTemperature(temp: Int): Unit
 
   /** Asynchronously sets the humidity from view to model.
     *
     * @param humidity
     *   The humidity to update.
     */
-  def setHumidity(humidity: Double): Unit
+  def setHumidity(humidity: Int): Unit
 
   /** Asynchronously makes model generate a map.
     *

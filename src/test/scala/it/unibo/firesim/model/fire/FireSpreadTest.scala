@@ -13,7 +13,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
       Vector(CellType.Grass, CellType.Burning(0)),
       Vector(CellType.Grass, CellType.Grass)
     )
-    val params = SimParams(0.0, 0.0, 30.0, 10.0)
+    val params = SimParams(0, 0, 30, 10)
 
     given prob: ProbabilityCalc = (_, _, _, _, _) => 1.0
     given burn: BurnDurationPolicy = (_, _) => false
@@ -88,7 +88,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
   }
 
   "directionalWindProbabilityDynamic" should "boost probability if cell in wind direction is burning" in {
-    val params = SimParams(1.0, 0.0, 25.0, 0.0)
+    val params = SimParams(1, 0, 25, 0)
     val matrix: Matrix = Vector(
       Vector(
         CellType.Grass,

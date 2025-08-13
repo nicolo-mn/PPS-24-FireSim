@@ -12,8 +12,8 @@ package it.unibo.firesim.model
   *   The relative humidity
   */
 case class SimParams(
-    windSpeed: Double,
-    windAngle: Double,
-    temperature: Double,
-    humidity: Double
+    windSpeed: Int,
+    windAngle: Int,
+    temperature: Int,
+    humidity: Int
 )

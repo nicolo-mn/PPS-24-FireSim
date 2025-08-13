@@ -131,7 +131,7 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         humidityLabel.text = humidityLabelText + value + humidityUnit
         // TODO: handle value changes
-        simController.setHumidity(value.toDouble)
+        simController.setHumidity(value)
     }
 
   private val temperatureSlider: Slider = new Slider:
@@ -142,7 +142,7 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         temperatureLabel.text = temperatureLabelText + value + temperatureUnit
         // TODO: handle value changes
-        simController.setTemperature(value.toDouble)
+        simController.setTemperature(value)
     }
 
   private val windDirectionSlider: Slider = new Slider:
@@ -154,7 +154,7 @@ class SimView(private val simController: SimController):
         windDirectionLabel.text =
           windDirectionLabelText + value + windDirectionUnit
         // TODO: handle value changes
-        simController.setWindAngle(value.toDouble)
+        simController.setWindAngle(value)
     }
 
   private val windIntensitySlider: Slider = new Slider:
@@ -166,7 +166,7 @@ class SimView(private val simController: SimController):
         windIntensityLabel.text =
           windIntensityLabelText + value + windIntensityUnit
         // TODO: handle value changes
-        simController.setWindSpeed(value.toDouble)
+        simController.setWindSpeed(value)
     }
 
   private val controlsPanel = new FlowPanel():

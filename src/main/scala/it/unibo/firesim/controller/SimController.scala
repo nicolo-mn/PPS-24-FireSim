@@ -21,10 +21,10 @@ class SimController(
 
   private val lock = Object()
 
-  private var windSpeed: Double = model.getSimParams.windSpeed
-  private var windAngle: Double = model.getSimParams.windAngle
-  private var temperature: Double = model.getSimParams.temperature
-  private var humidity: Double = model.getSimParams.humidity
+  private var windSpeed: Int = model.getSimParams.windSpeed
+  private var windAngle: Int = model.getSimParams.windAngle
+  private var temperature: Int = model.getSimParams.temperature
+  private var humidity: Int = model.getSimParams.humidity
 
   private var matrix: Matrix = Vector.empty
 
@@ -49,28 +49,28 @@ class SimController(
     * @param speed
     *   The wind speed to update.
     */
-  override def setWindSpeed(speed: Double): Unit = this.windSpeed = speed
+  override def setWindSpeed(speed: Int): Unit = this.windSpeed = speed
 
   /** Asynchronously sets the wind angle from view to model.
     *
     * @param angle
     *   The angle to update.
     */
-  override def setWindAngle(angle: Double): Unit = this.windAngle = angle
+  override def setWindAngle(angle: Int): Unit = this.windAngle = angle
 
   /** Asynchronously sets the temperature from view to model.
     *
     * @param temp
     *   The temperature to update.
     */
-  override def setTemperature(temp: Double): Unit = this.temperature = temp
+  override def setTemperature(temp: Int): Unit = this.temperature = temp
 
   /** Asynchronously sets the humidity from view to model.
     *
     * @param humidity
     *   The humidity to update.
     */
-  override def setHumidity(humidity: Double): Unit = this.humidity = humidity
+  override def setHumidity(humidity: Int): Unit = this.humidity = humidity
 
   /** Asynchronously makes model generate a map.
     *

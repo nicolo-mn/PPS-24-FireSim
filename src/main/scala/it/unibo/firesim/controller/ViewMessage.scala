@@ -15,21 +15,21 @@ sealed trait ViewMessage:
   * @param value
   *   The new wind speed value.
   */
-case class SetWindSpeed(value: Double) extends ViewMessage:
+case class SetWindSpeed(value: Int) extends ViewMessage:
   def execute(controller: SimController): Unit = controller.setWindSpeed(value)
 
 /** Message to update the wind angle parameter.
   * @param value
   *   The new wind angle value.
   */
-case class SetWindAngle(value: Double) extends ViewMessage:
+case class SetWindAngle(value: Int) extends ViewMessage:
   def execute(controller: SimController): Unit = controller.setWindAngle(value)
 
 /** Message to update the temperature parameter.
   * @param value
   *   The new temperature value.The new temperature value.
   */
-case class SetTemperature(value: Double) extends ViewMessage:
+case class SetTemperature(value: Int) extends ViewMessage:
 
   def execute(controller: SimController): Unit =
     controller.setTemperature(value)
@@ -38,7 +38,7 @@ case class SetTemperature(value: Double) extends ViewMessage:
   * @param value
   *   The new humidity value.
   */
-case class SetHumidity(value: Double) extends ViewMessage:
+case class SetHumidity(value: Int) extends ViewMessage:
   def execute(controller: SimController): Unit = controller.setHumidity(value)
 
 /** Message to generate a new simulation map with the given dimensions.
