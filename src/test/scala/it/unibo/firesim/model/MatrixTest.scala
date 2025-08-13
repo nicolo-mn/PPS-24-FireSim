@@ -33,10 +33,17 @@ class MatrixTest extends AnyFlatSpec with Matchers:
   it should "get the positions of cells with a certain cell type" in {
     val matrix = Vector.tabulate(3, 3)((row, col) =>
       CellType.Forest
-    ).update(
-      0,
-      0,
-      CellType.Station
-    ).update(1, 1, CellType.Station).update(2, 2, CellType.Station)
+    ).update(0, 0, CellType.Station).update(1, 1, CellType.Station).update(2, 2, CellType.Station)
     matrix.positionsOf(CellType.Station) should be(Seq((0, 0), (1, 1), (2, 2)))
+  }
+
+  it should "get the positions of cells with a certain problematic cell type" in {
+    val matrix = Vector.tabulate(3, 3)((row, col) =>
+      CellType.Forest
+    ).update(0, 0, CellType.Burning(10)).update(1, 1, CellType.Burning(1)).update(2, 2, CellType.Burning(3))
+    matrix.positionsOf(CellType.Burning(10)) should be(Seq((0, 0)))
+    matrix.positionsOf{
+      case CellType.Burning(_) => true
+      case _ => false
+    } should be(Seq((0, 0), (1, 1), (2, 2)))
   }

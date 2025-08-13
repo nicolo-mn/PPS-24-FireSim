@@ -169,13 +169,13 @@ class SimModel(
     val simParams = this.getSimParams
     matrix = fireSpread(matrix, simParams, cycle)
     
-    val burningCells = matrix.positionsOf(Burning())
-    val firefighersUpdate = firefighters.map(f => f.act(burningCells))
-    firefightersPos = Seq.empty
-    firefighersUpdate.foreach(fu => 
-      firefightersPos = firefightersPos :+ fu.position
-      extinguishCells(fu.extinguishedCells)
-    )
+//    val burningCells = matrix.positionsOf(Burning())
+//    val firefighersUpdate = firefighters.map(f => f.act(burningCells))
+//    firefightersPos = Seq.empty
+//    firefighersUpdate.foreach(fu => 
+//      firefightersPos = firefightersPos :+ fu.position
+//      extinguishCells(fu.extinguishedCells)
+//    )
 
     cycle += 1
     (matrix, firefightersPos)
