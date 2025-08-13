@@ -51,3 +51,14 @@ extension (matrix: Matrix)
         case (cT, j) if cT == cellType => (i, j)
       }
     }
+
+  /**
+   * @param f The function that maps CellTypes into boolean
+   * @return The positions of the cells with CellType mapped to true
+   */
+  def positionsOf(f: CellType => Boolean): Seq[(Int, Int)] =
+    matrix.zipWithIndex.flatMap { case (row, i) =>
+      row.zipWithIndex.collect {
+        case (cT, j) if f(cT) => (i, j)
+      }
+    }
