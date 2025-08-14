@@ -27,7 +27,7 @@ val defaultProbabilityCalc: ProbabilityCalc =
     math.max(0.0, math.min(p, 1.0))
 
 val defaultBurnDuration: BurnDurationPolicy = (start, current) =>
-  (current - start) >= 10
+  (current - start) >= 100
 
 val defaultRandomProvider: RandomProvider = () =>
   scala.util.Random.nextDouble()

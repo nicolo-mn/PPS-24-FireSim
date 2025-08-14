@@ -7,7 +7,7 @@ object Main:
 
   def main(args: Array[String]): Unit =
 
-    val FPS = 60
+    val FPS = 30
     val tickMs = (1000.0 / FPS).toLong
     val controller = new SimController(new SimModel())
     controller.loop(tickMs)

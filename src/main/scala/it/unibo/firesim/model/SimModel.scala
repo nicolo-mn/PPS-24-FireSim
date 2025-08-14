@@ -184,7 +184,8 @@ class SimModel(
     */
   def updateState(): (Matrix, Seq[(Int, Int)]) =
     val simParams = this.getSimParams
-    matrix = fireSpread(matrix, simParams, cycle)
+    if(cycle%10==0)
+      matrix = fireSpread(matrix, simParams, cycle)
 
     val burningCells = matrix.positionsOf {
       case Burning(_) => true
