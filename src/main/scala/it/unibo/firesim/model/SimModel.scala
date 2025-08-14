@@ -27,7 +27,7 @@ class SimModel(
     * @param cols
     *   Number of columns in the map (width)
     * @return
-    *   A Matrix containing the generated cells
+    *   The Matrix containing the generated cells
     */
   def generateMap(rows: Int, cols: Int): Matrix =
     val matrix = Vector.tabulate(rows, cols) { (r, c) =>
@@ -111,7 +111,7 @@ class SimModel(
       return Seq((random.nextInt(rows), random.nextInt(cols)))
     random.shuffle(emptyCells).take(count)
 
-  def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
+  private def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
     Seq((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)).filter((nr, nc) =>
       matrix.inBounds(nr, nc)
     )
@@ -143,12 +143,24 @@ class SimModel(
 
     expand(Seq(seed), Set.empty, 0, matrix)
 
+  /** @return
+    *   The simulation parameters
+    */
   def getSimParams: SimParams =
     lock.synchronized { params }
 
+  /** @param f
+    *   The function to update the simulation parameters
+    */
   def updateParams(f: SimParams => SimParams): Unit =
     lock.synchronized { params = f(params) }
 
+  /** @param cells
+    *   The cells to place
+    * @return
+    *   The updated game matrix and the list of positions of firefighters above
+    *   the map
+    */
   def placeCells(cells: Seq[((Int, Int), CellType)])
       : (Matrix, Seq[(Int, Int)]) =
     cells.foreach((p, cT) => placeCell(p, cT))
@@ -165,6 +177,11 @@ class SimModel(
           matrix = matrix.update(r, c, cellType)
       case _ => matrix = matrix.update(r, c, cellType)
 
+  /** Game tick method
+    * @return
+    *   The updated game matrix and the list of positions of firefighters above
+    *   the map
+    */
   def updateState(): (Matrix, Seq[(Int, Int)]) =
     val simParams = this.getSimParams
     matrix = fireSpread(matrix, simParams, cycle)
@@ -173,9 +190,9 @@ class SimModel(
       case Burning(_) => true
       case _          => false
     }
-    val firefighersUpdate = firefighters.map(f => f.act(burningCells))
+    val firefightersUpdate = firefighters.map(f => f.act(burningCells))
     firefightersPos = Seq.empty
-    firefighersUpdate.foreach(fu =>
+    firefightersUpdate.foreach(fu =>
       firefightersPos = firefightersPos :+ fu.position
       extinguishCells(fu.extinguishedCells)
     )
