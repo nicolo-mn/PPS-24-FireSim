@@ -4,7 +4,7 @@ import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
 import it.unibo.firesim.controller.{CellViewType, SimController}
 
-import scala.swing.event.{ButtonClicked, ValueChanged, WindowClosing}
+import scala.swing.event.{ButtonClicked, ValueChanged, WindowClosing, SelectionChanged}
 import java.awt.{Color, Dimension}
 import javax.swing.JPanel
 import scala.annotation.tailrec
@@ -12,19 +12,12 @@ import scala.swing.MenuBar.NoMenuBar.listenTo
 
 class GridButton(
     private val pos: (Int, Int),
-    private val simController: SimController,
-    var color: Color,
-    private val soilTypeSelector: ComboBox[String]
+    private val onClick: ((Int, Int)) => Unit,
+    var color: Color
 ) extends Button:
   background = color
   reactions += {
-    case ButtonClicked(_) =>
-      simController.placeCell(
-        pos,
-        CellViewType.fromString(
-          soilTypeSelector.item
-        ).getOrElse(CellViewType.Empty)
-      )
+    case ButtonClicked(_) => onClick(pos)
   }
 
   override def paintComponent(g: Graphics2D): Unit =
@@ -43,8 +36,23 @@ class SimView(private val simController: SimController):
   private val inGameAvailableSoils = Seq(fireSoilStr, emptySoilStr)
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
   soilTypeSelector.selection.item = fireSoilStr
+  soilTypeSelector.listenTo(soilTypeSelector.selection)
+  soilTypeSelector.reactions += {
+    case SelectionChanged(_) =>
+      firstClick = None
+  }
 
   var gridCells: Seq[Seq[GridButton]] = Seq.empty
+
+  private var drawLineMode = false
+  private var firstClick: Option[(Int, Int)] = None
+  private val drawLineButton: ToggleButton = new ToggleButton("🖉 Draw Line")
+
+  drawLineButton.reactions += {
+    case ButtonClicked(_) =>
+      drawLineMode = drawLineButton.selected
+      firstClick = None // reset eventuale primo click precedente
+  }
 
   private val gridPanel = new GridPanel(gridSize, gridSize):
     // The wrapped peer needs to be overridden as the grid's parent bypasses the homonymous scala method to handle resizing
@@ -174,6 +182,7 @@ class SimView(private val simController: SimController):
     contents += pauseResumeButton
     contents += resetButton
     contents += soilTypeSelector
+    contents += drawLineButton
     contents += new Label("Humidity:")
     contents += humiditySlider
     contents += humidityLabel
@@ -260,9 +269,30 @@ class SimView(private val simController: SimController):
         )
         askForGridSize()
 
+  private def handleClick(pos: (Int, Int)): Unit =
+    val selectedType = CellViewType
+      .fromString(soilTypeSelector.item)
+      .getOrElse(CellViewType.Empty)
+
+    if drawLineMode then
+      handleDrawLine(pos, selectedType)
+    else
+      simController.placeCell(pos, selectedType)
+
+  private def handleDrawLine(
+      pos: (Int, Int),
+      cellViewType: CellViewType
+  ): Unit =
+    firstClick match
+      case None =>
+        firstClick = Some(pos)
+      case Some(start) =>
+        firstClick = None
+        simController.placeLine(start, pos, cellViewType)
+
   private def generateGrid(rows: Int, cols: Int): Unit =
     gridCells = Seq.tabulate(rows, cols) { (i, j) =>
-      new GridButton((i, j), simController, Color.white, soilTypeSelector)
+      new GridButton((i, j), handleClick, Color.white)
     }
 
     gridPanel.contents.clear()
