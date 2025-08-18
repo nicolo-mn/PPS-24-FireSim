@@ -87,7 +87,8 @@ class SimModel(
         Station
       )
     )
-
+    firefighters = Seq.empty
+    firefightersPos = Seq.empty
     withStations.positionsOf(Station).foreach(s =>
       firefighters = firefighters :+ FireFighter(rows, cols, s)
       firefightersPos = firefightersPos :+ s
@@ -173,8 +174,7 @@ class SimModel(
     if oldCell == cellType || oldCell == Station then return
 
     cellType match
-      case Burning(_) | Burnt => if oldCell == Forest || oldCell == Grass then
-          matrix = matrix.update(r, c, cellType)
+      case Burning(_) if oldCell != Forest && oldCell != Grass => return
       case _ => matrix = matrix.update(r, c, cellType)
 
   /** Game tick method
@@ -184,7 +184,7 @@ class SimModel(
     */
   def updateState(): (Matrix, Seq[(Int, Int)]) =
     val simParams = this.getSimParams
-    if(cycle%10==0)
+    if cycle % 10 == 0 then
       matrix = fireSpread(matrix, simParams, cycle)
 
     val burningCells = matrix.positionsOf {
