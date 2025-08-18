@@ -72,6 +72,21 @@ trait Controller:
     */
   def closing(): Unit
 
+  /** Asynchronously makes model try to create a line.
+    *
+    * @param start
+    *   The start of the line.
+    * @param end
+    *   The end of the line.
+    * @param cellViewType
+    *   The type of cell.
+    */
+  def placeLine(
+      start: (Int, Int),
+      end: (Int, Int),
+      cellViewType: CellViewType
+  ): Unit
+
   /** Main game loop. Once is called the main thread will stay in this loop
     * until the program is closed.
     *

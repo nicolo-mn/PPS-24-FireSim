@@ -1,8 +1,9 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.{Matrix, update, SimModel}
-import it.unibo.firesim.util.Logger
+import it.unibo.firesim.model.{Matrix, SimModel, update}
+import it.unibo.firesim.util.{Line, Logger}
+import it.unibo.firesim.util.Line.*
 import it.unibo.firesim.view.SimView
 
 import scala.jdk.CollectionConverters.*
@@ -92,7 +93,17 @@ class SimController(
     *   The type of cell.
     */
   override def placeCell(pos: (Int, Int), cellViewType: CellViewType): Unit =
-    placeQueue.put((pos, CellTypeConverter.toModel(cellViewType)))
+    placeQueue.put(pos, CellTypeConverter.toModel(cellViewType))
+
+  override def placeLine(
+      start: (Int, Int),
+      end: (Int, Int),
+      cellViewType: CellViewType
+  ): Unit =
+    Line.lineBetween(
+      start,
+      end
+    ).withType(CellTypeConverter.toModel(cellViewType)).foreach(placeQueue.put)
 
   /** Notifies controller that the simulation has been started.
     */

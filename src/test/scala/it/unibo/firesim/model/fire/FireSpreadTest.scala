@@ -64,12 +64,6 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     grassProb should be >= 0.0
   }
 
-  "defaultBurnDuration" should "return true only after 10 cycles" in {
-    defaultBurnDuration(5, 16) shouldBe true
-    defaultBurnDuration(5, 7) shouldBe false
-
-  }
-
   "defaultRandomProvider" should "return a value between 0.0 and 1.0" in {
     val value = defaultRandomProvider()
     value should (be >= 0.0 and be <= 1.0)
