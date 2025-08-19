@@ -37,4 +37,5 @@ object UIConfig:
   val stationSoilStr: String = "Station"
   val rockSoilStr: String = "Rock"
   val firefighterStr: String = "Firefighter"
+  val waterSoilStr: String = "Water"
   val minimumGridSize: Int = 6

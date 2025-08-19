@@ -31,7 +31,7 @@ class SimView(private val simController: SimController):
   simController.generateMap(gridSize, gridSize)
 
   private val mapEditAvailableSoils =
-    Seq(fireSoilStr, emptySoilStr, forestSoilStr, grassSoilStr, rockSoilStr)
+    Seq(fireSoilStr, emptySoilStr, forestSoilStr, grassSoilStr, rockSoilStr, waterSoilStr)
 
   private val inGameAvailableSoils = Seq(fireSoilStr, emptySoilStr)
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
@@ -251,6 +251,7 @@ class SimView(private val simController: SimController):
       case CellViewType.Burnt       => Color.gray.darker()
       case CellViewType.Rock        => Color.gray.brighter()
       case CellViewType.Firefighter => new Color(165, 42, 42)
+      case CellViewType.Water       => Color.blue
       case null                     => Color.lightGray
 
   @tailrec

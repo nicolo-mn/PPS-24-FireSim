@@ -13,6 +13,7 @@ object CellTypeConverter:
     case CellViewType.Burnt       => CellType.Burnt
     case CellViewType.Rock        => CellType.Rock
     case CellViewType.Firefighter => CellType.Firefighter
+    case CellViewType.Water       => CellType.Water
     case null                     =>
       throw new IllegalArgumentException(s"Unknown CellViewType: $viewType")
 
@@ -25,5 +26,6 @@ object CellTypeConverter:
     case CellType.Burnt       => CellViewType.Burnt
     case CellType.Rock        => CellViewType.Rock
     case CellType.Firefighter => CellViewType.Firefighter
+    case CellType.Water       => CellViewType.Water
     case null                 =>
       throw new IllegalArgumentException(s"Unknown CellType: $modelType")
