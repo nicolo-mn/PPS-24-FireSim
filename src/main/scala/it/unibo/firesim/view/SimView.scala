@@ -31,7 +31,14 @@ class SimView(private val simController: SimController):
   simController.generateMap(gridSize, gridSize)
 
   private val mapEditAvailableSoils =
-    Seq(fireSoilStr, emptySoilStr, forestSoilStr, grassSoilStr, rockSoilStr, waterSoilStr)
+    Seq(
+      fireSoilStr,
+      emptySoilStr,
+      forestSoilStr,
+      grassSoilStr,
+      rockSoilStr,
+      waterSoilStr
+    )
 
   private val inGameAvailableSoils = Seq(fireSoilStr, emptySoilStr)
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
