@@ -23,7 +23,8 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     cellTypes should contain allElementsOf Seq(
       CellType.Forest,
       CellType.Grass,
-      CellType.Station
+      CellType.Station,
+      CellType.Water
     ) // Empty not included
   }
 
