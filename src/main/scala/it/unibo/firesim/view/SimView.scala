@@ -290,7 +290,7 @@ class SimView(private val simController: SimController):
 
     if drawLineMode then
       handleDrawLine(pos, selectedType)
-    else if brushToggle.enabled then
+    else if brushToggle.selected then
       handleBrushMode(pos, selectedType)
     else
       simController.placeCell(pos, selectedType)
