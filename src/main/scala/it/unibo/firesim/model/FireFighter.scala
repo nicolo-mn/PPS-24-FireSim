@@ -43,7 +43,12 @@ class FireFighter(
 
   private var loaded = true
   private var position = station
-  private val directions: Seq[(Int, Int)] = adjacentCellsInRay(1)
+  private var currentTarget = station
+  private var err = 0
+  private var deltaX = 0
+  private var deltaY = 0
+  private var stepX = 0
+  private var stepY = 0
   private val actionableCells = adjacentCellsInRay(fireFighterRay)
 
   /** Moves the firefighter towards the closest fire or the station in case it
@@ -71,10 +76,31 @@ class FireFighter(
     FireFighterUpdate(position, extinguishedCells)
 
   private def nextStepTowards(target: (Int, Int)): (Int, Int) =
-    directions.map(d => (d._1 + position._1, d._2 + position._2)).filter(p =>
-      0 <= p._1 && p._1 < rows && 0 <= p._2 && p._2 < cols
-    )
-      .minBy(distance(_, target))
+    if currentTarget != target then
+      currentTarget = target
+      initBresenhamAlgorithm(target)
+
+    if position._1 == target._1 && position._2 == target._2 then
+      position
+    else
+      var (nx, ny) = position
+      val e2 = 2 * err
+      if e2 >= deltaY then
+        err += deltaY
+        nx += stepX
+      if e2 <= deltaX then
+        err += deltaX
+        ny += stepY
+      (nx, ny)
+
+  private def initBresenhamAlgorithm(target: (Int, Int)): Unit =
+    val (x0, y0) = position
+    val (x1, y1) = target
+    deltaX = math.abs(x1 - x0)
+    deltaY = -math.abs(y1 - y0)
+    stepX = if x0 < x1 then 1 else -1
+    stepY = if y0 < y1 then 1 else -1
+    err = deltaX + deltaY
 
   private def burningCellsAround(
       pos: (Int, Int),
