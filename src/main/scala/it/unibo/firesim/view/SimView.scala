@@ -4,7 +4,8 @@ import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
 import it.unibo.firesim.controller.{CellViewType, SimController}
 
-import scala.swing.event.{ButtonClicked, ValueChanged, WindowClosing, SelectionChanged}
+import java.awt.event.{MouseAdapter, MouseEvent}
+import scala.swing.event.{ButtonClicked, SelectionChanged, ValueChanged, WindowClosing}
 import java.awt.{Color, Dimension}
 import javax.swing.JPanel
 import scala.annotation.tailrec
@@ -13,12 +14,17 @@ import scala.swing.MenuBar.NoMenuBar.listenTo
 class GridButton(
     private val pos: (Int, Int),
     private val onClick: ((Int, Int)) => Unit,
+    private val onHover: ((Int, Int)) => Unit,
     var color: Color
 ) extends Button:
   background = color
   reactions += {
     case ButtonClicked(_) => onClick(pos)
   }
+  peer.addMouseListener(
+    new MouseAdapter:
+      override def mouseEntered(e: MouseEvent): Unit = onHover(pos)
+  )
 
   override def paintComponent(g: Graphics2D): Unit =
     super.paintComponent(g)
@@ -53,6 +59,9 @@ class SimView(private val simController: SimController):
       drawLineMode = drawLineButton.selected
       firstClick = None // reset eventuale primo click precedente
   }
+
+  private var brushMode = false
+  private val brushToggle: ToggleButton = new ToggleButton("Brush")
 
   private val gridPanel = new GridPanel(gridSize, gridSize):
     // The wrapped peer needs to be overridden as the grid's parent bypasses the homonymous scala method to handle resizing
@@ -89,6 +98,7 @@ class SimView(private val simController: SimController):
       startButton.enabled = false
       pauseResumeButton.enabled = true
       resetButton.enabled = true
+      brushToggle.enabled = false
       soilTypeSelector.peer.setModel(
         ComboBox.newConstantModel(inGameAvailableSoils)
       )
@@ -102,6 +112,9 @@ class SimView(private val simController: SimController):
       resetButton.enabled = false
       startButton.enabled = true
       pauseResumeButton.enabled = false
+      brushToggle.enabled = true
+      brushToggle.selected = false
+      brushMode = false
       soilTypeSelector.peer.setModel(
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
@@ -183,6 +196,7 @@ class SimView(private val simController: SimController):
     contents += resetButton
     contents += soilTypeSelector
     contents += drawLineButton
+    contents += brushToggle
     contents += new Label("Humidity:")
     contents += humiditySlider
     contents += humidityLabel
@@ -276,7 +290,16 @@ class SimView(private val simController: SimController):
 
     if drawLineMode then
       handleDrawLine(pos, selectedType)
+    else if brushToggle.enabled then
+      handleBrushMode(pos, selectedType)
     else
+      simController.placeCell(pos, selectedType)
+
+  private def handleHover(pos: (Int, Int)): Unit =
+    if brushMode then
+      val selectedType = CellViewType
+        .fromString(soilTypeSelector.item)
+        .getOrElse(CellViewType.Empty)
       simController.placeCell(pos, selectedType)
 
   private def handleDrawLine(
@@ -290,9 +313,17 @@ class SimView(private val simController: SimController):
         firstClick = None
         simController.placeLine(start, pos, cellViewType)
 
+  private def handleBrushMode(
+      pos: (Int, Int),
+      cellViewType: CellViewType
+  ): Unit =
+    brushMode = !brushMode
+    if brushMode then
+      simController.placeCell(pos, cellViewType)
+
   private def generateGrid(rows: Int, cols: Int): Unit =
     gridCells = Seq.tabulate(rows, cols) { (i, j) =>
-      new GridButton((i, j), handleClick, Color.white)
+      new GridButton((i, j), handleClick, handleHover, Color.white)
     }
 
     gridPanel.contents.clear()
