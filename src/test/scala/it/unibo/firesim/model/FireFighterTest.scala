@@ -6,8 +6,8 @@ import org.scalatest.matchers.should.Matchers
 import scala.language.postfixOps
 
 class FireFighterTest extends AnyFlatSpec with Matchers:
-  private val rows = 5
-  private val cols = 5
+  private val rows = 7
+  private val cols = 7
   private val station = (0, 0)
 
   "FireFighter" should "move towards the closest fire" in {
@@ -15,6 +15,15 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val cellsOnFire = Seq((3, 0), (0, 4))
     fireFighter.act(cellsOnFire).position should be((1, 0))
     fireFighter.act(cellsOnFire).position should be((2, 0))
+  }
+
+  it should "use Bresenham algorithm to move" in {
+    val fireFighter = FireFighter(rows, cols, station)
+    val cellsOnFire = Seq((4, 2))
+    fireFighter.act(cellsOnFire).position should be((1, 1))
+    fireFighter.act(cellsOnFire).position should be((2, 1))
+    fireFighter.act(cellsOnFire).position should be((3, 2))
+    fireFighter.act(cellsOnFire).position should be((4, 2))
   }
 
   it should "extinguish cell only when it reaches a cell on fire" in {
@@ -27,11 +36,22 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     ))
   }
 
-  it should "adjust it direction if closer cells are set on fire" in {
+  it should "adjust its direction if closer cells are set on fire" in {
     val fireFighter = FireFighter(rows, cols, station)
     val initialCellsOnFire = Seq((4, 0))
     val updatedCellsOnFire = initialCellsOnFire :+ (2, 1)
     fireFighter.act(initialCellsOnFire).position should be((1, 0))
+    fireFighter.act(updatedCellsOnFire).position should be((2, 1))
+  }
+
+  it should "adjust its direction using Bresenham algorithm" in {
+    val fireFighter = FireFighter(rows, cols, station)
+    val initialCellsOnFire = Seq((2, 6))
+    val updatedCellsOnFire = initialCellsOnFire :+ (2, 1)
+    fireFighter.act(initialCellsOnFire).position should be((0, 1))
+    fireFighter.act(initialCellsOnFire).position should be((1, 2))
+    fireFighter.act(initialCellsOnFire).position should be((1, 3))
+    fireFighter.act(updatedCellsOnFire).position should be((2, 2))
     fireFighter.act(updatedCellsOnFire).position should be((2, 1))
   }
 
