@@ -34,14 +34,30 @@ class SimModel(
       Rock
     }
 
-    val forestSeedFrequency = 0.02 // 2%
+    val lakeSeedFrequency = 0.0001
+    val lakeSeedsCount = ((rows * cols) * lakeSeedFrequency).toInt
+    val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount)
+    val minLakeSize = (1.5 * rows).toInt
+    val maxLakeSize = (5 * rows).toInt
+    val lakeGrowthProbability = 0.8
+    val withLakes = lakeSeeds.foldLeft(matrix) { (matrix, seed) =>
+      growCluster(
+        matrix,
+        seed,
+        random.between(minLakeSize, maxLakeSize),
+        lakeGrowthProbability,
+        Water
+      )
+    }
+
+    val forestSeedFrequency = 0.015
     val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount)
 
-    val minForestSize = 30
-    val maxForestSize = 100
-    val forestGrowthProbability = 0.7 // 70%
-    val withForests = forestSeeds.foldLeft(matrix) { (matrix, seed) =>
+    val minForestSize = (0.3 * rows).toInt
+    val maxForestSize = (1.5 * rows).toInt
+    val forestGrowthProbability = 0.7
+    val withForests = forestSeeds.foldLeft(withLakes) { (matrix, seed) =>
       growCluster(
         matrix,
         seed,
@@ -65,7 +81,7 @@ class SimModel(
 
     val minGrassSpreadDistance = 10
     val maxGrassSpreadDistance = 40
-    val grassGrowthFrequency = 0.8 // 80%
+    val grassGrowthFrequency = 0.8
     val withGrass = grassSeeds.foldLeft(withForests) { (matrix, seed) =>
       growCluster(
         matrix,
@@ -76,7 +92,7 @@ class SimModel(
       )
     }
 
-    val stationSeedsFrequency = 0.0002 // 0.02%
+    val stationSeedsFrequency = 0.0002
     val stationSeedsCount = ((rows * cols) * stationSeedsFrequency).toInt max 1
     val stationSeeds =
       generateSparseSeeds(rows, cols, stationSeedsCount, withGrass)
