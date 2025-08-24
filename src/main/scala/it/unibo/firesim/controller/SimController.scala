@@ -28,6 +28,7 @@ class SimController(
   @volatile private var mapGenerated: Boolean = false
   @volatile private var isClosing: Boolean = false
   @volatile private var width, height: Int = 0
+  @volatile private var tickMs: Int = 0
 
   private val simView = new SimView(this)
   private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellType)]()
@@ -39,6 +40,13 @@ class SimController(
     *   The message to process.
     */
   override def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
+
+  /** Asynchronously sets the milliseconds to wait every tick
+   *
+   * @param tickMs
+   * The milliseconds to set
+   */
+  def setTickMs(tickMs: Int): Unit = this.tickMs = tickMs
 
   /** Asynchronously sets the wind speed from view to model.
     *
@@ -145,7 +153,8 @@ class SimController(
     *   The milliseconds every tick should last: could be more (simulation has
     *   delays) but not less.
     */
-  override def loop(tickMs: Long = 100): Unit =
+  override def loop(tickMs: Int = 100): Unit =
+    this.tickMs = tickMs
     while !isClosing do
       lock.synchronized {
         while !mapGenerated do
@@ -169,7 +178,7 @@ class SimController(
         ))
 
         val elapsed = System.currentTimeMillis() - t0
-        val remaining = tickMs - elapsed
+        val remaining = this.tickMs - elapsed
         Thread.sleep(math.max(0, remaining))
 
   private def onTick(): Unit =

@@ -10,6 +10,13 @@ trait Controller:
     */
   def handleViewMessage(msg: ViewMessage): Unit
 
+  /** Asynchronously sets the milliseconds to wait every tick
+   *
+   * @param tickMs
+   *    The milliseconds to set
+   */
+  def setTickMs(tickMs: Int): Unit
+
   /** Asynchronously sets the wind speed from view to model.
     *
     * @param speed
@@ -94,4 +101,4 @@ trait Controller:
     *   The milliseconds every tick should last: could be more (simulation has
     *   delays) but not less.
     */
-  def loop(tickMs: Long): Unit
+  def loop(tickMs: Int): Unit
