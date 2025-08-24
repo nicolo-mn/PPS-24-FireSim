@@ -2,7 +2,7 @@ package it.unibo.firesim.view
 
 import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
-import it.unibo.firesim.controller.{CellViewType, SimController}
+import it.unibo.firesim.controller.{CellViewType, SimController, SpeedType}
 
 import java.awt.event.{MouseAdapter, MouseEvent}
 import scala.swing.event.{ButtonClicked, SelectionChanged, ValueChanged, WindowClosing}
@@ -35,6 +35,14 @@ class SimView(private val simController: SimController):
   private var gridSize: Int = askForGridSize()
   // TODO: notify controller
   simController.generateMap(gridSize, gridSize)
+
+  private val speedSelector = new ComboBox(SpeedType.values.toSeq) {
+    renderer = ListView.Renderer(_.id)
+  }
+  speedSelector.selection.item = SpeedType.Speed1x
+  speedSelector.reactions += {
+    case SelectionChanged(_) =>
+  }
 
   private val mapEditAvailableSoils =
     Seq(
@@ -201,6 +209,7 @@ class SimView(private val simController: SimController):
     contents += startButton
     contents += pauseResumeButton
     contents += resetButton
+    contents += speedSelector
     contents += soilTypeSelector
     contents += drawLineButton
     contents += brushToggle
