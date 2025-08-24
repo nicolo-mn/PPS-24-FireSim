@@ -42,12 +42,14 @@ class SimController(
     */
   override def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
 
-  /** Asynchronously change the milliseconds to wait every tick using the speed factor
-   *
-   * @param factor
-   *    The speed factor used to divide the original tick milliseconds
-   */
-  def updateSimulationSpeed(factor: Double): Unit = tickMs = (originalTickMs / factor).toInt
+  /** Asynchronously change the milliseconds to wait every tick using the speed
+    * factor
+    *
+    * @param factor
+    *   The speed factor used to divide the original tick milliseconds
+    */
+  def updateSimulationSpeed(factor: Double): Unit =
+    tickMs = (originalTickMs / factor).toInt
 
   /** Asynchronously sets the wind speed from view to model.
     *

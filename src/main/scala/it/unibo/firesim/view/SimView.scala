@@ -36,13 +36,15 @@ class SimView(private val simController: SimController):
   // TODO: notify controller
   simController.generateMap(gridSize, gridSize)
 
-  private val speedSelector = new ComboBox(SpeedType.values.toSeq) {
+  private val speedSelector = new ComboBox(SpeedType.values.toSeq):
     renderer = ListView.Renderer(_.id)
-  }
+
   speedSelector.selection.item = SpeedType.Speed1x
   speedSelector.listenTo(speedSelector.selection)
   speedSelector.reactions += {
-    case SelectionChanged(_) => simController.updateSimulationSpeed(speedSelector.selection.item.multiplier)
+    case SelectionChanged(_) => simController.updateSimulationSpeed(
+        speedSelector.selection.item.multiplier
+      )
   }
 
   private val mapEditAvailableSoils =
