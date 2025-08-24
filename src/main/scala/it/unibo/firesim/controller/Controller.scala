@@ -10,12 +10,12 @@ trait Controller:
     */
   def handleViewMessage(msg: ViewMessage): Unit
 
-  /** Asynchronously sets the milliseconds to wait every tick
+  /** Asynchronously change the milliseconds to wait every tick using the speed factor
    *
-   * @param tickMs
-   *    The milliseconds to set
+   * @param factor
+   *    The speed factor used to divide the original tick milliseconds
    */
-  def setTickMs(tickMs: Int): Unit
+  def updateSimulationSpeed(factor: Double): Unit
 
   /** Asynchronously sets the wind speed from view to model.
     *

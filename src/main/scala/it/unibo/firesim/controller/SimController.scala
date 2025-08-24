@@ -23,6 +23,7 @@ class SimController(
   private val lock = Object()
 
   private var matrix: Matrix = Vector.empty
+  private var originalTickMs: Int = 0
 
   @volatile private var running: Boolean = false
   @volatile private var mapGenerated: Boolean = false
@@ -41,12 +42,12 @@ class SimController(
     */
   override def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
 
-  /** Asynchronously sets the milliseconds to wait every tick
+  /** Asynchronously change the milliseconds to wait every tick using the speed factor
    *
-   * @param tickMs
-   * The milliseconds to set
+   * @param factor
+   *    The speed factor used to divide the original tick milliseconds
    */
-  def setTickMs(tickMs: Int): Unit = this.tickMs = tickMs
+  def updateSimulationSpeed(factor: Double): Unit = tickMs = (originalTickMs / factor).toInt
 
   /** Asynchronously sets the wind speed from view to model.
     *
@@ -155,6 +156,8 @@ class SimController(
     */
   override def loop(tickMs: Int = 100): Unit =
     this.tickMs = tickMs
+    this.originalTickMs = tickMs
+
     while !isClosing do
       lock.synchronized {
         while !mapGenerated do
