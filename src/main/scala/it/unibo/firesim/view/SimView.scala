@@ -40,8 +40,9 @@ class SimView(private val simController: SimController):
     renderer = ListView.Renderer(_.id)
   }
   speedSelector.selection.item = SpeedType.Speed1x
+  speedSelector.listenTo(speedSelector.selection)
   speedSelector.reactions += {
-    case SelectionChanged(_) =>
+    case SelectionChanged(_) => simController.updateSimulationSpeed(speedSelector.selection.item.multiplier)
   }
 
   private val mapEditAvailableSoils =
