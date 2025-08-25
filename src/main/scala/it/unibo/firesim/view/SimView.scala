@@ -33,7 +33,6 @@ class GridButton(
 
 class SimView(private val simController: SimController):
   private var gridSize: Int = askForGridSize()
-  // TODO: notify controller
   simController.generateMap(gridSize, gridSize)
 
   private val speedSelector = new ComboBox(SpeedType.values.toSeq):
@@ -121,7 +120,6 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(inGameAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-      // TODO: notify controller
       simController.startSimulation()
   }
 
@@ -137,7 +135,6 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-      // TODO: notify controller
       simController.stopSimulation()
       gridSize = askForGridSize()
       generateGrid(gridSize, gridSize)
@@ -146,7 +143,6 @@ class SimView(private val simController: SimController):
 
   pauseResumeButton.reactions += {
     case ButtonClicked(_) =>
-      // TODO: notify controller
       simController.pauseResumeSimulation()
   }
 
@@ -169,7 +165,6 @@ class SimView(private val simController: SimController):
     reactions += {
       case ValueChanged(_) =>
         humidityLabel.text = humidityLabelText + value + humidityUnit
-        // TODO: handle value changes
         simController.setHumidity(value)
     }
 
@@ -180,7 +175,6 @@ class SimView(private val simController: SimController):
     reactions += {
       case ValueChanged(_) =>
         temperatureLabel.text = temperatureLabelText + value + temperatureUnit
-        // TODO: handle value changes
         simController.setTemperature(value)
     }
 
@@ -192,7 +186,6 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         windDirectionLabel.text =
           windDirectionLabelText + value + windDirectionUnit
-        // TODO: handle value changes
         simController.setWindAngle(value)
     }
 
@@ -204,7 +197,6 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         windIntensityLabel.text =
           windIntensityLabelText + value + windIntensityUnit
-        // TODO: handle value changes
         simController.setWindSpeed(value)
     }
 
