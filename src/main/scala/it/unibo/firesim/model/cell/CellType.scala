@@ -1,5 +1,7 @@
 package it.unibo.firesim.model.cell
 
+import it.unibo.firesim.model.fire.FireStage
+
 /** Enumeration of possible cell types in the simulation.
   *
   *   - `Forest`: a forest cell that can catch fire.
@@ -12,4 +14,4 @@ package it.unibo.firesim.model.cell
   */
 enum CellType:
   case Forest, Grass, Empty, Station, Burnt, Rock, Firefighter, Water
-  case Burning(startCycle: Int)
+  case Burning(startCycle: Int, fireStage: FireStage, originalType: CellType)

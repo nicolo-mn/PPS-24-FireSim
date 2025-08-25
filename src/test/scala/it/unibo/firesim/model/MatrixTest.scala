@@ -1,6 +1,8 @@
 package it.unibo.firesim.model
 
 import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.cell.CellType.Grass
+import it.unibo.firesim.model.fire.FireStage.Ignition
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -47,11 +49,19 @@ class MatrixTest extends AnyFlatSpec with Matchers:
     ).update(
       0,
       0,
-      CellType.Burning(10)
-    ).update(1, 1, CellType.Burning(1)).update(2, 2, CellType.Burning(3))
-    matrix.positionsOf(CellType.Burning(10)) should be(Seq((0, 0)))
+      CellType.Burning(10, Ignition, Grass)
+    ).update(
+      1,
+      1,
+      CellType.Burning(1, Ignition, Grass)
+    ).update(2, 2, CellType.Burning(3, Ignition, Grass))
+    matrix.positionsOf(CellType.Burning(
+      10,
+      Ignition,
+      Grass
+    )) should be(Seq((0, 0)))
     matrix.positionsOf {
-      case CellType.Burning(_) => true
-      case _                   => false
+      case CellType.Burning(_, _, _) => true
+      case _                         => false
     } should be(Seq((0, 0), (1, 1), (2, 2)))
   }

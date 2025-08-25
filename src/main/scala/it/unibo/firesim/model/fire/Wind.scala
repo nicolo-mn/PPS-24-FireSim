@@ -9,7 +9,7 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
     val cc = c + dir.dc
 
     val neighborIsBurning =
-      matrix.inBounds(rr, cc) && matrix(rr)(cc).isBurning
+      matrix.inBounds(rr, cc) && CellTypeOps.isBurning(matrix(rr)(cc))
 
     val speedFactor = 1.0 + math.tanh(params.windSpeed / 10.0) * 0.5
     val windBoost = if neighborIsBurning then speedFactor else 1.0
