@@ -1,11 +1,13 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.cell.CellType.Forest
+import it.unibo.firesim.model.fire.FireStage.Ignition
 
 object CellTypeConverter:
 
   def toModel(viewType: CellViewType): CellType = viewType match
-    case CellViewType.Fire        => CellType.Burning(0)
+    case CellViewType.Fire        => CellType.Burning(0, Ignition, Forest)
     case CellViewType.Grass       => CellType.Grass
     case CellViewType.Forest      => CellType.Forest
     case CellViewType.Empty       => CellType.Empty
@@ -17,7 +19,7 @@ object CellTypeConverter:
       throw new IllegalArgumentException(s"Unknown CellViewType: $viewType")
 
   def toView(modelType: CellType): CellViewType = modelType match
-    case CellType.Burning(_)  => CellViewType.Fire
+    case CellType.Burning(_,_,_)  => CellViewType.Fire
     case CellType.Grass       => CellViewType.Grass
     case CellType.Forest      => CellViewType.Forest
     case CellType.Empty       => CellViewType.Empty

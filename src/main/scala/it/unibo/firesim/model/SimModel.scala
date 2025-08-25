@@ -2,11 +2,13 @@ package it.unibo.firesim.model
 
 import it.unibo.firesim.model.cell.CellType
 import it.unibo.firesim.model.cell.CellType.*
-import it.unibo.firesim.model.fire.fireSpread
-import it.unibo.firesim.model.fire.WindyHumidDefaults.{given_ProbabilityCalc, given_RandomProvider, given_BurnDurationPolicy}
+import it.unibo.firesim.model.fire.*
 
 import scala.annotation.tailrec
 import scala.util.Random
+
+given ProbabilityCalc: ProbabilityCalc = directionalWindProbabilityDynamic(defaultProbabilityCalc)
+given BurnDurationPolicy: BurnDurationPolicy = defaultBurnDuration
 
 class SimModel(
     random: Random = Random(),
@@ -19,6 +21,9 @@ class SimModel(
   private var firefighters: Seq[FireFighter] = Seq.empty
   private var firefightersPos: Seq[(Int, Int)] = Seq.empty
   private var cycle: Int = 0
+
+  private var randoms: LazyList[Double] =
+    LazyList.continually(Random.nextDouble())
 
   /** Generates a map with the specified number of rows and columns.
     *
@@ -174,7 +179,7 @@ class SimModel(
     if oldCell == cellType || oldCell == Station then return
 
     cellType match
-      case Burning(_) if oldCell != Forest && oldCell != Grass => return
+      case Burning(_, _, _) if oldCell != Forest && oldCell != Grass => return
       case _ => matrix = matrix.update(r, c, cellType)
 
   /** Game tick method
@@ -184,14 +189,16 @@ class SimModel(
     */
   def updateState(): (Matrix, Seq[(Int, Int)]) =
     val simParams = this.getSimParams
-    if cycle % 10 == 0 then
-      matrix = fireSpread(matrix, simParams, cycle)
-
     val burningCells = matrix.positionsOf {
-      case Burning(_) => true
-      case _          => false
-    }
-    val firefightersUpdate = firefighters.map(f => f.act(burningCells))
+      case Burning(_, _, _) => true
+      case _                => false
+    }.toSet
+    val (newMatrix, newBurningCells, nextRandoms) =
+      fireSpread(matrix, burningCells, simParams, cycle, randoms)
+    matrix = newMatrix
+    randoms = nextRandoms
+
+    val firefightersUpdate = firefighters.map(f => f.act(newBurningCells.toSeq))
     firefightersPos = Seq.empty
     firefightersUpdate.foreach(fu =>
       firefightersPos = firefightersPos :+ fu.position
