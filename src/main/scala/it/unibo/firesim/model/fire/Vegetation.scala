@@ -6,6 +6,7 @@ enum Vegetation:
   case None
 
 object Vegetation:
+
   def flammability(v: Vegetation): Double = v match
     case Forest => 0.2
     case Grass  => 0.1

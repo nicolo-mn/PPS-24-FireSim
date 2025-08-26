@@ -7,7 +7,9 @@ import it.unibo.firesim.model.fire.*
 import scala.annotation.tailrec
 import scala.util.Random
 
-given ProbabilityCalc: ProbabilityCalc = directionalWindProbabilityDynamic(defaultProbabilityCalc)
+given ProbabilityCalc: ProbabilityCalc =
+  directionalWindProbabilityDynamic(defaultProbabilityCalc)
+
 given BurnDurationPolicy: BurnDurationPolicy = defaultBurnDuration
 
 class SimModel(

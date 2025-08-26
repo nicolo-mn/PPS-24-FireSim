@@ -4,37 +4,116 @@ import scala.swing.*
 import it.unibo.firesim.config.UIConfig.*
 import it.unibo.firesim.controller.{CellViewType, SimController, SpeedType}
 
-import java.awt.event.{MouseAdapter, MouseEvent}
-import scala.swing.event.{ButtonClicked, SelectionChanged, ValueChanged, WindowClosing}
+import scala.swing.event.{ButtonClicked, MouseDragged, MousePressed, SelectionChanged, ValueChanged, WindowClosing}
 import java.awt.{Color, Dimension}
-import javax.swing.JPanel
 import scala.annotation.tailrec
-import scala.swing.MenuBar.NoMenuBar.listenTo
+import scala.concurrent.{ExecutionContext, Future}
+import scala.swing.MenuBar.NoMenuBar.{listenTo, repaint}
 
-class GridButton(
-    private val pos: (Int, Int),
+extension (i: Int)
+  /** Clamps an integer value within a given range. */
+  private def clamp(lo: Int, hi: Int): Int = math.max(lo, math.min(hi, i))
+
+/** Utility methods for GridCanvas.
+  */
+private object GridCanvas:
+
+  /** The color associated with a given cell type
+    * @param cell
+    *   the cell type to find the color
+    * @return
+    *   the color associated with a given cell type
+    */
+  private def cellColor(cell: CellViewType): Color = cell match
+    case CellViewType.Fire        => Color.red
+    case CellViewType.Empty       => Color.white
+    case CellViewType.Forest      => Color.green.darker()
+    case CellViewType.Grass       => Color.green.brighter()
+    case CellViewType.Station     => Color.yellow
+    case CellViewType.Burnt       => Color.gray.darker()
+    case CellViewType.Rock        => Color.gray.brighter()
+    case CellViewType.Firefighter => new Color(165, 42, 42)
+    case CellViewType.Water       => Color.blue
+    case null                     => Color.lightGray
+
+class GridCanvas(
+    var gridSize: Int,
+    private var gridData: Seq[CellViewType],
     private val onClick: ((Int, Int)) => Unit,
-    private val onHover: ((Int, Int)) => Unit,
-    var color: Color
-) extends Button:
-  background = color
+    private val onHover: ((Int, Int)) => Unit
+) extends Panel:
+
+  private case class GridGeometry(cellSize: Int, offsetX: Int, offsetY: Int)
+  listenTo(mouse.clicks, mouse.moves)
+
   reactions += {
-    case ButtonClicked(_) => onClick(pos)
+    case e: MousePressed => onClick(pixelToCell(e.point))
+    case e: MouseDragged => onHover(pixelToCell(e.point))
   }
-  peer.addMouseListener(
-    new MouseAdapter:
-      override def mouseEntered(e: MouseEvent): Unit = onHover(pos)
-  )
 
   override def paintComponent(g: Graphics2D): Unit =
     super.paintComponent(g)
-    g.setColor(color)
-    g.fillRect(0, 0, size.width, size.height)
+    val geo = gridGeometry
+    for row <- 0 until gridSize; col <- 0 until gridSize do
+      val idx = row * gridSize + col
+      g.setColor(GridCanvas.cellColor(gridData(idx)))
+      g.fillRect(
+        col * geo.cellSize + geo.offsetX,
+        row * geo.cellSize + geo.offsetY,
+        geo.cellSize,
+        geo.cellSize
+      )
+      g.setColor(Color.black)
+      g.drawRect(
+        col * geo.cellSize + geo.offsetX,
+        row * geo.cellSize + geo.offsetY,
+        geo.cellSize,
+        geo.cellSize
+      )
+
+  /** Converts a pixel coordinate to a grid cell coordinate. */
+  private def pixelToCell(p: Point): (Int, Int) =
+    val geo = gridGeometry
+    (
+      ((p.y - geo.offsetY) / geo.cellSize).clamp(0, gridSize - 1),
+      ((p.x - geo.offsetX) / geo.cellSize).clamp(0, gridSize - 1)
+    )
+
+  private def gridGeometry: GridGeometry =
+    val cellSize = (math.min(size.width, size.height) max 1) / gridSize
+    val offsetX = (size.width - (cellSize * gridSize)) / 2
+    val offsetY = (size.height - (cellSize * gridSize)) / 2
+    GridGeometry(cellSize, offsetX, offsetY)
+
+  /** Updates the grid data and repaints the canvas.
+    * @param updated
+    *   the sequence containing all the Cell
+    */
+  def updateGrid(updated: Seq[CellViewType]): Unit =
+    if updated.size == gridSize * gridSize then
+      gridData = updated
+      Swing.onEDT(repaint())
+
+  /** Resets the grid to a new size, clearing all cells and repaints the canvas
+    * @param newSize
+    *   the new size of the grid
+    */
+  def reset(newSize: Int): Unit =
+    gridSize = newSize
+    gridData = Seq.fill(gridSize * gridSize)(CellViewType.Empty)
+    Swing.onEDT(repaint())
 
 class SimView(private val simController: SimController):
   private var gridSize: Int = askForGridSize()
-  // TODO: notify controller
   simController.generateMap(gridSize, gridSize)
+
+  private val gridData: Seq[CellViewType] =
+    Seq.fill(gridSize * gridSize)(CellViewType.Empty)
+
+  private val gridCanvas =
+    new GridCanvas(gridSize, gridData, handleClick, handleHover)
+
+  gridCanvas.preferredSize = new Dimension(500, 500)
 
   private val speedSelector = new ComboBox(SpeedType.values.toSeq):
     renderer = ListView.Renderer(_.id)
@@ -42,7 +121,8 @@ class SimView(private val simController: SimController):
   speedSelector.selection.item = SpeedType.Speed1x
   speedSelector.listenTo(speedSelector.selection)
   speedSelector.reactions += {
-    case SelectionChanged(_) => simController.updateSimulationSpeed(
+    case SelectionChanged(_) =>
+      simController.updateSimulationSpeed(
         speedSelector.selection.item.multiplier
       )
   }
@@ -59,52 +139,18 @@ class SimView(private val simController: SimController):
 
   private val inGameAvailableSoils = Seq(fireSoilStr, emptySoilStr)
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
-  soilTypeSelector.selection.item = fireSoilStr
-  soilTypeSelector.listenTo(soilTypeSelector.selection)
-  soilTypeSelector.reactions += {
-    case SelectionChanged(_) =>
-      firstClick = None
-  }
 
-  var gridCells: Seq[Seq[GridButton]] = Seq.empty
-
-  private var drawLineMode = false
   private var firstClick: Option[(Int, Int)] = None
   private val drawLineButton: ToggleButton = new ToggleButton("🖉 Draw Line")
 
   drawLineButton.reactions += {
     case ButtonClicked(_) =>
-      drawLineMode = drawLineButton.selected
-      firstClick = None // reset eventuale primo click precedente
+      firstClick = None
   }
 
-  private var brushMode = false
   private val brushToggle: ToggleButton = new ToggleButton("Brush")
 
-  private val gridPanel = new GridPanel(gridSize, gridSize):
-    // The wrapped peer needs to be overridden as the grid's parent bypasses the homonymous scala method to handle resizing
-    override lazy val peer: JPanel =
-      new JPanel(new java.awt.GridLayout(gridSize, gridSize)):
-        // Handle grid resize
-        override def getPreferredSize: Dimension =
-          val d = super.getPreferredSize
-          val c = getParent
-          val prefSize =
-            if c == null then new Dimension(d.width, d.height)
-            else c.getSize
-          val w = prefSize.getWidth.toInt
-          val h = prefSize.getHeight.toInt
-          val s = if w > h then h else w
-          new Dimension(s, s)
-    override def preferredSize: Dimension = peer.getPreferredSize
-
-  generateGrid(gridSize, gridSize)
-
-  // Put the grid as the only element of a GridBagPanel to keep it centered
-  private val boardConstraint: Panel = new GridBagPanel:
-    background = backgroundColor
-    layout(gridPanel) = new Constraints
-
+  // controlli
   private val startButton: Button = new Button("▶ Start")
   private val pauseResumeButton: Button = new Button("⏸ Pause/Resume")
   private val resetButton: Button = new Button("\uD83D\uDD04 Reset")
@@ -121,8 +167,9 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(inGameAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-      // TODO: notify controller
-      simController.startSimulation()
+      Future {
+        simController.startSimulation()
+      }(ExecutionContext.global)
   }
 
   resetButton.reactions += {
@@ -132,7 +179,6 @@ class SimView(private val simController: SimController):
       pauseResumeButton.enabled = false
       brushToggle.enabled = true
       brushToggle.selected = false
-      brushMode = false
       soilTypeSelector.peer.setModel(
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
@@ -140,8 +186,7 @@ class SimView(private val simController: SimController):
       // TODO: notify controller
       simController.stopSimulation()
       gridSize = askForGridSize()
-      generateGrid(gridSize, gridSize)
-      simController.generateMap(gridSize, gridSize)
+      gridCanvas.reset(gridSize)
   }
 
   pauseResumeButton.reactions += {
@@ -240,7 +285,7 @@ class SimView(private val simController: SimController):
     minimumSize = new Dimension(minWidth, minHeight)
     contents = new BorderPanel:
       layout(scrollPanel) = BorderPanel.Position.North
-      layout(boardConstraint) = BorderPanel.Position.Center
+      layout(gridCanvas) = BorderPanel.Position.Center
     centerOnScreen()
     visible = true
 
@@ -253,39 +298,14 @@ class SimView(private val simController: SimController):
         optionType = Dialog.Options.YesNo,
         title = "Confirm Exit"
       )
-
       if response == Dialog.Result.Yes then
         simController.closing()
         mainFrame.dispose()
   }
 
   def setViewMap(updatedGridCells: Seq[CellViewType]): Unit =
-    if updatedGridCells.length != gridSize * gridSize then
-      // TODO: log error
-      Dialog.showMessage(
-        mainFrame,
-        "Expected Seq[CellViewType] of length " + gridSize * gridSize
-          + ", found " + updatedGridCells.length + "instead",
-        messageType = Dialog.Message.Error,
-        title = "ERROR"
-      )
-    else
-      gridCells.flatten.zip(updatedGridCells).foreach((b, c) =>
-        b.color = getCellColor(c); b.repaint()
-      )
-
-  private def getCellColor(cellViewType: CellViewType): Color =
-    cellViewType match
-      case CellViewType.Fire        => Color.red
-      case CellViewType.Empty       => Color.white
-      case CellViewType.Forest      => Color.green.darker()
-      case CellViewType.Grass       => Color.green.brighter()
-      case CellViewType.Station     => Color.yellow
-      case CellViewType.Burnt       => Color.gray.darker()
-      case CellViewType.Rock        => Color.gray.brighter()
-      case CellViewType.Firefighter => new Color(165, 42, 42)
-      case CellViewType.Water       => Color.blue
-      case null                     => Color.lightGray
+    if updatedGridCells.length == gridSize * gridSize then
+      gridCanvas.updateGrid(updatedGridCells)
 
   @tailrec
   private def askForGridSize(): Int =
@@ -294,7 +314,7 @@ class SimView(private val simController: SimController):
       case Some(input)
           if input.toIntOption.isDefined && input.toInt >= minimumGridSize =>
         input.toInt
-      case Some(input) =>
+      case Some(_) =>
         Dialog.showMessage(
           null,
           s"Grid size must be a number greater than ${minimumGridSize - 1}.",
@@ -304,22 +324,19 @@ class SimView(private val simController: SimController):
         askForGridSize()
 
   private def handleClick(pos: (Int, Int)): Unit =
-    val selectedType = CellViewType
-      .fromString(soilTypeSelector.item)
-      .getOrElse(CellViewType.Empty)
-
-    if drawLineMode then
+    val selectedType = CellViewType.fromString(
+      soilTypeSelector.item
+    ).getOrElse(CellViewType.Empty)
+    if drawLineButton.selected then
       handleDrawLine(pos, selectedType)
-    else if brushToggle.selected then
-      handleBrushMode(pos, selectedType)
     else
       simController.placeCell(pos, selectedType)
 
   private def handleHover(pos: (Int, Int)): Unit =
-    if brushMode then
-      val selectedType = CellViewType
-        .fromString(soilTypeSelector.item)
-        .getOrElse(CellViewType.Empty)
+    if brushToggle.selected then
+      val selectedType = CellViewType.fromString(
+        soilTypeSelector.item
+      ).getOrElse(CellViewType.Empty)
       simController.placeCell(pos, selectedType)
 
   private def handleDrawLine(
@@ -331,23 +348,6 @@ class SimView(private val simController: SimController):
         firstClick = Some(pos)
       case Some(start) =>
         firstClick = None
-        simController.placeLine(start, pos, cellViewType)
-
-  private def handleBrushMode(
-      pos: (Int, Int),
-      cellViewType: CellViewType
-  ): Unit =
-    brushMode = !brushMode
-    if brushMode then
-      simController.placeCell(pos, cellViewType)
-
-  private def generateGrid(rows: Int, cols: Int): Unit =
-    gridCells = Seq.tabulate(rows, cols) { (i, j) =>
-      new GridButton((i, j), handleClick, handleHover, Color.white)
-    }
-
-    gridPanel.contents.clear()
-    gridPanel.peer.setLayout(new java.awt.GridLayout(rows, cols))
-    gridPanel.contents ++= gridCells.flatten
-    gridPanel.revalidate()
-    gridPanel.repaint()
+        Future {
+          simController.placeLine(start, pos, cellViewType)
+        }(ExecutionContext.global)

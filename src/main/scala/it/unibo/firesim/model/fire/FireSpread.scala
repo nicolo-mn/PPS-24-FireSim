@@ -17,7 +17,7 @@ def fireSpread(
 
   if burningCells.isEmpty then
     (matrix, burningCells, randoms)
-  else {
+  else
     val rows = matrix.length
     val cols = if rows > 0 then matrix(0).length else 0
     val newMatrix = Array.ofDim[CellType](rows, cols)
@@ -60,7 +60,6 @@ def fireSpread(
             newMatrix(r)(c) = currentCell
 
     (newMatrix.map(_.toVector).toVector, newBurningCells, rng)
-    }
 
 def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
   for
