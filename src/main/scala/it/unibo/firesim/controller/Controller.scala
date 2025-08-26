@@ -10,7 +10,7 @@ trait Controller:
     */
   def handleViewMessage(msg: ViewMessage): Unit
 
-  /** Asynchronously change the milliseconds to wait every tick using the speed
+  /** Change the milliseconds to wait every tick using the speed
     * factor
     *
     * @param factor
@@ -18,35 +18,35 @@ trait Controller:
     */
   def updateSimulationSpeed(factor: Double): Unit
 
-  /** Asynchronously sets the wind speed from view to model.
+  /** Sets the wind speed from view to model.
     *
     * @param speed
     *   The wind speed to update.
     */
   def setWindSpeed(speed: Int): Unit
 
-  /** Asynchronously sets the wind angle from view to model.
+  /** Sets the wind angle from view to model.
     *
     * @param angle
     *   The angle to update.
     */
   def setWindAngle(angle: Int): Unit
 
-  /** Asynchronously sets the temperature from view to model.
+  /** Sets the temperature from view to model.
     *
     * @param temp
     *   The temperature to update.
     */
   def setTemperature(temp: Int): Unit
 
-  /** Asynchronously sets the humidity from view to model.
+  /** Sets the humidity from view to model.
     *
     * @param humidity
     *   The humidity to update.
     */
   def setHumidity(humidity: Int): Unit
 
-  /** Asynchronously makes model generate a map.
+  /** Makes model generate a map.
     *
     * @param width
     *   The width of the map.
@@ -55,7 +55,7 @@ trait Controller:
     */
   def generateMap(width: Int, height: Int): Unit
 
-  /** Asynchronously makes model try to place a cell.
+  /** Makes model try to place a cell.
     *
     * @param pos
     *   The position of the cell.
@@ -80,7 +80,7 @@ trait Controller:
     */
   def closing(): Unit
 
-  /** Asynchronously makes model try to create a line.
+  /** Makes model try to create a line.
     *
     * @param start
     *   The start of the line.

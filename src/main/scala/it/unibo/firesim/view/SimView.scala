@@ -139,6 +139,12 @@ class SimView(private val simController: SimController):
 
   private val inGameAvailableSoils = Seq(fireSoilStr, emptySoilStr)
   private val soilTypeSelector = new ComboBox(mapEditAvailableSoils)
+  soilTypeSelector.selection.item = fireSoilStr
+  soilTypeSelector.listenTo(soilTypeSelector.selection)
+  soilTypeSelector.reactions += {
+    case SelectionChanged(_) =>
+      firstClick = None
+  }
 
   private var firstClick: Option[(Int, Int)] = None
   private val drawLineButton: ToggleButton = new ToggleButton("🖉 Draw Line")
@@ -183,7 +189,6 @@ class SimView(private val simController: SimController):
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-      // TODO: notify controller
       simController.stopSimulation()
       gridSize = askForGridSize()
       gridCanvas.reset(gridSize)
@@ -191,7 +196,6 @@ class SimView(private val simController: SimController):
 
   pauseResumeButton.reactions += {
     case ButtonClicked(_) =>
-      // TODO: notify controller
       simController.pauseResumeSimulation()
   }
 
@@ -214,7 +218,6 @@ class SimView(private val simController: SimController):
     reactions += {
       case ValueChanged(_) =>
         humidityLabel.text = humidityLabelText + value + humidityUnit
-        // TODO: handle value changes
         simController.setHumidity(value)
     }
 
@@ -225,7 +228,6 @@ class SimView(private val simController: SimController):
     reactions += {
       case ValueChanged(_) =>
         temperatureLabel.text = temperatureLabelText + value + temperatureUnit
-        // TODO: handle value changes
         simController.setTemperature(value)
     }
 
@@ -237,7 +239,6 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         windDirectionLabel.text =
           windDirectionLabelText + value + windDirectionUnit
-        // TODO: handle value changes
         simController.setWindAngle(value)
     }
 
@@ -249,7 +250,6 @@ class SimView(private val simController: SimController):
       case ValueChanged(_) =>
         windIntensityLabel.text =
           windIntensityLabelText + value + windIntensityUnit
-        // TODO: handle value changes
         simController.setWindSpeed(value)
     }
 
@@ -298,6 +298,7 @@ class SimView(private val simController: SimController):
         optionType = Dialog.Options.YesNo,
         title = "Confirm Exit"
       )
+
       if response == Dialog.Result.Yes then
         simController.closing()
         mainFrame.dispose()

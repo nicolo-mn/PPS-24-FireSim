@@ -42,7 +42,7 @@ class SimController(
     */
   override def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
 
-  /** Asynchronously change the milliseconds to wait every tick using the speed
+  /** Change the milliseconds to wait every tick using the speed
     * factor
     *
     * @param factor
@@ -51,7 +51,7 @@ class SimController(
   def updateSimulationSpeed(factor: Double): Unit =
     tickMs = (originalTickMs / factor).toInt
 
-  /** Asynchronously sets the wind speed from view to model.
+  /** Sets the wind speed from view to model.
     *
     * @param speed
     *   The wind speed to update.
@@ -59,7 +59,7 @@ class SimController(
   override def setWindSpeed(speed: Int): Unit =
     model.updateParams(_.copy(windSpeed = speed))
 
-  /** Asynchronously sets the wind angle from view to model.
+  /** Sets the wind angle from view to model.
     *
     * @param angle
     *   The angle to update.
@@ -67,7 +67,7 @@ class SimController(
   override def setWindAngle(angle: Int): Unit =
     model.updateParams(_.copy(windAngle = angle))
 
-  /** Asynchronously sets the temperature from view to model.
+  /** Sets the temperature from view to model.
     *
     * @param temp
     *   The temperature to update.
@@ -75,7 +75,7 @@ class SimController(
   override def setTemperature(temp: Int): Unit =
     model.updateParams(_.copy(temperature = temp))
 
-  /** Asynchronously sets the humidity from view to model.
+  /** Sets the humidity from view to model.
     *
     * @param humidity
     *   The humidity to update.
@@ -83,7 +83,7 @@ class SimController(
   override def setHumidity(humidity: Int): Unit =
     model.updateParams(_.copy(humidity = humidity))
 
-  /** Asynchronously makes model generate a map.
+  /** Makes model generate a map.
     *
     * @param width
     *   The width of the map.
@@ -96,7 +96,7 @@ class SimController(
     lock.notifyAll()
   }
 
-  /** Asynchronously makes model try to place a cell.
+  /** Makes model try to place a cell.
     *
     * @param pos
     *   The position of the cell.
