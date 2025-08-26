@@ -156,7 +156,6 @@ class SimView(private val simController: SimController):
 
   private val brushToggle: ToggleButton = new ToggleButton("Brush")
 
-  // controlli
   private val startButton: Button = new Button("▶ Start")
   private val pauseResumeButton: Button = new Button("⏸ Pause/Resume")
   private val resetButton: Button = new Button("\uD83D\uDD04 Reset")
@@ -191,6 +190,7 @@ class SimView(private val simController: SimController):
       soilTypeSelector.selection.item = fireSoilStr
       simController.stopSimulation()
       gridSize = askForGridSize()
+      simController.generateMap(gridSize, gridSize)
       gridCanvas.reset(gridSize)
   }
 
