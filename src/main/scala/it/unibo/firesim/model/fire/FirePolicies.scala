@@ -8,24 +8,28 @@ type BurnDurationPolicy = (CellType, Int, Int) => Boolean
 
 val defaultBurnDuration: BurnDurationPolicy =
   (cellType, start, current) =>
-    (current - start) >= Vegetation.burnDuration(
-      CellTypeOps.vegetation(cellType)
-    )
+    (current - start) >= cellType.vegetation.burnDuration
 
 val defaultProbabilityCalc: ProbabilityCalc =
   (cellType, params, r, c, matrix) =>
-    if !CellTypeOps.isFlammable(cellType) then 0.0
+    if !cellType.isFlammable || cellType.isBurning
+    then 0.0
     else
-      val veg = CellTypeOps.vegetation(cellType)
-      val stageFactor = cellType match
-        case CellType.Burning(_, stage, _) => FireStage.stageProbFactor(stage)
-        case _                             => 1.0
-      val humidityFactor = math.max(0.0, 1.0 - params.humidity / 100.0)
-      val temperatureFactor = math.max(0.0, (params.temperature - 15.0) / 25.0)
 
-      val p = Vegetation.flammability(veg) *
-        stageFactor *
+      val humidityFactor = 1.0 / (1.0 + math.exp((params.humidity - 70) / 20.0))
+      val temperatureFactor =
+        1.0 / (1.0 + math.exp(-(params.temperature - 20) / 5.0))
+
+      val neighborInfluence = neighbors(r, c, matrix)
+        .map(pos => matrix(pos._1)(pos._2))
+        .collect { case CellType.Burning(_, stage, _) =>
+          stage.probabilityFactor
+        }
+        .sum
+
+      val p = cellType.vegetation.flammability *
         humidityFactor *
-        temperatureFactor
+        temperatureFactor *
+        (1.0 + neighborInfluence * 0.05)
 
       math.min(1.0, math.max(0.0, p))
