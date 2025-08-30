@@ -42,8 +42,7 @@ class SimController(
     */
   override def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
 
-  /** Change the milliseconds to wait every tick using the speed
-    * factor
+  /** Change the milliseconds to wait every tick using the speed factor
     *
     * @param factor
     *   The speed factor used to divide the original tick milliseconds

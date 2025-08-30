@@ -3,6 +3,7 @@ package it.unibo.firesim.model
 import it.unibo.firesim.model.cell.CellType
 import it.unibo.firesim.model.cell.CellType.*
 import it.unibo.firesim.model.fire.*
+import it.unibo.firesim.config.Config.*
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -37,16 +38,16 @@ class SimModel(
     *   The Matrix containing the generated cells
     */
   def generateMap(rows: Int, cols: Int): Matrix =
-    val matrix = Vector.tabulate(rows, cols) { (r, c) =>
-      Rock
-    }
 
-    val lakeSeedFrequency = 0.0001
-    val lakeSeedsCount = ((rows * cols) * lakeSeedFrequency).toInt
+    val meanRowsCols = (rows + cols) / 2
+    def roundedMeanMul(ratio: Double): Int = (ratio * meanRowsCols).round.toInt
+
+    val matrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
+
+    val lakeSeedsCount = roundedMeanMul(lakeSeedFrequency) max 1
     val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount)
-    val minLakeSize = (1.5 * rows).toInt
-    val maxLakeSize = (5 * rows).toInt
-    val lakeGrowthProbability = 0.8
+    val minLakeSize = roundedMeanMul(minLakeSizeRatio)
+    val maxLakeSize = roundedMeanMul(maxLakeSizeRatio)
     val withLakes = lakeSeeds.foldLeft(matrix) { (matrix, seed) =>
       growCluster(
         matrix,
@@ -57,13 +58,11 @@ class SimModel(
       )
     }
 
-    val forestSeedFrequency = 0.015
-    val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt max 1
+    val forestSeedsCount = roundedMeanMul(forestSeedFrequency) max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount)
 
-    val minForestSize = (0.3 * rows).toInt
-    val maxForestSize = (1.5 * rows).toInt
-    val forestGrowthProbability = 0.7
+    val minForestSize = roundedMeanMul(minForestSizeRatio)
+    val maxForestSize = roundedMeanMul(maxForestSizeRatio)
     val withForests = forestSeeds.foldLeft(withLakes) { (matrix, seed) =>
       growCluster(
         matrix,
@@ -86,21 +85,19 @@ class SimModel(
         }
       }
 
-    val minGrassSpreadDistance = 10
-    val maxGrassSpreadDistance = 40
-    val grassGrowthFrequency = 0.8
+    val minGrassSpreadDistance = roundedMeanMul(minGrassSizeRatio)
+    val maxGrassSpreadDistance = roundedMeanMul(maxGrassSizeRatio)
     val withGrass = grassSeeds.foldLeft(withForests) { (matrix, seed) =>
       growCluster(
         matrix,
         seed,
         random.between(minGrassSpreadDistance, maxGrassSpreadDistance),
-        grassGrowthFrequency,
+        grassGrowthProbability,
         Grass
       )
     }
 
-    val stationSeedsFrequency = 0.0002
-    val stationSeedsCount = ((rows * cols) * stationSeedsFrequency).toInt max 1
+    val stationSeedsCount = roundedMeanMul(stationSeedsFrequency) max 1
     val stationSeeds =
       generateSparseSeeds(rows, cols, stationSeedsCount, withGrass)
     val withStations = stationSeeds.foldLeft(withGrass)((m, pos) =>
