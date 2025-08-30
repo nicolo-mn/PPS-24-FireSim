@@ -29,6 +29,26 @@ class SimModel(
   private var randoms: LazyList[Double] =
     LazyList.continually(Random.nextDouble())
 
+  class MapBuilder(private var current: Matrix):
+
+    def addLakes(): MapBuilder =
+      current = SimModel.this.addLakes(current)
+      this
+
+    def addForests(): MapBuilder =
+      current = SimModel.this.addForests(current)
+      this
+
+    def addGrass(): MapBuilder =
+      current = SimModel.this.addGrass(current)
+      this
+
+    def addStations(): MapBuilder =
+      current = SimModel.this.addStations(current)
+      this
+
+    def result: Matrix = current
+
   /** Generates a map with the specified number of rows and columns.
     *
     * @param rows
@@ -43,10 +63,12 @@ class SimModel(
     this.cols = cols
 
     val baseMatrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
-    val withLakes = addLakes(baseMatrix)
-    val withForests = addForests(withLakes)
-    val withGrass = addGrass(withForests)
-    matrix = addStations(withGrass)
+    matrix = MapBuilder(baseMatrix)
+      .addLakes()
+      .addForests()
+      .addGrass()
+      .addStations()
+      .result
 
     firefighters = Seq.empty
     firefightersPos = Seq.empty
