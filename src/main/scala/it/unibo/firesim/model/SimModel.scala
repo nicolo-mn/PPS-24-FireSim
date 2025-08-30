@@ -24,6 +24,7 @@ class SimModel(
   private var firefighters: Seq[FireFighter] = Seq.empty
   private var firefightersPos: Seq[(Int, Int)] = Seq.empty
   private var cycle: Int = 0
+  private var rows, cols: Int = 0
 
   private var randoms: LazyList[Double] =
     LazyList.continually(Random.nextDouble())
@@ -38,19 +39,35 @@ class SimModel(
     *   The Matrix containing the generated cells
     */
   def generateMap(rows: Int, cols: Int): Matrix =
+    this.rows = rows
+    this.cols = cols
 
-    val meanRowsCols = (rows + cols) / 2
-    def roundedMeanMul(ratio: Double): Int = (ratio * meanRowsCols).round.toInt
+    val baseMatrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
+    val withLakes = addLakes(baseMatrix)
+    val withForests = addForests(withLakes)
+    val withGrass = addGrass(withForests)
+    matrix = addStations(withGrass)
 
-    val matrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
+    firefighters = Seq.empty
+    firefightersPos = Seq.empty
+    matrix.positionsOf(Station).foreach(s =>
+      firefighters = firefighters :+ FireFighter(rows, cols, s)
+      firefightersPos = firefightersPos :+ s
+    )
 
+    matrix
+
+  private def roundedMeanMul(ratio: Double): Int =
+    (ratio * (rows + cols) / 2).round.toInt
+
+  private def addLakes(matrix: Matrix): Matrix =
     val lakeSeedsCount = roundedMeanMul(lakeSeedFrequency) max 1
     val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount)
     val minLakeSize = roundedMeanMul(minLakeSizeRatio)
     val maxLakeSize = roundedMeanMul(maxLakeSizeRatio)
-    val withLakes = lakeSeeds.foldLeft(matrix) { (matrix, seed) =>
+    lakeSeeds.foldLeft(matrix) { (m, seed) =>
       growCluster(
-        matrix,
+        m,
         seed,
         random.between(minLakeSize, maxLakeSize),
         lakeGrowthProbability,
@@ -58,14 +75,15 @@ class SimModel(
       )
     }
 
+  private def addForests(matrix: Matrix): Matrix =
     val forestSeedsCount = roundedMeanMul(forestSeedFrequency) max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount)
 
     val minForestSize = roundedMeanMul(minForestSizeRatio)
     val maxForestSize = roundedMeanMul(maxForestSizeRatio)
-    val withForests = forestSeeds.foldLeft(withLakes) { (matrix, seed) =>
+    forestSeeds.foldLeft(matrix) { (m, seed) =>
       growCluster(
-        matrix,
+        m,
         seed,
         random.between(minForestSize, maxForestSize),
         forestGrowthProbability,
@@ -73,21 +91,14 @@ class SimModel(
       )
     }
 
-    val grassSeeds: Seq[(Int, Int)] =
-      (0 until withForests.rows).flatMap { r =>
-        (0 until withForests.cols).flatMap { c =>
-          if withForests(r)(c) == Forest then
-            neighbors(r, c, withForests).filter { case (nr, nc) =>
-              withForests(nr)(nc) == Rock
-            }
-          else
-            Seq.empty
-        }
-      }
+  private def addGrass(matrix: Matrix): Matrix =
+    val grassSeeds: Seq[(Int, Int)] = matrix.positionsOf(Forest)
+      .flatMap((r, c) => neighbors(r, c, matrix))
+      .filter((r, c) => matrix(r)(c) == Rock)
 
     val minGrassSpreadDistance = roundedMeanMul(minGrassSizeRatio)
     val maxGrassSpreadDistance = roundedMeanMul(maxGrassSizeRatio)
-    val withGrass = grassSeeds.foldLeft(withForests) { (matrix, seed) =>
+    grassSeeds.foldLeft(matrix) { (matrix, seed) =>
       growCluster(
         matrix,
         seed,
@@ -97,25 +108,17 @@ class SimModel(
       )
     }
 
+  private def addStations(matrix: Matrix): Matrix =
     val stationSeedsCount = roundedMeanMul(stationSeedsFrequency) max 1
     val stationSeeds =
-      generateSparseSeeds(rows, cols, stationSeedsCount, withGrass)
-    val withStations = stationSeeds.foldLeft(withGrass)((m, pos) =>
+      generateSparseSeeds(rows, cols, stationSeedsCount, matrix)
+    stationSeeds.foldLeft(matrix)((m, pos) =>
       m.update(
         pos._1,
         pos._2,
         Station
       )
     )
-    firefighters = Seq.empty
-    firefightersPos = Seq.empty
-    withStations.positionsOf(Station).foreach(s =>
-      firefighters = firefighters :+ FireFighter(rows, cols, s)
-      firefightersPos = firefightersPos :+ s
-    )
-
-    this.matrix = withStations
-    withStations
 
   private def generateSparseSeeds(
       rows: Int,
