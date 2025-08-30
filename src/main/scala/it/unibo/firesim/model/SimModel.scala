@@ -5,6 +5,7 @@ import it.unibo.firesim.model.cell.CellType.*
 import it.unibo.firesim.model.fire.*
 import it.unibo.firesim.config.Config.*
 
+import scala.collection.parallel.CollectionConverters.*
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -87,7 +88,7 @@ class SimModel(
     val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount)
     val minLakeSize = roundedMeanMul(minLakeSizeRatio)
     val maxLakeSize = roundedMeanMul(maxLakeSizeRatio)
-    lakeSeeds.foldLeft(matrix) { (m, seed) =>
+    lakeSeeds.par.foldLeft(matrix) { (m, seed) =>
       growCluster(
         m,
         seed,
@@ -103,7 +104,7 @@ class SimModel(
 
     val minForestSize = roundedMeanMul(minForestSizeRatio)
     val maxForestSize = roundedMeanMul(maxForestSizeRatio)
-    forestSeeds.foldLeft(matrix) { (m, seed) =>
+    forestSeeds.par.foldLeft(matrix) { (m, seed) =>
       growCluster(
         m,
         seed,
@@ -114,13 +115,14 @@ class SimModel(
     }
 
   private def addGrass(matrix: Matrix): Matrix =
-    val grassSeeds: Seq[(Int, Int)] = matrix.positionsOf(Forest)
+    val grassSeeds: Seq[(Int, Int)] = matrix.positionsOf(Forest).par
       .flatMap((r, c) => neighbors(r, c, matrix))
       .filter((r, c) => matrix(r)(c) == Rock)
+      .seq
 
     val minGrassSpreadDistance = roundedMeanMul(minGrassSizeRatio)
     val maxGrassSpreadDistance = roundedMeanMul(maxGrassSizeRatio)
-    grassSeeds.foldLeft(matrix) { (matrix, seed) =>
+    grassSeeds.par.foldLeft(matrix) { (matrix, seed) =>
       growCluster(
         matrix,
         seed,
@@ -134,7 +136,7 @@ class SimModel(
     val stationSeedsCount = roundedMeanMul(stationSeedsFrequency) max 1
     val stationSeeds =
       generateSparseSeeds(rows, cols, stationSeedsCount, matrix)
-    stationSeeds.foldLeft(matrix)((m, pos) =>
+    stationSeeds.par.foldLeft(matrix)((m, pos) =>
       m.update(
         pos._1,
         pos._2,
@@ -233,12 +235,13 @@ class SimModel(
       case Burning(_, _, _) => true
       case _                => false
     }.toSet
-    val (newMatrix, newBurningCells, nextRandoms) =
+    val (updatedMatrix, updatedBurningCells, nextRandoms) =
       fireSpread(matrix, burningCells, simParams, cycle, randoms)
-    matrix = newMatrix
+    matrix = updatedMatrix
     randoms = nextRandoms
 
-    val firefightersUpdate = firefighters.map(f => f.act(newBurningCells.toSeq))
+    val firefightersUpdate =
+      firefighters.par.map(f => f.act(updatedBurningCells.toSeq))
     firefightersPos = Seq.empty
     firefightersUpdate.foreach(fu =>
       firefightersPos = firefightersPos :+ fu.position
