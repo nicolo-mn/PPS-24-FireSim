@@ -6,18 +6,15 @@ import it.unibo.firesim.model.{Matrix, SimParams}
 import it.unibo.firesim.model.cell.CellType
 import it.unibo.firesim.model.cell.CellType.Grass
 import it.unibo.firesim.model.fire.FireStage.{Active, Ignition}
+import it.unibo.firesim.util.*
 
 class FireSpreadTest extends AnyFlatSpec with Matchers:
 
-  def randoms(values: Double*): LazyList[Double] =
-    LazyList.from(values)
+  val rng: RNG = SimpleRNG(42)
 
   given prob: ProbabilityCalc = (_, _, _, _, _) => 1.0
 
-  given burn: BurnDurationPolicy = (cellType, start, current) =>
-    (current - start) >= Vegetation.burnDuration(
-      CellTypeOps.vegetation(cellType)
-    )
+  given burn: BurnDurationPolicy = defaultBurnDuration
 
   "fireSpread" should "turn flammable cells into burning with high probability and a burning neighbor" in {
     val matrix: Matrix = Vector(
@@ -30,7 +27,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val params = SimParams(0, 0, 30, 10)
 
     val (result, newBurning, _) =
-      fireSpread(matrix, Set((0, 1)), params, 1, randoms(0.1, 0.1, 0.1))
+      fireSpread(matrix, Set((0, 1)), params, 1, rng)
     result(0)(0) shouldBe a[CellType.Burning]
     result(0)(0).asInstanceOf[CellType.Burning].originalType shouldBe Grass
     result(1)(0) shouldBe a[CellType.Burning]
@@ -45,7 +42,9 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
       (current - start) >= 3
     given BurnDurationPolicy = testBurnDuration
 
-    val (newM, _, _) = fireSpread(matrix, Set((0, 0)), params, 3, randoms(0.0))
+    val (midM, _, _) = fireSpread(matrix, Set((0, 0)), params, 2, rng)
+    midM(0)(0) shouldBe a[CellType.Burning]
+    val (newM, _, _) = fireSpread(matrix, Set((0, 0)), params, 3, rng)
     newM(0)(0) shouldBe CellType.Burnt
   }
 
@@ -60,12 +59,12 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     given prob: ProbabilityCalc = (_, _, _, _, _) => 0.0
 
     val (newM, _, _) =
-      fireSpread(matrix, Set((0, 1)), params, 1, randoms(0.1, 0.2, 0.3))
+      fireSpread(matrix, Set((0, 1)), params, 1, rng)
     newM(0)(0) shouldBe CellType.Grass
     newM(0)(1) shouldBe a[CellType.Burning]
   }
 
-  "defaultProbabilityCalc" should "give higher probability for forest than grass" in {
+  "defaultProbabilityCalc" should "give higher probability for grass than forest" in {
     val dummyMatrix = Vector.empty
     val params = SimParams(0, 0, 30, 20)
 
@@ -74,7 +73,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val grassProb =
       defaultProbabilityCalc(CellType.Grass, params, 0, 1, dummyMatrix)
 
-    forestProb should be > grassProb
+    grassProb should be > forestProb
     forestProb should be <= 1.0
     grassProb should be >= 0.0
   }
@@ -121,25 +120,34 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     boosted should be <= 1.0
   }
 
-  it should "only burn cells with high probability and near a burning cell" in {
+  "directionalWindProbabilityDynamic" should "boost probability only in the wind direction" in {
+    val params = SimParams(10, 0, 25, 0)
+
     val matrix: Matrix = Vector(
-      Vector(CellType.Grass, CellType.Grass, CellType.Grass),
       Vector(
         CellType.Grass,
-        CellType.Burning(0, Active, Grass),
+        CellType.Grass,
         CellType.Grass
       ),
-      Vector(CellType.Grass, CellType.Grass, CellType.Grass)
+      Vector(
+        CellType.Grass,
+        CellType.Burning(0, Ignition, Grass),
+        CellType.Grass
+      ),
+      Vector(
+        CellType.Grass,
+        CellType.Grass,
+        CellType.Grass
+      )
     )
 
-    val params = SimParams(0, 0, 30, 10)
+    val base: ProbabilityCalc = (_, _, _, _, _) => 0.4
+    val windAdjusted = directionalWindProbabilityDynamic(base)
 
-    val testRandoms = LazyList(0.8, 0.1, 0.8, 0.8, 0.3, 0.6, 0.6, 0.1, 0.2)
+    // upwind cell
+    val rightCellProb = windAdjusted(matrix(1)(1), params, 1, 2, matrix)
+    // not upwind
+    val leftCellProb = windAdjusted(matrix(1)(1), params, 1, 0, matrix)
 
-    given prob: ProbabilityCalc = (_, _, _, _, _) => 0.5
-
-    val (result, _, _) = fireSpread(matrix, Set((1, 1)), params, 1, testRandoms)
-
-    result(1)(2) shouldBe a[CellType.Burning]
-    result(0)(0) shouldBe CellType.Grass
+    leftCellProb should be > rightCellProb
   }

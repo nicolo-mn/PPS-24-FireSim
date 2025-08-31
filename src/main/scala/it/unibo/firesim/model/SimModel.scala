@@ -4,6 +4,7 @@ import it.unibo.firesim.model.cell.CellType
 import it.unibo.firesim.model.cell.CellType.*
 import it.unibo.firesim.model.fire.*
 import it.unibo.firesim.config.Config.*
+import it.unibo.firesim.util.{RNG, SimpleRNG}
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.annotation.tailrec
@@ -26,9 +27,7 @@ class SimModel(
   private var firefightersPos: Seq[(Int, Int)] = Seq.empty
   private var cycle: Int = 0
   private var rows, cols: Int = 0
-
-  private var randoms: LazyList[Double] =
-    LazyList.continually(Random.nextDouble())
+  private var rng: RNG = SimpleRNG(42)
 
   class MapBuilder(private var current: Matrix):
 
@@ -236,9 +235,9 @@ class SimModel(
       case _                => false
     }.toSet
     val (updatedMatrix, updatedBurningCells, nextRandoms) =
-      fireSpread(matrix, burningCells, simParams, cycle, randoms)
+      fireSpread(matrix, burningCells, simParams, cycle, rng)
     matrix = updatedMatrix
-    randoms = nextRandoms
+    rng = nextRandoms
 
     val firefightersUpdate =
       firefighters.par.map(f => f.act(updatedBurningCells.toSeq))

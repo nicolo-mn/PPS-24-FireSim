@@ -2,21 +2,19 @@ package it.unibo.firesim.model.fire
 
 import it.unibo.firesim.model.{Matrix, SimParams, inBounds, update}
 import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.fire.* // Assuming your fire logic is here
+import it.unibo.firesim.util.RNG
 
-/** A helper function to get valid neighbor positions. It uses the `inBounds`
-  * extension method from your Matrix type.
-  */
+/** */
 def fireSpread(
     matrix: Matrix,
     burning: Set[(Int, Int)],
     params: SimParams,
     currentCycle: Int,
-    randoms: LazyList[Double]
+    rng: RNG
 )(using
     prob: ProbabilityCalc,
     burn: BurnDurationPolicy
-): (Matrix, Set[(Int, Int)], LazyList[Double]) =
+): (Matrix, Set[(Int, Int)], RNG) =
 
   val (stillBurningUpdates, extinguishedPositions) = burning.foldLeft(
     (Map.empty[(Int, Int), CellType], Set.empty[(Int, Int)])
@@ -33,14 +31,17 @@ def fireSpread(
             currentCycle,
             oldCellType.vegetation.burnDuration
           )
-          (
-            burningAcc + (pos -> CellType.Burning(
-              start,
-              nextStage,
-              oldCellType
-            )),
-            extinguishedAcc
-          )
+          if nextStage != fireStage then
+            (
+              burningAcc + (pos -> CellType.Burning(
+                start,
+                nextStage,
+                oldCellType
+              )),
+              extinguishedAcc
+            )
+          else
+            (burningAcc, extinguishedAcc)
       case _ =>
         (burningAcc, extinguishedAcc)
   }
@@ -54,21 +55,22 @@ def fireSpread(
       cell.isFlammable && !cell.isBurning
     }
 
-  val (newlyIgnited, remainingRandoms) = ignitionCandidates.foldLeft(
-    (Map.empty[(Int, Int), CellType], randoms)
-  ) { case ((ignitedAcc, rand), pos) =>
+  val (newlyIgnited, finalRng) = ignitionCandidates.foldLeft(
+    (Map.empty[(Int, Int), CellType], rng)
+  ) { case ((ignitedAcc, r), pos) =>
+
     val cell = matrix(pos._1)(pos._2)
     val ignitionProb = prob(cell, params, pos._1, pos._2, matrix)
-
-    if rand.head < ignitionProb then
+    val (randVal, nextRng) = r.nextDouble
+    if randVal < ignitionProb then
       val newBurningCell = CellType.Burning(
         currentCycle,
         FireStage.Ignition,
         matrix(pos._1)(pos._2)
       )
-      (ignitedAcc + (pos -> newBurningCell), rand.tail)
+      (ignitedAcc + (pos -> newBurningCell), nextRng)
     else
-      (ignitedAcc, rand.tail)
+      (ignitedAcc, nextRng)
   }
 
   val allChanges = stillBurningUpdates ++
@@ -80,7 +82,7 @@ def fireSpread(
   )
 
   val newBurningSet = stillBurningPos ++ newlyIgnited.keys
-  (newMatrix, newBurningSet, remainingRandoms)
+  (newMatrix, newBurningSet, finalRng)
 
 private def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
   for
