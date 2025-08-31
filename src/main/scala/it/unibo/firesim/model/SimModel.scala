@@ -3,7 +3,9 @@ package it.unibo.firesim.model
 import it.unibo.firesim.model.cell.CellType
 import it.unibo.firesim.model.cell.CellType.*
 import it.unibo.firesim.model.fire.*
+import it.unibo.firesim.config.Config.*
 
+import scala.collection.parallel.CollectionConverters.*
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -23,9 +25,30 @@ class SimModel(
   private var firefighters: Seq[FireFighter] = Seq.empty
   private var firefightersPos: Seq[(Int, Int)] = Seq.empty
   private var cycle: Int = 0
+  private var rows, cols: Int = 0
 
   private var randoms: LazyList[Double] =
     LazyList.continually(Random.nextDouble())
+
+  class MapBuilder(private var current: Matrix):
+
+    def addLakes(): MapBuilder =
+      current = SimModel.this.addLakes(current)
+      this
+
+    def addForests(): MapBuilder =
+      current = SimModel.this.addForests(current)
+      this
+
+    def addGrass(): MapBuilder =
+      current = SimModel.this.addGrass(current)
+      this
+
+    def addStations(): MapBuilder =
+      current = SimModel.this.addStations(current)
+      this
+
+    def result: Matrix = current
 
   /** Generates a map with the specified number of rows and columns.
     *
@@ -37,19 +60,37 @@ class SimModel(
     *   The Matrix containing the generated cells
     */
   def generateMap(rows: Int, cols: Int): Matrix =
-    val matrix = Vector.tabulate(rows, cols) { (r, c) =>
-      Rock
-    }
+    this.rows = rows
+    this.cols = cols
 
-    val lakeSeedFrequency = 0.0001
-    val lakeSeedsCount = ((rows * cols) * lakeSeedFrequency).toInt
+    val baseMatrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
+    matrix = MapBuilder(baseMatrix)
+      .addLakes()
+      .addForests()
+      .addGrass()
+      .addStations()
+      .result
+
+    firefighters = Seq.empty
+    firefightersPos = Seq.empty
+    matrix.positionsOf(Station).foreach(s =>
+      firefighters = firefighters :+ FireFighter(rows, cols, s)
+      firefightersPos = firefightersPos :+ s
+    )
+
+    matrix
+
+  private def roundedMeanMul(ratio: Double): Int =
+    (ratio * (rows + cols) / 2).round.toInt
+
+  private def addLakes(matrix: Matrix): Matrix =
+    val lakeSeedsCount = roundedMeanMul(lakeSeedFrequency) max 1
     val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount)
-    val minLakeSize = (1.5 * rows).toInt
-    val maxLakeSize = (5 * rows).toInt
-    val lakeGrowthProbability = 0.8
-    val withLakes = lakeSeeds.foldLeft(matrix) { (matrix, seed) =>
+    val minLakeSize = roundedMeanMul(minLakeSizeRatio)
+    val maxLakeSize = roundedMeanMul(maxLakeSizeRatio)
+    lakeSeeds.par.foldLeft(matrix) { (m, seed) =>
       growCluster(
-        matrix,
+        m,
         seed,
         random.between(minLakeSize, maxLakeSize),
         lakeGrowthProbability,
@@ -57,16 +98,15 @@ class SimModel(
       )
     }
 
-    val forestSeedFrequency = 0.015
-    val forestSeedsCount = ((rows * cols) * forestSeedFrequency).toInt max 1
+  private def addForests(matrix: Matrix): Matrix =
+    val forestSeedsCount = roundedMeanMul(forestSeedFrequency) max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount)
 
-    val minForestSize = (0.3 * rows).toInt
-    val maxForestSize = (1.5 * rows).toInt
-    val forestGrowthProbability = 0.7
-    val withForests = forestSeeds.foldLeft(withLakes) { (matrix, seed) =>
+    val minForestSize = roundedMeanMul(minForestSizeRatio)
+    val maxForestSize = roundedMeanMul(maxForestSizeRatio)
+    forestSeeds.par.foldLeft(matrix) { (m, seed) =>
       growCluster(
-        matrix,
+        m,
         seed,
         random.between(minForestSize, maxForestSize),
         forestGrowthProbability,
@@ -74,51 +114,35 @@ class SimModel(
       )
     }
 
-    val grassSeeds: Seq[(Int, Int)] =
-      (0 until withForests.rows).flatMap { r =>
-        (0 until withForests.cols).flatMap { c =>
-          if withForests(r)(c) == Forest then
-            neighbors(r, c, withForests).filter { case (nr, nc) =>
-              withForests(nr)(nc) == Rock
-            }
-          else
-            Seq.empty
-        }
-      }
+  private def addGrass(matrix: Matrix): Matrix =
+    val grassSeeds: Seq[(Int, Int)] = matrix.positionsOf(Forest).par
+      .flatMap((r, c) => neighbors(r, c, matrix))
+      .filter((r, c) => matrix(r)(c) == Rock)
+      .seq
 
-    val minGrassSpreadDistance = 10
-    val maxGrassSpreadDistance = 40
-    val grassGrowthFrequency = 0.8
-    val withGrass = grassSeeds.foldLeft(withForests) { (matrix, seed) =>
+    val minGrassSpreadDistance = roundedMeanMul(minGrassSizeRatio)
+    val maxGrassSpreadDistance = roundedMeanMul(maxGrassSizeRatio)
+    grassSeeds.par.foldLeft(matrix) { (matrix, seed) =>
       growCluster(
         matrix,
         seed,
         random.between(minGrassSpreadDistance, maxGrassSpreadDistance),
-        grassGrowthFrequency,
+        grassGrowthProbability,
         Grass
       )
     }
 
-    val stationSeedsFrequency = 0.0002
-    val stationSeedsCount = ((rows * cols) * stationSeedsFrequency).toInt max 1
+  private def addStations(matrix: Matrix): Matrix =
+    val stationSeedsCount = roundedMeanMul(stationSeedsFrequency) max 1
     val stationSeeds =
-      generateSparseSeeds(rows, cols, stationSeedsCount, withGrass)
-    val withStations = stationSeeds.foldLeft(withGrass)((m, pos) =>
+      generateSparseSeeds(rows, cols, stationSeedsCount, matrix)
+    stationSeeds.par.foldLeft(matrix)((m, pos) =>
       m.update(
         pos._1,
         pos._2,
         Station
       )
     )
-    firefighters = Seq.empty
-    firefightersPos = Seq.empty
-    withStations.positionsOf(Station).foreach(s =>
-      firefighters = firefighters :+ FireFighter(rows, cols, s)
-      firefightersPos = firefightersPos :+ s
-    )
-
-    this.matrix = withStations
-    withStations
 
   private def generateSparseSeeds(
       rows: Int,
@@ -211,12 +235,13 @@ class SimModel(
       case Burning(_, _, _) => true
       case _                => false
     }.toSet
-    val (newMatrix, newBurningCells, nextRandoms) =
+    val (updatedMatrix, updatedBurningCells, nextRandoms) =
       fireSpread(matrix, burningCells, simParams, cycle, randoms)
-    matrix = newMatrix
+    matrix = updatedMatrix
     randoms = nextRandoms
 
-    val firefightersUpdate = firefighters.map(f => f.act(newBurningCells.toSeq))
+    val firefightersUpdate =
+      firefighters.par.map(f => f.act(updatedBurningCells.toSeq))
     firefightersPos = Seq.empty
     firefightersUpdate.foreach(fu =>
       firefightersPos = firefightersPos :+ fu.position
