@@ -1,9 +1,19 @@
 package it.unibo.firesim.model.fire
 
+import it.unibo.firesim.config.Config.*
+
 enum FireStage(val probabilityFactor: Double, val activationThreshold: Double):
-  case Ignition extends FireStage(0.3, 0.3)
-  case Active extends FireStage(1.0, 0.7)
-  case Smoldering extends FireStage(0.2, 1.0)
+
+  case Ignition
+      extends FireStage(ignitionProbabilityFactor, ignitionActivationThreshold)
+
+  case Active
+      extends FireStage(activeProbabilityFactor, activeActivationThreshold)
+
+  case Smoldering extends FireStage(
+        smolderingProbabilityFactor,
+        smolderingActivationThreshold
+      )
 
 object FireStage:
 

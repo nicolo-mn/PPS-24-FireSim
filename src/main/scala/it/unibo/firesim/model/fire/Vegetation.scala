@@ -1,6 +1,8 @@
 package it.unibo.firesim.model.fire
 
+import it.unibo.firesim.config.Config.*
+
 enum Vegetation(val flammability: Double, val burnDuration: Int):
-  case Forest extends Vegetation(flammability = 0.02, burnDuration = 100)
-  case Grass extends Vegetation(flammability = 0.05, burnDuration = 70)
-  case None extends Vegetation(flammability = 0.0, burnDuration = 0)
+  case Forest extends Vegetation(forestFlammability, forestBurnDuration)
+  case Grass extends Vegetation(grassFlammability, grassBurnDuration)
+  case None extends Vegetation(noFlammability, noBurnDuration)

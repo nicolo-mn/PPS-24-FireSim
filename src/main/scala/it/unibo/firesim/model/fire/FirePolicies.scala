@@ -1,5 +1,6 @@
 package it.unibo.firesim.model.fire
 
+import it.unibo.firesim.config.Config.*
 import it.unibo.firesim.model.{Matrix, SimParams}
 import it.unibo.firesim.model.cell.CellType
 
@@ -13,12 +14,16 @@ val defaultBurnDuration: BurnDurationPolicy =
 val defaultProbabilityCalc: ProbabilityCalc =
   (cellType, params, r, c, matrix) =>
     if !cellType.isFlammable || cellType.isBurning
-    then 0.0
+    then minProbability
     else
 
-      val humidityFactor = 1.0 / (1.0 + math.exp((params.humidity - 70) / 20.0))
+      val humidityFactor = 1.0 / (1.0 + math.exp(
+        (params.humidity - humidityMidpoint) / humidityScale
+      ))
       val temperatureFactor =
-        1.0 / (1.0 + math.exp(-(params.temperature - 20) / 5.0))
+        1.0 / (1.0 + math.exp(
+          -(params.temperature - temperatureMidpoint) / temperatureScale
+        ))
 
       val neighborInfluence = neighbors(r, c, matrix)
         .map(pos => matrix(pos._1)(pos._2))
@@ -27,9 +32,9 @@ val defaultProbabilityCalc: ProbabilityCalc =
         }
         .sum
 
-      val p = cellType.vegetation.flammability *
+      val probability = cellType.vegetation.flammability *
         humidityFactor *
         temperatureFactor *
-        (1.0 + neighborInfluence * 0.05)
+        (baseNeighborInfluence + neighborInfluence * neighborInfluenceWeight)
 
-      math.min(1.0, math.max(0.0, p))
+      math.min(maxProbability, math.max(minProbability, probability))
