@@ -202,11 +202,16 @@ class SimModel(
   def updateParams(f: SimParams => SimParams): Unit =
     lock.synchronized { params = f(params) }
 
+  /** @return
+    *   The current cycle number
+    */
+  def getCurrentCycle: Int = cycle
+
   /** @param cells
     *   The cells to place
     * @return
-    *   The updated game matrix and the list of positions of firefighters above
-    *   the map
+    *   The updated game matrix, the list of positions of firefighters above the
+    *   map
     */
   def placeCells(cells: Seq[((Int, Int), CellType)])
       : (Matrix, Seq[(Int, Int)]) =

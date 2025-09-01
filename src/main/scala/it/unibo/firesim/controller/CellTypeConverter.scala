@@ -1,13 +1,17 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.cell.CellType.Forest
 import it.unibo.firesim.model.fire.FireStage.Ignition
 
 object CellTypeConverter:
 
-  def toModel(viewType: CellViewType): CellType = viewType match
-    case CellViewType.Fire        => CellType.Burning(0, Ignition, Forest)
+  def toModel(
+      viewType: CellViewType,
+      prevCell: CellType = CellType.Forest,
+      currentGeneration: Int = 0
+  ): CellType = viewType match
+    case CellViewType.Fire =>
+      CellType.Burning(currentGeneration, Ignition, prevCell)
     case CellViewType.Grass       => CellType.Grass
     case CellViewType.Forest      => CellType.Forest
     case CellViewType.Empty       => CellType.Empty
