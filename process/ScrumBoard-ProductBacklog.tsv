@@ -13,13 +13,17 @@ Remove Cell, use CellType instead	P0	nicolo-mn	Done		S	Sprint 3
 Add Rock in CellType, adjust map generation. Add FireFighter cell types and its conversions	P0	nicolo-mn	Done		S	Sprint 3
 Calculate barrier line from 2 points	P0	juriGug	Done		S	Sprint 3
 Change SimParams types and update	P0	juriGug	Done		S	Sprint 3
-Handle performance issues	P0		Backlog			
 Basic map creation algorithm	P1	mRickk	Done		M	Sprint 1
 Implement SimController to receive messages from view	P1	juriGug	Done		S	Sprint 1
 GUI parameter selectors buttons	P1	nicolo-mn	Done		S	Sprint 1
-Firefighter more realistic movement	P1	nicolo-mn	Ready		S	Sprint 4
-Add lakes in map generation	P1	mRickk	Ready		S	Sprint 4
-Changing the impact of wind direction	P1	juriGug	Ready		S	Sprint 4
-Simulation speed management	P2	mRickk	Ready		S	Sprint 4
-Brush drawing in map	P2	nicolo-mn	Ready		S	Sprint 4
-Handle draw line button that works for every type of cell	P2	juriGug	Ready		M	Sprint 4
+Firefighter more realistic movement	P1	nicolo-mn	Done		S	Sprint 4
+Add lakes in map generation	P1	mRickk	Done		S	Sprint 4
+Changing the impact of wind direction	P1	juriGug	Done		S	Sprint 4
+Refactor view to use a single frame instead of a matrix of buttons	P1	juriGug	Ready		M	
+Change firefighter behavior to prioritize cells closer to their fire station	P1	nicolo-mn	Ready		S	
+Simulation speed management	P2	mRickk	Done		S	Sprint 4
+Brush drawing in map	P2	nicolo-mn	Done		S	Sprint 4
+Handle draw line button that works for every type of cell	P2	juriGug	Done		M	Sprint 4
+Parallelize map generation	P2	mRickk	Ready		S	
+Parallelize fire fighters	P2	nicolo-mn	Ready		S	
+Change firefighter logic to improve performance	P2	nicolo-mn	Ready		S	
