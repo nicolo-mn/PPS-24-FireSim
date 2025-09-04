@@ -1,6 +1,5 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.CellType
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

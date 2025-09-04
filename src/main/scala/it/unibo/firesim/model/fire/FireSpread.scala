@@ -1,7 +1,6 @@
 package it.unibo.firesim.model.fire
 
-import it.unibo.firesim.model.{Matrix, SimParams, inBounds, update}
-import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.{CellType, Matrix, SimParams, inBounds, update}
 import it.unibo.firesim.util.RNG
 
 /** */

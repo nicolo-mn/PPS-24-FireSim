@@ -1,7 +1,6 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.cell.CellType.Grass
+import CellType.Grass
 import it.unibo.firesim.model.fire.FireStage.Ignition
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

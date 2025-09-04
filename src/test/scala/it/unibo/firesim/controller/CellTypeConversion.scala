@@ -1,7 +1,7 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.config.UIConfig.forestSoilStr
-import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.CellType
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

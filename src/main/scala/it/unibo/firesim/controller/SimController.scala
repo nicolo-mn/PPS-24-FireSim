@@ -1,7 +1,6 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.{Matrix, SimModel, update}
+import it.unibo.firesim.model.{CellType, Matrix, SimModel, update}
 import it.unibo.firesim.util.{Line, Logger}
 import it.unibo.firesim.util.Line.*
 import it.unibo.firesim.view.SimView

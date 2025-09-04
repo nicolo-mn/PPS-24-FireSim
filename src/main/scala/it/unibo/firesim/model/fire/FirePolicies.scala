@@ -1,8 +1,7 @@
 package it.unibo.firesim.model.fire
 
 import it.unibo.firesim.config.Config.*
-import it.unibo.firesim.model.{Matrix, SimParams}
-import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.{CellType, Matrix, SimParams}
 
 type ProbabilityCalc = (CellType, SimParams, Int, Int, Matrix) => Double
 type BurnDurationPolicy = (CellType, Int, Int) => Boolean

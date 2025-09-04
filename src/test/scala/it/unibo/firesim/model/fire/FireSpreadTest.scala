@@ -2,9 +2,8 @@ package it.unibo.firesim.model.fire
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import it.unibo.firesim.model.{Matrix, SimParams}
-import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.cell.CellType.Grass
+import it.unibo.firesim.model.{CellType, Matrix, SimParams}
+import CellType.Grass
 import it.unibo.firesim.model.fire.FireStage.{Active, Ignition}
 import it.unibo.firesim.util.*
 

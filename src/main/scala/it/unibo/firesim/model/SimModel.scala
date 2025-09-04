@@ -1,7 +1,6 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.cell.CellType.*
+import CellType.*
 import it.unibo.firesim.model.fire.*
 import it.unibo.firesim.config.Config.*
 import it.unibo.firesim.util.{RNG, SimpleRNG}

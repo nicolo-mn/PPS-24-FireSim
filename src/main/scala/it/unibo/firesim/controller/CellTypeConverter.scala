@@ -1,6 +1,6 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.CellType
 import it.unibo.firesim.model.fire.FireStage.Ignition
 
 object CellTypeConverter:

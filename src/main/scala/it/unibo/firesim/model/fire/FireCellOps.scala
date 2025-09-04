@@ -1,6 +1,6 @@
 package it.unibo.firesim.model.fire
 
-import it.unibo.firesim.model.cell.CellType
+import it.unibo.firesim.model.CellType
 
 object FireCellOps:
 
