@@ -3,13 +3,48 @@ package it.unibo.firesim.model.fire
 import it.unibo.firesim.config.Config.*
 import it.unibo.firesim.model.{CellType, Matrix, SimParams}
 
+/** A function type representing the probability that a given cell will ignite
+  * during a simulation cycle
+  *
+  * @param cellType
+  *   the type of the cell to evaluate
+  * @param params
+  *   the current global simulation parameters
+  * @param r
+  *   the row index of the cell in the matrix
+  * @param c
+  *   the column index of the cell in the matrix
+  * @param matrix
+  *   the full simulation grid
+  * @return
+  *   a probability value in the range `[minProbability, maxProbability]`
+  */
 type ProbabilityCalc = (CellType, SimParams, Int, Int, Matrix) => Double
+
+/** The policy that determines whether a burning cell has exceeded its burn
+  * duration and should transition to a burnt state.
+  *
+  * @param cellType
+  *   the type of the cell
+  * @param start
+  *   the cycle at which the cell started burning
+  * @param current
+  *   the current simulation cycle
+  * @return
+  *   true if the cell has finished burning, false otherwise
+  */
 type BurnDurationPolicy = (CellType, Int, Int) => Boolean
 
+/** Default burn duration policy: a cell stops burning when the number of
+  * elapsed cycles is greater than its vegetation's configured `burnDuration`.
+  */
 val defaultBurnDuration: BurnDurationPolicy =
   (cellType, start, current) =>
     (current - start) >= cellType.vegetation.burnDuration
 
+/** Default probability calculation strategy for ignition. Uses only
+  * temperature, humidity and neighbour influence
+  */
 val defaultProbabilityCalc: ProbabilityCalc =
   (cellType, params, r, c, matrix) =>
     if !cellType.isFlammable || cellType.isBurning

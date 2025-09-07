@@ -3,7 +3,28 @@ package it.unibo.firesim.model.fire
 import it.unibo.firesim.model.{CellType, Matrix, SimParams, inBounds, update}
 import it.unibo.firesim.util.RNG
 
-/** */
+/** Executes one simulation step of fire spread across the grid.
+  *
+  * @param matrix
+  *   current simulation grid.
+  * @param burning
+  *   set of positions (row, col) that are currently burning
+  * @param params
+  *   the global simulation parameters
+  * @param currentCycle
+  *   the current simulation cycle
+  * @param rng
+  *   the random number generator state
+  * @param prob
+  *   the ignition probability function
+  * @param burn
+  *   the burn duration policy
+  * @return
+  *   a tuple with:
+  *   - the updated grid (`Matrix`)
+  *   - the updated set of burning positions
+  *   - the updated random number generator
+  */
 def fireSpread(
     matrix: Matrix,
     burning: Set[(Int, Int)],

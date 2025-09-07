@@ -3,6 +3,11 @@ package it.unibo.firesim.model.fire
 import it.unibo.firesim.config.Config.*
 import it.unibo.firesim.model.inBounds
 
+/**
+ * Boosts the ignition probability for cells that are downwind from a burning neighbor.
+ * @param base The base `ProbabilityCalc` function to decorate.
+ * @return A new `ProbabilityCalc` function that includes the wind effect.
+ */
 def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
   (cell, params, r, c, matrix) =>
     val dir = fromAngle(params.windAngle)
@@ -19,6 +24,11 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
     val baseProb = base(cell, params, r, c, matrix)
     math.min(baseProb * windBoost, maxProbability)
 
+/**
+ * A `ProbabilityCalc` to add a high humidity penalty.
+ * @param base The base `ProbabilityCalc` function to decorate.
+ * @return A new `ProbabilityCalc` function that includes the humidity penalty.
+ */
 def humidityAware(base: ProbabilityCalc): ProbabilityCalc =
   (cell, params, r, c, matrix) =>
     val penalty =
