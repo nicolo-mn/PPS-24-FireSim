@@ -1,18 +1,15 @@
 package it.unibo.firesim.model.fire
 
-enum Vegetation:
-  case Forest
-  case Grass
-  case None
+import it.unibo.firesim.config.Config.*
 
-object Vegetation:
-
-  def flammability(v: Vegetation): Double = v match
-    case Forest => 0.2
-    case Grass  => 0.1
-    case None   => 0.0
-
-  def burnDuration(v: Vegetation): Int = v match
-    case Forest => 100
-    case Grass  => 70
-    case None   => 0
+/** Represents different types of vegetation, each with distinct fire
+  * properties.
+  * @param flammability
+  *   A base factor for ignition probability.
+  * @param burnDuration
+  *   The number of simulation cycles it takes for this vegetation to burn out.
+  */
+enum Vegetation(val flammability: Double, val burnDuration: Int):
+  case Forest extends Vegetation(forestFlammability, forestBurnDuration)
+  case Grass extends Vegetation(grassFlammability, grassBurnDuration)
+  case None extends Vegetation(noFlammability, noBurnDuration)

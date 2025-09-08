@@ -10,8 +10,7 @@ trait Controller:
     */
   def handleViewMessage(msg: ViewMessage): Unit
 
-  /** Change the milliseconds to wait every tick using the speed
-    * factor
+  /** Change the milliseconds to wait every tick using the speed factor
     *
     * @param factor
     *   The speed factor used to divide the original tick milliseconds

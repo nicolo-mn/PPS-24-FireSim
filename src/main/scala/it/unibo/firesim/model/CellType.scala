@@ -1,4 +1,4 @@
-package it.unibo.firesim.model.cell
+package it.unibo.firesim.model
 
 import it.unibo.firesim.model.fire.FireStage
 

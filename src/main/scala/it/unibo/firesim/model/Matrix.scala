@@ -1,7 +1,5 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.cell.CellType
-
 type Matrix = Vector[Vector[CellType]]
 
 extension (matrix: Matrix)

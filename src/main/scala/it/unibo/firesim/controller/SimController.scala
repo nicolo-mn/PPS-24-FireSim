@@ -1,7 +1,6 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.model.cell.CellType
-import it.unibo.firesim.model.{Matrix, SimModel, update}
+import it.unibo.firesim.model.{CellType, Matrix, SimModel, update}
 import it.unibo.firesim.util.{Line, Logger}
 import it.unibo.firesim.util.Line.*
 import it.unibo.firesim.view.SimView
@@ -24,6 +23,7 @@ class SimController(
 
   private var matrix: Matrix = Vector.empty
   private var originalTickMs: Int = 0
+  private var currentGeneration: Int = 0
 
   @volatile private var running: Boolean = false
   @volatile private var mapGenerated: Boolean = false
@@ -42,8 +42,7 @@ class SimController(
     */
   override def handleViewMessage(msg: ViewMessage): Unit = msg.execute(this)
 
-  /** Change the milliseconds to wait every tick using the speed
-    * factor
+  /** Change the milliseconds to wait every tick using the speed factor
     *
     * @param factor
     *   The speed factor used to divide the original tick milliseconds
@@ -104,7 +103,14 @@ class SimController(
     *   The type of cell.
     */
   override def placeCell(pos: (Int, Int), cellViewType: CellViewType): Unit =
-    placeQueue.put(pos, CellTypeConverter.toModel(cellViewType))
+    placeQueue.put(
+      pos,
+      CellTypeConverter.toModel(
+        cellViewType,
+        matrix(pos._1)(pos._2),
+        currentGeneration
+      )
+    )
 
   override def placeLine(
       start: (Int, Int),
@@ -114,7 +120,7 @@ class SimController(
     Line.lineBetween(
       start,
       end
-    ).withType(CellTypeConverter.toModel(cellViewType)).foreach(placeQueue.put)
+    ).withType(cellViewType).foreach(placeCell)
 
   /** Notifies controller that the simulation has been started.
     */
@@ -167,7 +173,6 @@ class SimController(
             simView.setViewMap(model.generateMap(height, width)
               .flatten.map(CellTypeConverter.toView))
             mapGenerated = true
-            Logger.log(getClass, "map generated successfully")
           else lock.wait()
       }
 
@@ -187,6 +192,7 @@ class SimController(
         Thread.sleep(math.max(0, remaining))
 
   private def onTick(): Unit =
+    currentGeneration = model.getCurrentCycle
     model.updateState()
 
   private def handleQueuedCells(): Unit =
