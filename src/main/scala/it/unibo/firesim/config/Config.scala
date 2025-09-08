@@ -1,7 +1,7 @@
 package it.unibo.firesim.config
 
 object Config:
-  val fireFighterRay: Int = 1
+  val fireFighterRay: Int = 3
   val lakeGrowthProbability = 0.8
   val forestGrowthProbability = 0.7
   val grassGrowthProbability = 0.8
