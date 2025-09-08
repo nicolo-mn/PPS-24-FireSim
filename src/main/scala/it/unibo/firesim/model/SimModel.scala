@@ -10,13 +10,15 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 given ProbabilityCalc: ProbabilityCalc =
-  directionalWindProbabilityDynamic(defaultProbabilityCalc)
+  ProbabilityBuilder()
+    .wind
+    .humidityPenalty
 
 given BurnDurationPolicy: BurnDurationPolicy = defaultBurnDuration
 
 class SimModel(
     random: Random = Random(),
-    initial: SimParams = SimParams(1, 0, 25, 50)
+    initial: SimParams = SimParams(20, 90, 20, 50)
 ):
 
   private val lock = new AnyRef
@@ -26,7 +28,7 @@ class SimModel(
   private var firefightersPos: Seq[(Int, Int)] = Seq.empty
   private var cycle: Int = 0
   private var rows, cols: Int = 0
-  private var rng: RNG = SimpleRNG(42)
+  private var rng: RNG = SimpleRNG(System.currentTimeMillis())
 
   class MapBuilder(private var current: Matrix):
 
