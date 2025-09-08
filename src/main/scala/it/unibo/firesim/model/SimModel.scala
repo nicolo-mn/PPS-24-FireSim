@@ -250,7 +250,7 @@ class SimModel(
       fireSpread(matrix, burningCells, simParams, cycle, rng)
     matrix = updatedMatrix
     rng = nextRandoms
-    val actionableCells = burningCells
+    val actionableCells = burningCells.filter(isSavable)
     val firefightersUpdates =
       firefighters.par.map(firefightersUpdater(actionableCells, _)).seq
     firefighters = firefightersUpdates.map(_._1)
@@ -267,3 +267,8 @@ class SimModel(
 
   private def generateSeeds(rows: Int, cols: Int, count: Int): Seq[(Int, Int)] =
     Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))
+
+  private def isSavable(pos: (Int, Int)): Boolean =
+    neighbors(pos._1, pos._2, matrix).exists((r, c) =>
+      matrix(r)(c) == Grass || matrix(r)(c) == Forest
+    )
