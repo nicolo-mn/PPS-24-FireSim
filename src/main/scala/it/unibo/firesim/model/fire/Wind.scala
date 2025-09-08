@@ -3,11 +3,13 @@ package it.unibo.firesim.model.fire
 import it.unibo.firesim.config.Config.*
 import it.unibo.firesim.model.inBounds
 
-/**
- * Boosts the ignition probability for cells that are downwind from a burning neighbor.
- * @param base The base `ProbabilityCalc` function to decorate.
- * @return A new `ProbabilityCalc` function that includes the wind effect.
- */
+/** Boosts the ignition probability for cells that are downwind from a burning
+  * neighbor.
+  * @param base
+  *   The base `ProbabilityCalc` function to decorate.
+  * @return
+  *   A new `ProbabilityCalc` function that includes the wind effect.
+  */
 def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
   (cell, params, r, c, matrix) =>
     val dir = fromAngle(params.windAngle)
@@ -24,11 +26,12 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
     val baseProb = base(cell, params, r, c, matrix)
     math.min(baseProb * windBoost, maxProbability)
 
-/**
- * A `ProbabilityCalc` to add a high humidity penalty.
- * @param base The base `ProbabilityCalc` function to decorate.
- * @return A new `ProbabilityCalc` function that includes the humidity penalty.
- */
+/** A `ProbabilityCalc` to add a high humidity penalty.
+  * @param base
+  *   The base `ProbabilityCalc` function to decorate.
+  * @return
+  *   A new `ProbabilityCalc` function that includes the humidity penalty.
+  */
 def humidityAware(base: ProbabilityCalc): ProbabilityCalc =
   (cell, params, r, c, matrix) =>
     val penalty =
@@ -47,6 +50,5 @@ enum WindDirection(val dr: Int, val dc: Int):
 
 private def fromAngle(angle: Double): WindDirection =
   val numDirections = WindDirection.values.length
-  val a0 = ((angle % grades) + grades) % grades
-  val bin = ((a0 + halfSector) / grades / numDirections).toInt % numDirections
-  WindDirection.values(bin)
+  val sectorSize = 360.0 / numDirections
+  WindDirection.values(((angle % 360) / sectorSize).toInt % numDirections)

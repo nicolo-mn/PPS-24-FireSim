@@ -25,7 +25,7 @@ object Config:
   val grades = 360.0
   val halfSector: Double = grades / 2.0
   val windNormalization = 10.0
-  val maxWindBoost = 0.5
+  val maxWindBoost = 1.0
   val baseWindBoost = 1.0
   val humidityPenalty = 0.7
   val highHumidity = 85

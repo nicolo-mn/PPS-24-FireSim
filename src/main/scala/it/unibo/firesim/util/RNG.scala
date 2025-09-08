@@ -21,5 +21,5 @@ case class SimpleRNG(seed: Long) extends RNG:
     val newSeed = (seed * 0x5deece66dL + 0xbL) & 0xffffffffffffL
     val nextRNG = SimpleRNG(newSeed)
     val n =
-      (newSeed << 5 | (newSeed >>> 43)).toDouble / (1L << 53).toDouble // usa 53 bit
+      newSeed.toDouble / (1L << 48).toDouble
     (n, nextRNG)
