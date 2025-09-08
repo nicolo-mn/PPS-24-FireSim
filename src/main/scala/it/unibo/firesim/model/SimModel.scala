@@ -4,6 +4,9 @@ import CellType.*
 import it.unibo.firesim.model.fire.*
 import it.unibo.firesim.config.Config.*
 import it.unibo.firesim.util.{RNG, SimpleRNG}
+import it.unibo.firesim.model.firefighters.FireFighterState.*
+import it.unibo.firesim.model.firefighters.FireFighter
+import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.annotation.tailrec
@@ -23,7 +26,13 @@ class SimModel(
   private var params = initial
   private var matrix: Matrix = Vector.empty
   private var firefighters: Seq[FireFighter] = Seq.empty
-  private var firefightersPos: Seq[(Int, Int)] = Seq.empty
+
+  private val firefightersUpdater =
+    for
+      _ <- moveStep
+      extinguished <- extinguishStep
+    yield extinguished
+
   private var cycle: Int = 0
   private var rows, cols: Int = 0
   private var rng: RNG = SimpleRNG(42)
@@ -69,11 +78,10 @@ class SimModel(
       .addStations()
       .result
 
-    firefighters = Seq.empty
-    firefightersPos = Seq.empty
-    matrix.positionsOf(Station).foreach(s =>
-      firefighters = firefighters :+ FireFighter(rows, cols, s)
-      firefightersPos = firefightersPos :+ s
+    firefighters = matrix.positionsOf(Station).map(s =>
+      createFireFighter:
+        withRay(fireFighterRay)
+        stationedIn(s)
     )
 
     matrix
@@ -215,7 +223,7 @@ class SimModel(
   def placeCells(cells: Seq[((Int, Int), CellType)])
       : (Matrix, Seq[(Int, Int)]) =
     cells.foreach((p, cT) => placeCell(p, cT))
-    (matrix, firefightersPos)
+    (matrix, firefighters.map(f => f.position))
 
   private def placeCell(pos: (Int, Int), cellType: CellType): Unit =
     val (r, c) = pos
@@ -242,17 +250,17 @@ class SimModel(
       fireSpread(matrix, burningCells, simParams, cycle, rng)
     matrix = updatedMatrix
     rng = nextRandoms
-
-    val firefightersUpdate =
-      firefighters.par.map(f => f.act(updatedBurningCells.toSeq))
-    firefightersPos = Seq.empty
-    firefightersUpdate.foreach(fu =>
-      firefightersPos = firefightersPos :+ fu.position
-      extinguishCells(fu.extinguishedCells)
-    )
+    val actionableCells = burningCells
+    val firefightersUpdates =
+      firefighters.par.map(firefightersUpdater(actionableCells, _)).seq
+    firefighters = firefightersUpdates.map(_._1)
+    extinguishCells(firefightersUpdates.foldLeft(Set.empty[(Int, Int)])(
+      (s, u) =>
+        s ++ u._2
+    ).toSeq)
 
     cycle += 1
-    (matrix, firefightersPos)
+    (matrix, firefighters.map(f => f.position))
 
   private def extinguishCells(burntCells: Seq[(Int, Int)]): Unit =
     burntCells.foreach(p => placeCell(p, Burnt))
