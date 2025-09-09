@@ -44,12 +44,18 @@
 8. Controllo del flusso temporale della simulazione (0.5x, 1x, 1.5x, 2x)
 9. Rappresentazione della corretta diffusione del fuoco
    1. Solo i tipi di terreno infiammabili (boschivo, erboso) possono diventare _in fiamme_
-   2. Dopo un certo tempo, una cella _in fiamme_ diventa bruciata senza possibilità di bruciare nuovamente
+   2. Una cella che diventa _in fiamme_ ha 3 stadi del fuoco
+      1.  Si ha un primo stadio di ignezione in cui la probabilità di infuocare un'altra è abbastanza bassa
+      2.  Il secondo stadio è quello in cui il fuoco è più vivo ed ha una maggiore probabilità di infuocare
+         un'altra cella
+      3. L'ultimo stadio è quello in cui il fuoco ha meno probabilità di infuocare una cella vicina 
+   4. Dopo un certo tempo, una cella _in fiamme_ diventa bruciata senza possibilità di bruciare nuovamente
       1. Il tipo di terreno boschivo brucierà più a lungo ma prenderà fuoco più difficilmente
       2. Il tipo di terreno erboso brucierà per meno tempo ma prenderà fuoco più facilmente
-   3. All'aumentare della temperatura, la diffusione sarà più veloce
-   4. All'aumentare dell'umidità, la diffusione sarà più veloce
-   5. All'aumentare dell'intensità del vento, la diffusione del fuoco sarà maggiore nella direzione del vento
+   5. All'aumentare della temperatura, la diffusione sarà più veloce
+   6. All'aumentare dell'umidità, la diffusione sarà più lenta
+   7. All'aumentare dei vicini in fiamme, aumentà la probabilità di prendere fuoco
+   8. All'aumentare dell'intensità del vento, la diffusione del fuoco sarà maggiore nella direzione del vento
 10. Le squadre di pompieri:
     1. Si muovono verso celle infuocate che hanno attorno celle erboste o foreste, con l'obiettivo di proteggerle, dando la priorità a quelle più vicino alla loro stazione
     2. Si muovono su tutta la mappa senza vincoli, in modo realistico seguendo visivamente la diagonale tra il punto in cui si trovano e l'obiettivo 
