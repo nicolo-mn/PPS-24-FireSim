@@ -43,6 +43,7 @@ object FireStage:
     */
   def nextStage(start: Int, currentCycle: Int, burnDuration: Int): FireStage =
     val ratio = (currentCycle - start).toDouble / burnDuration
-    if ratio <= Ignition.activationThreshold then Ignition
-    else if ratio <= Active.activationThreshold then Active
-    else Smoldering
+    ratio match
+      case r if r <= Ignition.activationThreshold => Ignition
+      case r if r <= Active.activationThreshold   => Active
+      case _                                      => Smoldering

@@ -42,7 +42,7 @@ object Config:
   val ignitionProbabilityFactor = 0.3
   val ignitionActivationThreshold = 0.3
   val activeProbabilityFactor = 1.0
-  val activeActivationThreshold = 0.7
+  val activeActivationThreshold = 0.8
   val smolderingProbabilityFactor = 0.2
   val smolderingActivationThreshold = 1.0
 
