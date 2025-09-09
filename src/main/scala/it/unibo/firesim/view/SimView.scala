@@ -314,12 +314,12 @@ class SimView(private val simController: SimController):
     Dialog.showInput(null, "Enter grid size:", initial = "10") match
       case None => sys.exit(0)
       case Some(input)
-          if input.toIntOption.isDefined && input.toInt >= minimumGridSize =>
+          if input.toIntOption.isDefined && input.toInt >= minGridSize && input.toInt <= maxGridSize =>
         input.toInt
       case Some(_) =>
         Dialog.showMessage(
           null,
-          s"Grid size must be a number greater than ${minimumGridSize - 1}.",
+          s"Grid size must be a number between $minGridSize and $maxGridSize.",
           title = "Input Error",
           Dialog.Message.Error
         )
