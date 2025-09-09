@@ -153,6 +153,11 @@ class SimView(private val simController: SimController):
   drawLineButton.reactions += {
     case ButtonClicked(_) =>
       firstClick = None
+      if drawLineButton.selected then
+        brushToggle.selected = false
+        brushToggle.enabled = false
+      else
+        brushToggle.enabled = true
   }
 
   private val brushToggle: ToggleButton = new ToggleButton("Brush")
@@ -168,7 +173,9 @@ class SimView(private val simController: SimController):
       startButton.enabled = false
       pauseResumeButton.enabled = true
       resetButton.enabled = true
-      brushToggle.enabled = false
+      drawLineButton.selected = false
+      brushToggle.enabled = true
+      brushToggle.selected = false
       soilTypeSelector.peer.setModel(
         ComboBox.newConstantModel(inGameAvailableSoils)
       )
@@ -183,7 +190,6 @@ class SimView(private val simController: SimController):
       resetButton.enabled = false
       startButton.enabled = true
       pauseResumeButton.enabled = false
-      brushToggle.enabled = true
       brushToggle.selected = false
       soilTypeSelector.peer.setModel(
         ComboBox.newConstantModel(mapEditAvailableSoils)
