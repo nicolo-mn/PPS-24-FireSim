@@ -36,14 +36,52 @@ def fireSpread(
     burn: BurnDurationPolicy
 ): (Matrix, Set[(Int, Int)], RNG) =
 
-  val (stillBurningUpdates, extinguishedPositions) = burning.foldLeft(
+  val (stillBurningUpdates, extinguishedPositions) = updateBurningCells(matrix, burning, burn, currentCycle)
+  val stillBurningPos = stillBurningUpdates.keys.toSet
+
+  val ignitionCandidates = burning
+    .flatMap(pos => neighbors(pos._1, pos._2, matrix))
+    .filter { pos =>
+      val cell = matrix(pos._1)(pos._2)
+      cell.isFlammable && !cell.isBurning
+    }
+
+  val (newlyIgnited, finalRng) = igniteNewFires(ignitionCandidates, prob, rng, params, matrix, currentCycle)
+
+  val allChanges = stillBurningUpdates ++
+    newlyIgnited ++
+    extinguishedPositions.map(p => (p, CellType.Burnt))
+
+  val newMatrix = allChanges.foldLeft(matrix)((m, change) =>
+    m.update(change._1._1, change._1._2, change._2)
+  )
+
+  val newBurningSet = stillBurningPos ++ newlyIgnited.keys
+  (newMatrix, newBurningSet, finalRng)
+
+private def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
+  for
+    dr <- -1 to 1
+    dc <- -1 to 1
+    if !(dr == 0 && dc == 0) && matrix.inBounds(r + dr, c + dc)
+  yield (r + dr, c + dc)
+
+private def updateBurningCells(
+                                matrix: Matrix,
+                                burning: Set[(Int, Int)],
+                                burnt: BurnDurationPolicy,
+                                currentCycle: Int
+                              ): (Map[(Int, Int), CellType], Set[(Int, Int)]) = {
+  // Iterate over burning cells and decide whether they keep burning,
+  // transition to the next fire stage, or extinguish
+  burning.foldLeft(
     (Map.empty[(Int, Int), CellType], Set.empty[(Int, Int)])
   ) { case ((burningAcc, extinguishedAcc), pos) =>
     matrix(pos._1)(pos._2) match
 
       case CellType.Burning(start, fireStage, oldCellType) =>
 
-        if burn(oldCellType, start, currentCycle) then
+        if burnt(oldCellType, start, currentCycle) then
           (burningAcc, extinguishedAcc + pos)
         else
           val nextStage = FireStage.nextStage(
@@ -65,17 +103,17 @@ def fireSpread(
       case _ =>
         (burningAcc, extinguishedAcc)
   }
+}
 
-  val stillBurningPos = stillBurningUpdates.keys.toSet
-
-  val ignitionCandidates = burning
-    .flatMap(pos => neighbors(pos._1, pos._2, matrix))
-    .filter { pos =>
-      val cell = matrix(pos._1)(pos._2)
-      cell.isFlammable && !cell.isBurning
-    }
-
-  val (newlyIgnited, finalRng) = ignitionCandidates.foldLeft(
+private def igniteNewFires(
+                            ignitionCandidates: Set[(Int, Int)],
+                            prob: ProbabilityCalc,
+                            rng: RNG,
+                            params: SimParams,
+                            matrix: Matrix,
+                            currentCycle: Int
+                          ): (Map[(Int, Int), CellType], RNG) = {
+  ignitionCandidates.foldLeft(
     (Map.empty[(Int, Int), CellType], rng)
   ) { case ((ignitedAcc, r), pos) =>
 
@@ -92,21 +130,4 @@ def fireSpread(
     else
       (ignitedAcc, nextRng)
   }
-
-  val allChanges = stillBurningUpdates ++
-    newlyIgnited ++
-    extinguishedPositions.map(p => (p, CellType.Burnt))
-
-  val newMatrix = allChanges.foldLeft(matrix)((m, change) =>
-    m.update(change._1._1, change._1._2, change._2)
-  )
-
-  val newBurningSet = stillBurningPos ++ newlyIgnited.keys
-  (newMatrix, newBurningSet, finalRng)
-
-private def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
-  for
-    dr <- -1 to 1
-    dc <- -1 to 1
-    if !(dr == 0 && dc == 0) && matrix.inBounds(r + dr, c + dc)
-  yield (r + dr, c + dc)
+}
