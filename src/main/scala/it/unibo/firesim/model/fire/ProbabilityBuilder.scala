@@ -2,12 +2,12 @@ package it.unibo.firesim.model.fire
 
 import scala.language.implicitConversions
 
-/**
- * Each method composes an additional calculation policy on top of the
- * accumulated function.
- *
- * @param currentCalc The `ProbabilityCalc` function composed so far.
- */
+/** Each method composes an additional calculation policy on top of the
+  * accumulated function.
+  *
+  * @param currentCalc
+  *   The `ProbabilityCalc` function composed so far.
+  */
 case class ProbabilityBuilder(private val currentCalc: ProbabilityCalc):
 
   /** Adds the wind effect */
@@ -22,15 +22,15 @@ case class ProbabilityBuilder(private val currentCalc: ProbabilityCalc):
   def build: ProbabilityCalc = currentCalc
 
 object ProbabilityBuilder:
-  /**
-   * The entry point for the DSL. Starts the building process using the
-   * `defaultProbabilityCalc` as the base.
-   */
+
+  /** The entry point for the DSL. Starts the building process using the
+    * `defaultProbabilityCalc` as the base.
+    */
   def apply(): ProbabilityBuilder =
     ProbabilityBuilder(defaultProbabilityCalc)
 
-  /**
-   * Automatically converts the builder to its final `ProbabilityCalc` function
-   * when it's used in a context that expects one.
-   */
-  implicit def toCalc(builder: ProbabilityBuilder): ProbabilityCalc = builder.build
+  /** Automatically converts the builder to its final `ProbabilityCalc` function
+    * when it's used in a context that expects one.
+    */
+  implicit def toCalc(builder: ProbabilityBuilder): ProbabilityCalc =
+    builder.build

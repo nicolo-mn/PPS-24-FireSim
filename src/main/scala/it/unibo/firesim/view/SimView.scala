@@ -113,7 +113,8 @@ class SimView(private val simController: SimController):
   private val gridCanvas =
     new GridCanvas(gridSize, gridData, handleClick, handleHover)
 
-  gridCanvas.preferredSize = new Dimension(500, 500)
+  gridCanvas.preferredSize =
+    new Dimension(defaultGridCanvasWidth, defaultGridCanvasHeight)
 
   private val speedSelector = new ComboBox(SpeedType.values.toSeq):
     renderer = ListView.Renderer(_.id)

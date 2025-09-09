@@ -7,6 +7,8 @@ object UIConfig:
   val minHeight: Int = 700
   val defaultWidth: Int = 1000
   val defaultHeight: Int = 1000
+  val defaultGridCanvasWidth: Int = 500
+  val defaultGridCanvasHeight: Int = 500
   val defaultGridSize: Int = 10
   val minHumidity: Int = 0
   val maxHumidity: Int = 100
