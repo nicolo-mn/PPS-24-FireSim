@@ -3,10 +3,10 @@ package it.unibo.firesim.config
 import java.awt.Color
 
 object UIConfig:
-  val minWidth: Int = 300
-  val minHeight: Int = 300
-  val defaultWidth: Int = 500
-  val defaultHeight: Int = 500
+  val minWidth: Int = 700
+  val minHeight: Int = 700
+  val defaultWidth: Int = 1000
+  val defaultHeight: Int = 1000
   val defaultGridSize: Int = 10
   val minHumidity: Int = 0
   val maxHumidity: Int = 100
