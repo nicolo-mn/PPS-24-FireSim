@@ -43,7 +43,7 @@ In particolare:
 
 L'utente ha a disposizione vari controlli per gestire lo stato di avanzamento della simulazione, come i pulsanti per resettare, iniziare, fermare e riprendere una simulazione, e slider che permettono di modificare i parametri.
 
-L'utente ha la possibiltà di modificare celle della mappa selezionando il tipo di cella da inserire tramite una scelta multipla (che cambia dinamicamente nel momento in cui si comincia la simulazione) e cliccando sulla cella interessata. 
+L'utente ha la possibilità di modificare celle della mappa selezionando il tipo di cella da inserire tramite una scelta multipla (che cambia dinamicamente nel momento in cui si comincia la simulazione) e cliccando sulla cella interessata. 
 
 Poiché l'applicazione prevede una fase iniziale di modifica della mappa, vi sono strumenti che permettono la modifica di molteplici celle della mappa, come uno strumento pennello per calorare le celle su cui passa il puntatore o uno strumento linea che permette di colorare una linea tra due punti, anche diagonale. 
 
