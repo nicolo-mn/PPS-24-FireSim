@@ -29,8 +29,7 @@ object ProbabilityBuilder:
   def apply(): ProbabilityBuilder =
     ProbabilityBuilder(defaultProbabilityCalc)
 
-  /**
-   * Automatically converts the builder to its final `ProbabilityCalc` function
-   * when it's used in a context that expects one.
-   */
+  /** Automatically converts the builder to its final `ProbabilityCalc` function
+    * when it's used in a context that expects one.
+    */
   given Conversion[ProbabilityBuilder, ProbabilityCalc] = _.build

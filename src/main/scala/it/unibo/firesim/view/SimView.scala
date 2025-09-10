@@ -163,7 +163,8 @@ class SimView(private val simController: SimController):
   private val brushToggle: ToggleButton = new ToggleButton("Brush")
 
   private val startButton: Button = new Button("▶ Start")
-  private val pauseResumeButton: Button = new Button("⏸ Pause/Resume")
+  var isPaused = false
+  private val pauseResumeButton: Button = new Button("⏸ Pause")
   private val resetButton: Button = new Button("\uD83D\uDD04 Reset")
   pauseResumeButton.enabled = false
   resetButton.enabled = false
@@ -204,6 +205,8 @@ class SimView(private val simController: SimController):
   pauseResumeButton.reactions += {
     case ButtonClicked(_) =>
       simController.pauseResumeSimulation()
+      isPaused = !isPaused
+      pauseResumeButton.text = if isPaused then "▶ Resume" else "⏸ Pause"
   }
 
   private val humidityLabel =
@@ -286,7 +289,7 @@ class SimView(private val simController: SimController):
     horizontalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
     verticalScrollBarPolicy = ScrollPane.BarPolicy.Never
 
-  private val mainFrame = new MainFrame:
+  private val mainFrame = new Frame:
     title = "FireSim"
     preferredSize = new Dimension(defaultWidth, defaultHeight)
     minimumSize = new Dimension(minWidth, minHeight)
@@ -296,6 +299,9 @@ class SimView(private val simController: SimController):
     centerOnScreen()
     visible = true
 
+  mainFrame.peer.setDefaultCloseOperation(
+    javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE
+  )
   listenTo(mainFrame)
   mainFrame.reactions += {
     case _: WindowClosing =>

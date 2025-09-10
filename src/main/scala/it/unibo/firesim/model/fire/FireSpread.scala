@@ -36,7 +36,8 @@ def fireSpread(
     burn: BurnDurationPolicy
 ): (Matrix, Set[(Int, Int)], RNG) =
 
-  val (stillBurningUpdates, extinguishedPositions) = updateBurningCells(matrix, burning, burn, currentCycle)
+  val (stillBurningUpdates, extinguishedPositions) =
+    updateBurningCells(matrix, burning, burn, currentCycle)
   val stillBurningPos = stillBurningUpdates.keys.toSet
 
   val ignitionCandidates = burning
@@ -46,7 +47,8 @@ def fireSpread(
       cell.isFlammable && !cell.isBurning
     }
 
-  val (newlyIgnited, finalRng) = igniteNewFires(ignitionCandidates, prob, rng, params, matrix, currentCycle)
+  val (newlyIgnited, finalRng) =
+    igniteNewFires(ignitionCandidates, prob, rng, params, matrix, currentCycle)
 
   val allChanges = stillBurningUpdates ++
     newlyIgnited ++
@@ -67,11 +69,11 @@ private def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
   yield (r + dr, c + dc)
 
 private def updateBurningCells(
-                                matrix: Matrix,
-                                burning: Set[(Int, Int)],
-                                burnt: BurnDurationPolicy,
-                                currentCycle: Int
-                              ): (Map[(Int, Int), CellType], Set[(Int, Int)]) = {
+    matrix: Matrix,
+    burning: Set[(Int, Int)],
+    burnt: BurnDurationPolicy,
+    currentCycle: Int
+): (Map[(Int, Int), CellType], Set[(Int, Int)]) =
   // Iterate over burning cells and decide whether they keep burning,
   // transition to the next fire stage, or extinguish
   burning.foldLeft(
@@ -103,16 +105,15 @@ private def updateBurningCells(
       case _ =>
         (burningAcc, extinguishedAcc)
   }
-}
 
 private def igniteNewFires(
-                            ignitionCandidates: Set[(Int, Int)],
-                            prob: ProbabilityCalc,
-                            rng: RNG,
-                            params: SimParams,
-                            matrix: Matrix,
-                            currentCycle: Int
-                          ): (Map[(Int, Int), CellType], RNG) = {
+    ignitionCandidates: Set[(Int, Int)],
+    prob: ProbabilityCalc,
+    rng: RNG,
+    params: SimParams,
+    matrix: Matrix,
+    currentCycle: Int
+): (Map[(Int, Int), CellType], RNG) =
   ignitionCandidates.foldLeft(
     (Map.empty[(Int, Int), CellType], rng)
   ) { case ((ignitedAcc, r), pos) =>
@@ -130,4 +131,3 @@ private def igniteNewFires(
     else
       (ignitedAcc, nextRng)
   }
-}
