@@ -4,7 +4,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import it.unibo.firesim.model.{CellType, Matrix, SimParams}
 import CellType.Grass
-import it.unibo.firesim.model.fire.FireStage.{Active, Ignition}
+import it.unibo.firesim.config.Config.{baseWindBoost, humidityPenalty, maxWindBoost, windNormalization}
+import it.unibo.firesim.model.fire.FireStage.{Active, Ignition, Smoldering}
 import it.unibo.firesim.util.*
 
 class FireSpreadTest extends AnyFlatSpec with Matchers:
@@ -77,7 +78,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     grassProb should be >= 0.0
   }
 
-  "windAndHumidityAdjusted" should "apply penalty if humidity is high" in {
+  "humidityAdjusted" should "apply penalty if humidity is high" in {
     val matrix = Vector(Vector(CellType.Burning(0, Ignition, Grass)))
     val lowHumidity = SimParams(1, 0, 30, 30)
     val highHumidity = SimParams(1, 0, 30, 90)
@@ -91,36 +92,8 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     high should be < low
   }
 
-  "directionalWindProbabilityDynamic" should "boost probability if cell in wind direction is burning" in {
-    val params = SimParams(1, 0, 25, 0)
-    val matrix: Matrix = Vector(
-      Vector(
-        CellType.Grass,
-        CellType.Grass,
-        CellType.Grass
-      ),
-      Vector(
-        CellType.Grass,
-        CellType.Grass,
-        CellType.Burning(0, Ignition, Grass)
-      ),
-      Vector(
-        CellType.Grass,
-        CellType.Grass,
-        CellType.Grass
-      )
-    )
-    val base: ProbabilityCalc = (_, _, _, _, _) => 0.4
-    val windAdjusted = directionalWindProbabilityDynamic(base)
-
-    val boosted = windAdjusted(matrix(1)(1), params, 1, 1, matrix)
-
-    boosted should be > 0.4
-    boosted should be <= 1.0
-  }
-
   "directionalWindProbabilityDynamic" should "boost probability only in the wind direction" in {
-    val params = SimParams(10, 0, 25, 0)
+    val params = SimParams(10, 270, 25, 0)
 
     val matrix: Matrix = Vector(
       Vector(
@@ -149,4 +122,62 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val leftCellProb = windAdjusted(matrix(1)(1), params, 1, 0, matrix)
 
     leftCellProb should be > rightCellProb
+  }
+
+  "FireStage.nextStage" should "correctly transition between fire stages" in {
+    val burnDuration = 10
+    val startCycle = 0
+
+    FireStage.nextStage(startCycle, 1, burnDuration) shouldBe Ignition
+
+    FireStage.nextStage(startCycle, 4, burnDuration) shouldBe Active
+
+    FireStage.nextStage(startCycle, 7, burnDuration) shouldBe Active
+
+    FireStage.nextStage(startCycle, 9, burnDuration) shouldBe Smoldering
+    FireStage.nextStage(startCycle, 10, burnDuration) shouldBe Smoldering
+  }
+
+  "fromAngle (Wind)" should "correctly convert angle to WindDirection" in {
+    val angleToDirection = Map(
+      0.0 -> WindDirection.North,
+      45.0 -> WindDirection.NorthEast,
+      90.0 -> WindDirection.East,
+      135.0 -> WindDirection.SouthEast,
+      180.0 -> WindDirection.South,
+      225.0 -> WindDirection.SouthWest,
+      270.0 -> WindDirection.West,
+      315.0 -> WindDirection.NorthWest,
+      360.0 -> WindDirection.North
+    )
+
+    angleToDirection.foreach { (angle, direction) =>
+      fromAngle(angle) shouldBe direction
+    }
+  }
+
+  "ProbabilityBuilder" should "correctly compose wind and humidity policies" in {
+    val params = SimParams(
+      windSpeed = 10,
+      windAngle = 270,
+      temperature = 25,
+      humidity = 95
+    )
+
+    val matrix =
+      Vector(Vector(CellType.Grass, CellType.Burning(0, Active, Grass)))
+
+    val baseProb: ProbabilityCalc = (_, _, _, _, _) => 0.2
+    val composedProb = ProbabilityBuilder(baseProb).wind.humidityPenalty
+
+    // handmade probability
+    val speedFactor = baseWindBoost + math.tanh(
+      params.windSpeed / windNormalization
+    ) * maxWindBoost
+    val afterWind = baseProb(CellType.Grass, params, 0, 0, matrix) * speedFactor
+    val expectedProb = afterWind * humidityPenalty
+
+    val actualProb = composedProb(CellType.Grass, params, 0, 0, matrix)
+
+    actualProb shouldBe expectedProb
   }

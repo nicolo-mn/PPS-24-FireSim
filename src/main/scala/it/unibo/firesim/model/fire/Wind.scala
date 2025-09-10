@@ -39,14 +39,14 @@ def humidityAware(base: ProbabilityCalc): ProbabilityCalc =
     base(cell, params, r, c, matrix) * penalty
 
 enum WindDirection(val dr: Int, val dc: Int):
-  case East extends WindDirection(0, 1)
-  case NorthEast extends WindDirection(-1, 1)
   case North extends WindDirection(-1, 0)
-  case NorthWest extends WindDirection(-1, -1)
-  case West extends WindDirection(0, -1)
-  case SouthWest extends WindDirection(1, -1)
+  case NorthEast extends WindDirection(-1, -1)
+  case East extends WindDirection(0, -1)
+  case SouthEast extends WindDirection(1, -1)
   case South extends WindDirection(1, 0)
-  case SouthEast extends WindDirection(1, 1)
+  case SouthWest extends WindDirection(1, 1)
+  case West extends WindDirection(0, 1)
+  case NorthWest extends WindDirection(-1, 1)
 
 private def fromAngle(angle: Double): WindDirection =
   val numDirections = WindDirection.values.length
