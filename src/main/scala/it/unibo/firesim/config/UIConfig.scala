@@ -9,6 +9,13 @@ object UIConfig:
   val defaultHeight: Int = 1000
   val defaultGridCanvasWidth: Int = 500
   val defaultGridCanvasHeight: Int = 500
+  val defaultScrollPanelWidth: Int = 200
+  val defaultScrollPanelHeight: Int = 200
+  val defaultControlsPanelWidth: Int = 500
+  val defaultControlsPanelHeight: Int = 0
+  val minControlsPanelWidth: Int = 500
+  val minControlsPanelHeight: Int = 0
+  val emptySpaceDim: Int = 5
   val defaultGridSize: Int = 10
   val minHumidity: Int = 0
   val maxHumidity: Int = 100

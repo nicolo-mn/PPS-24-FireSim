@@ -6,7 +6,11 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, SelectionChanged, ValueChanged}
 
-class ControlsPanel(simController: SimController) extends FlowPanel:
+class ControlsPanel(simController: SimController)
+    extends BoxPanel(orientation = Orientation.Vertical):
+  minimumSize =
+    new Dimension(defaultControlsPanelWidth, defaultControlsPanelHeight)
+  preferredSize = new Dimension(minControlsPanelWidth, minControlsPanelHeight)
 
   private val mapEditAvailableSoils = Seq(
     fireSoilStr,
@@ -61,25 +65,32 @@ class ControlsPanel(simController: SimController) extends FlowPanel:
   border = Swing.EmptyBorder(0, 0, 20, 0)
 
   contents ++= Seq(
-    startButton,
-    pauseResumeButton,
-    resetButton,
-    speedSelector,
-    soilTypeSelector,
-    drawLineButton,
-    brushToggle,
-    new Label("Humidity:"),
-    humiditySlider,
-    humidityLabel,
-    new Label("Temperature:"),
-    temperatureSlider,
-    temperatureLabel,
-    new Label("Wind Direction:"),
-    windDirectionSlider,
-    windDirectionLabel,
-    new Label("Wind Intensity:"),
-    windIntensitySlider,
-    windIntensityLabel
+    new BoxPanel(Orientation.Horizontal) with ControlsLine(
+        startButton,
+        pauseResumeButton,
+        resetButton,
+        speedSelector,
+        soilTypeSelector
+      ),
+    new BoxPanel(Orientation.Horizontal)
+      with ControlsLine(drawLineButton, brushToggle),
+    new BoxPanel(Orientation.Horizontal)
+      with ControlsLine(new Label("Humidity:"), humiditySlider, humidityLabel),
+    new BoxPanel(Orientation.Horizontal) with ControlsLine(
+        new Label("Temperature:"),
+        temperatureSlider,
+        temperatureLabel
+      ),
+    new BoxPanel(Orientation.Horizontal) with ControlsLine(
+        new Label("Wind Direction:"),
+        windDirectionSlider,
+        windDirectionLabel
+      ),
+    new BoxPanel(Orientation.Horizontal) with ControlsLine(
+        new Label("Wind Intensity:"),
+        windIntensitySlider,
+        windIntensityLabel
+      )
   )
 
   listenTo(
@@ -168,3 +179,17 @@ class ControlsPanel(simController: SimController) extends FlowPanel:
     )
     soilTypeSelector.selection.item = fireSoilStr
     Future { simController.startSimulation() }(ExecutionContext.global)
+
+trait ControlsLine(comps: Component*):
+  panel: BoxPanel =>
+  if comps.nonEmpty then
+    panel.contents ++= comps.flatMap(comp =>
+      Seq(comp, Swing.HStrut(emptySpaceDim))
+    ).dropRight(1)
+  panel.border = Swing.EmptyBorder(
+    emptySpaceDim,
+    emptySpaceDim,
+    emptySpaceDim,
+    emptySpaceDim
+  )
+  maximumSize = preferredSize

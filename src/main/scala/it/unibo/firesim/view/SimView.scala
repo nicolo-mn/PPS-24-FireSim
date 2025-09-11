@@ -30,15 +30,17 @@ class SimView(private val simController: SimController):
 
   private val scrollPanel = new ScrollPane(controlsPanel):
     horizontalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
-    verticalScrollBarPolicy = ScrollPane.BarPolicy.Never
+    verticalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
+    preferredSize =
+      new Dimension(defaultScrollPanelWidth, defaultScrollPanelHeight)
 
   private val mainFrame = new Frame:
     title = "FireSim"
     preferredSize = new Dimension(defaultWidth, defaultHeight)
     minimumSize = new Dimension(minWidth, minHeight)
-    contents = new BorderPanel:
-      layout(scrollPanel) = BorderPanel.Position.North
-      layout(gridCanvas) = BorderPanel.Position.Center
+    contents = new SplitPane(Orientation.Horizontal, scrollPanel, gridCanvas):
+      continuousLayout = true
+      resizeWeight = 0.0
     centerOnScreen()
     visible = true
     peer.setDefaultCloseOperation(
