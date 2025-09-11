@@ -59,6 +59,7 @@ class SimView(private val simController: SimController):
       onWindowClose()
 
     case ButtonClicked(b) if b == controlsPanel.resetButton =>
+      simController.stopSimulation()
       val newSize = askForGridSize()
       gridSize = newSize
       simController.generateMap(gridSize, gridSize)

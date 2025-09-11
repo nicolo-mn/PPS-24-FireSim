@@ -121,7 +121,6 @@ class ControlsPanel(simController: SimController)
         ComboBox.newConstantModel(mapEditAvailableSoils)
       )
       soilTypeSelector.selection.item = fireSoilStr
-      simController.stopSimulation()
 
     case ButtonClicked(`pauseResumeButton`) =>
       simController.pauseResumeSimulation()
