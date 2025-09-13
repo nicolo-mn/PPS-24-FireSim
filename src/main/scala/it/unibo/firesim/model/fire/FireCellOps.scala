@@ -27,3 +27,7 @@ extension (cell: CellType)
   def isBurning: Boolean = cell match
     case CellType.Burning(_, _, _) => true
     case _                         => false
+
+  def isWater: Boolean = cell match
+    case CellType.Water => true
+    case _ => false

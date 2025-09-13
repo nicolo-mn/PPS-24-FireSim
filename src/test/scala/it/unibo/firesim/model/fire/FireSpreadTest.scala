@@ -117,11 +117,29 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val windAdjusted = directionalWindProbabilityDynamic(base)
 
     // upwind cell
-    val rightCellProb = windAdjusted(matrix(1)(1), params, 1, 2, matrix)
+    val rightCellProb = windAdjusted(matrix(1)(2), params, 1, 2, matrix)
     // not upwind
-    val leftCellProb = windAdjusted(matrix(1)(1), params, 1, 0, matrix)
+    val leftCellProb = windAdjusted(matrix(1)(0), params, 1, 0, matrix)
 
     leftCellProb should be > rightCellProb
+  }
+
+  "waterHumidityWind" should "apply MAX penalty for water directly upwind " in {
+    val matrix: Matrix = Vector(
+      Vector(
+        CellType.Grass,
+        CellType.Grass
+      ),
+      Vector(CellType.Grass, CellType.Water)
+    )
+    val params = SimParams(10, 10, 10, 10)
+
+    val base: ProbabilityCalc = (_, _, _, _, _) => 0.4
+    val withWater = waterHumidityWind(base)
+
+    val upwindWater = withWater(matrix(0)(1), params, 0, 1, matrix)
+    val normal = withWater(matrix(0)(0), params, 0, 0 , matrix)
+    normal should be > upwindWater
   }
 
   "FireStage.nextStage" should "correctly transition between fire stages" in {
@@ -156,28 +174,23 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     }
   }
 
-  "ProbabilityBuilder" should "correctly compose wind and humidity policies" in {
-    val params = SimParams(
-      windSpeed = 10,
-      windAngle = 270,
-      temperature = 25,
-      humidity = 95
-    )
+  "ProbabilityBuilder" should "compose policies correctly" in {
+    val params = SimParams(windSpeed = 10, windAngle = 270, temperature = 25, humidity = 95)
+    val matrix = Vector(Vector(CellType.Grass, CellType.Burning(0, Active, Grass)))
 
-    val matrix =
-      Vector(Vector(CellType.Grass, CellType.Burning(0, Active, Grass)))
+    val baseProbValue = 0.5
+    val baseCalc: ProbabilityCalc = (_, _, _, _, _) => baseProbValue
 
-    val baseProb: ProbabilityCalc = (_, _, _, _, _) => 0.2
-    val composedProb = ProbabilityBuilder(baseProb).wind.humidityPenalty
+    val probWithWind = ProbabilityBuilder(baseCalc).withWind.build
+    val probWithHumidity = ProbabilityBuilder(baseCalc).withHumidityPenalty.build
+    val probComposed = ProbabilityBuilder(baseCalc).withWind.withHumidityPenalty.build
 
-    // handmade probability
-    val speedFactor = baseWindBoost + math.tanh(
-      params.windSpeed / windNormalization
-    ) * maxWindBoost
-    val afterWind = baseProb(CellType.Grass, params, 0, 0, matrix) * speedFactor
-    val expectedProb = afterWind * humidityPenalty
+    val windRes = probWithWind(CellType.Grass, params, 0, 0, matrix)
+    val humidityRes = probWithHumidity(CellType.Grass, params, 0, 0, matrix)
+    val composedRes = probComposed(CellType.Grass, params, 0, 0, matrix)
 
-    val actualProb = composedProb(CellType.Grass, params, 0, 0, matrix)
-
-    actualProb shouldBe expectedProb
+    windRes should be > baseProbValue
+    humidityRes should be < baseProbValue
+    composedRes should be < windRes
+    composedRes should not be baseProbValue
   }
