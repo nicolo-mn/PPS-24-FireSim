@@ -14,8 +14,9 @@ import scala.util.Random
 
 given ProbabilityCalc: ProbabilityCalc =
   ProbabilityBuilder()
-    .wind
-    .humidityPenalty
+    .withHumidityPenalty
+    .withWind
+    .withWaterEffects
 
 given BurnDurationPolicy: BurnDurationPolicy = defaultBurnDuration
 

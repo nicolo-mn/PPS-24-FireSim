@@ -30,4 +30,4 @@ extension (cell: CellType)
 
   def isWater: Boolean = cell match
     case CellType.Water => true
-    case _ => false
+    case _              => false

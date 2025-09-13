@@ -8,28 +8,32 @@ import scala.language.implicitConversions
   * @param currentCalc
   *   The `ProbabilityCalc` function composed so far.
   */
-case class ProbabilityDSL(private val currentCalc: ProbabilityCalc):
+case class ProbabilityBuilder(private val currentCalc: ProbabilityCalc):
 
   /** Adds the wind effect */
-  def withWind: ProbabilityDSL =
+  def withWind: ProbabilityBuilder =
     copy(currentCalc = directionalWindProbabilityDynamic(currentCalc))
 
   /** Adds a humidity penalty */
-  def withHumidityPenalty: ProbabilityDSL =
+  def withHumidityPenalty: ProbabilityBuilder =
     copy(currentCalc = humidityAware(currentCalc))
+
+  /** Adds a water penalty based on wind direction */
+  def withWaterEffects: ProbabilityBuilder =
+    copy(currentCalc = waterHumidityWind(currentCalc))
 
   /** Returns the final composed `ProbabilityCalc` */
   def build: ProbabilityCalc = currentCalc
 
-object ProbabilityDSL:
+object ProbabilityBuilder:
 
   /** The entry point for the DSL. Starts the building process using the
     * `defaultProbabilityCalc` as the base.
     */
-  def apply(): ProbabilityDSL =
-    ProbabilityDSL(defaultProbabilityCalc)
+  def apply(): ProbabilityBuilder =
+    ProbabilityBuilder(defaultProbabilityCalc)
 
   /** Automatically converts the builder to its final `ProbabilityCalc` function
     * when it's used in a context that expects one.
     */
-  given Conversion[ProbabilityDSL, ProbabilityCalc] = _.build
+  given Conversion[ProbabilityBuilder, ProbabilityCalc] = _.build

@@ -40,33 +40,44 @@ def humidityAware(base: ProbabilityCalc): ProbabilityCalc =
       if params.humidity > highHumidity then humidityPenalty else maxProbability
     base(cell, params, r, c, matrix) * penalty
 
+  /** reduces ignition probability for cells receiving humid wind from a body of
+    * water, with an effect that diminishes with distance.
+    *
+    * @param base
+    *   The base `ProbabilityCalc` function to decorate
+    * @return
+    *   A new `ProbabilityCalc` that includes the extended coastal humidity
+    *   effect.
+    */
 
-  /**
-   * reduces ignition probability for cells receiving humid wind
-   * from a body of water, with an effect that diminishes with distance.
-   *
-   * @param base
-   * The base `ProbabilityCalc` function to decorate
-   * @return
-   * A new `ProbabilityCalc` that includes the extended coastal humidity effect.
-   */
 def waterHumidityWind(base: ProbabilityCalc): ProbabilityCalc =
   (cell, params, r, c, matrix) =>
 
     val baseProb = base(cell, params, r, c, matrix)
     val windOrigin = fromAngle(params.windAngle)
 
-    /**
-     * A tail-recursive helper function that searches for a water cell upwind.
-     *
-     * @param currentR current row in the search.
-     * @param currentC current column in the search.
-     * @param distance the distance from the original cell.
-     * @return if the water is found within the search range
-     */
+    /** A tail-recursive helper function that searches for a water cell upwind.
+      *
+      * @param currentR
+      *   current row in the search.
+      * @param currentC
+      *   current column in the search.
+      * @param distance
+      *   the distance from the original cell.
+      * @return
+      *   if the water is found within the search range
+      */
     @tailrec
-    def findWaterUpwind(currentR: Int, currentC: Int, distance: Int): Option[Int] =
-      if !matrix.inBounds(currentR, currentC) || distance > coastalEffectMaxRange then
+    def findWaterUpwind(
+        currentR: Int,
+        currentC: Int,
+        distance: Int
+    ): Option[Int] =
+      if !matrix.inBounds(
+          currentR,
+          currentC
+        ) || distance > coastalEffectMaxRange
+      then
         None
       else if matrix(currentR)(currentC).isWater then
         Some(distance)
@@ -83,7 +94,8 @@ def waterHumidityWind(base: ProbabilityCalc): ProbabilityCalc =
 
     waterDistance match
       case Some(d) =>
-        val falloffFactor = (coastalEffectMaxRange - d + 1).toDouble / coastalEffectMaxRange
+        val falloffFactor =
+          (coastalEffectMaxRange - d + 1).toDouble / coastalEffectMaxRange
         val penaltyMultiplier = 1.0 - (maxCoastalHumidityEffect * falloffFactor)
         math.max(0, baseProb * penaltyMultiplier)
       case None =>

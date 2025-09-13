@@ -138,7 +138,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val withWater = waterHumidityWind(base)
 
     val upwindWater = withWater(matrix(0)(1), params, 0, 1, matrix)
-    val normal = withWater(matrix(0)(0), params, 0, 0 , matrix)
+    val normal = withWater(matrix(0)(0), params, 0, 0, matrix)
     normal should be > upwindWater
   }
 
@@ -175,15 +175,23 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
   }
 
   "ProbabilityBuilder" should "compose policies correctly" in {
-    val params = SimParams(windSpeed = 10, windAngle = 270, temperature = 25, humidity = 95)
-    val matrix = Vector(Vector(CellType.Grass, CellType.Burning(0, Active, Grass)))
+    val params = SimParams(
+      windSpeed = 10,
+      windAngle = 270,
+      temperature = 25,
+      humidity = 95
+    )
+    val matrix =
+      Vector(Vector(CellType.Grass, CellType.Burning(0, Active, Grass)))
 
     val baseProbValue = 0.5
     val baseCalc: ProbabilityCalc = (_, _, _, _, _) => baseProbValue
 
     val probWithWind = ProbabilityBuilder(baseCalc).withWind.build
-    val probWithHumidity = ProbabilityBuilder(baseCalc).withHumidityPenalty.build
-    val probComposed = ProbabilityBuilder(baseCalc).withWind.withHumidityPenalty.build
+    val probWithHumidity =
+      ProbabilityBuilder(baseCalc).withHumidityPenalty.build
+    val probComposed =
+      ProbabilityBuilder(baseCalc).withWind.withHumidityPenalty.build
 
     val windRes = probWithWind(CellType.Grass, params, 0, 0, matrix)
     val humidityRes = probWithHumidity(CellType.Grass, params, 0, 0, matrix)

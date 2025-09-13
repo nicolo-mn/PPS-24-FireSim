@@ -53,7 +53,7 @@ object Config:
   val forestBurnDuration = 100
   val grassBurnDuration = 70
   val noBurnDuration = 0
-  
-  //water influence
+
+  // water influence
   val coastalEffectMaxRange = 4
-  val maxCoastalHumidityEffect = 0.5 
+  val maxCoastalHumidityEffect = 0.5
