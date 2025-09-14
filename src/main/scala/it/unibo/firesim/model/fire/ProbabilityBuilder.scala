@@ -22,7 +22,7 @@ case class ProbabilityBuilder(private val currentCalc: ProbabilityCalc):
   def withWaterEffects: ProbabilityBuilder =
     copy(currentCalc = waterHumidityWind(currentCalc))
 
-  /** Returns the final composed `ProbabilityCalc` */
+  /** Finalizes the builder and returns the composed `ProbabilityCalc` */
   def build: ProbabilityCalc = currentCalc
 
 object ProbabilityBuilder:

@@ -4,7 +4,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import it.unibo.firesim.model.{CellType, Matrix, SimParams}
 import CellType.Grass
-import it.unibo.firesim.config.Config.{baseWindBoost, humidityPenalty, maxWindBoost, windNormalization}
 import it.unibo.firesim.model.fire.FireStage.{Active, Ignition, Smoldering}
 import it.unibo.firesim.util.*
 
@@ -93,7 +92,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
   }
 
   "directionalWindProbabilityDynamic" should "boost probability only in the wind direction" in {
-    val params = SimParams(10, 270, 25, 0)
+    val params = SimParams(10, 90, 25, 0)
 
     val matrix: Matrix = Vector(
       Vector(
@@ -116,9 +115,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val base: ProbabilityCalc = (_, _, _, _, _) => 0.4
     val windAdjusted = directionalWindProbabilityDynamic(base)
 
-    // upwind cell
     val rightCellProb = windAdjusted(matrix(1)(2), params, 1, 2, matrix)
-    // not upwind
     val leftCellProb = windAdjusted(matrix(1)(0), params, 1, 0, matrix)
 
     leftCellProb should be > rightCellProb
@@ -132,7 +129,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
       ),
       Vector(CellType.Grass, CellType.Water)
     )
-    val params = SimParams(10, 10, 10, 10)
+    val params = SimParams(10, 190, 10, 10)
 
     val base: ProbabilityCalc = (_, _, _, _, _) => 0.4
     val withWater = waterHumidityWind(base)
@@ -177,7 +174,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
   "ProbabilityBuilder" should "compose policies correctly" in {
     val params = SimParams(
       windSpeed = 10,
-      windAngle = 270,
+      windAngle = 90,
       temperature = 25,
       humidity = 95
     )

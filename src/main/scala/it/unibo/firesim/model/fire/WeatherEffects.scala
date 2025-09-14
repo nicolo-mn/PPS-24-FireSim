@@ -40,7 +40,7 @@ def humidityAware(base: ProbabilityCalc): ProbabilityCalc =
       if params.humidity > highHumidity then humidityPenalty else maxProbability
     base(cell, params, r, c, matrix) * penalty
 
-  /** reduces ignition probability for cells receiving humid wind from a body of
+  /** Reduces ignition probability for cells receiving humid wind from a body of
     * water, with an effect that diminishes with distance.
     *
     * @param base
@@ -56,7 +56,7 @@ def waterHumidityWind(base: ProbabilityCalc): ProbabilityCalc =
     val baseProb = base(cell, params, r, c, matrix)
     val windOrigin = fromAngle(params.windAngle)
 
-    /** A tail-recursive helper function that searches for a water cell upwind.
+    /** A tail-recursive helper function that searches for a water cell.
       *
       * @param currentR
       *   current row in the search.
@@ -83,13 +83,13 @@ def waterHumidityWind(base: ProbabilityCalc): ProbabilityCalc =
         Some(distance)
       else
         findWaterUpwind(
-          currentR - windOrigin.dr,
-          currentC - windOrigin.dc,
+          currentR + windOrigin.dr,
+          currentC + windOrigin.dc,
           distance + 1
         )
 
-    val upwindR = r - windOrigin.dr
-    val upwindC = c - windOrigin.dc
+    val upwindR = r + windOrigin.dr
+    val upwindC = c + windOrigin.dc
     val waterDistance = findWaterUpwind(upwindR, upwindC, 1)
 
     waterDistance match
@@ -103,13 +103,13 @@ def waterHumidityWind(base: ProbabilityCalc): ProbabilityCalc =
 
 enum WindDirection(val dr: Int, val dc: Int):
   case North extends WindDirection(-1, 0)
-  case NorthEast extends WindDirection(-1, -1)
-  case East extends WindDirection(0, -1)
-  case SouthEast extends WindDirection(1, -1)
+  case NorthEast extends WindDirection(-1, 1)
+  case East extends WindDirection(0, 1)
+  case SouthEast extends WindDirection(1, 1)
   case South extends WindDirection(1, 0)
-  case SouthWest extends WindDirection(1, 1)
-  case West extends WindDirection(0, 1)
-  case NorthWest extends WindDirection(-1, 1)
+  case SouthWest extends WindDirection(1, -1)
+  case West extends WindDirection(0, -1)
+  case NorthWest extends WindDirection(-1, -1)
 
 private def fromAngle(angle: Double): WindDirection =
   val numDirections = WindDirection.values.length
