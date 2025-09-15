@@ -1,40 +1,34 @@
 package it.unibo.firesim.model.firefighters
 
 import it.unibo.firesim.model.monads.ReaderStates.ReaderState
-import it.unibo.firesim.model.firefighters.FireFighterUtils.*
-import it.unibo.firesim.model.firefighters.FireFighterUtils.FireFighterAction.*
 
 object FireFighterState:
-
+  import it.unibo.firesim.model.firefighters.FireFighterUtils.*
   private type CellsOnFire = Set[(Int, Int)]
 
   def moveStep: ReaderState[CellsOnFire, FireFighter, Unit] =
     ReaderState[CellsOnFire, FireFighter, Unit]((fireCells, f) =>
-      val newTarget = if f.loaded && fireCells.nonEmpty then
-        val tmp =
-          fireCells.minBy(c => f.distance(f.position, c))
-        if !fireCells.contains(f.target) ||
-          tmp == f.target ||
-          f.position == f.station ||
-          f.distance(
-            tmp,
-            f.station
-          ) < f.distance(f.target, f.station) / 2 ||
-          f.distance(
-            f.target,
-            tmp
-          ) < f.distance(f.target, f.station) / 2
-        then
-          tmp
-        else f.target
-      else
-        f.station
+      val newTarget = Option.when(f.loaded)(fireCells)
+        .collect { case c if c.nonEmpty => c.minBy(f.distance(f.position, _)) }
+        .filter(candidate =>
+          !fireCells.contains(f.target) ||
+            f.distance(
+              candidate,
+              f.station
+            ) < f.distance(f.target, f.station) / 2 ||
+            f.distance(
+              f.target,
+              candidate
+            ) < f.distance(f.target, f.station) / 2
+        )
+        .getOrElse(if f.loaded then f.target else f.station)
       (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
     )
 
   def extinguishStep
       : ReaderState[CellsOnFire, FireFighter, CellsOnFire] =
     ReaderState[CellsOnFire, FireFighter, CellsOnFire]((fireCells, f) =>
+      import it.unibo.firesim.model.firefighters.FireFighterUtils.FireFighterAction.*
       f.action(fireCells) match
         case Some(Extinguish) =>
           (
