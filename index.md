@@ -1,7 +1,7 @@
 # PPS-24: FireSim
 
 ## Sommario:
-- [Introduzione](1-development-process/index.md)
+- [Introduzione](0-introduction/index.md)
 - [Processo di sviluppo](1-development-process/index.md)
 - [Requisiti](2-requirements/index.md)
 - [Design architetturale](3-architecture/index.md)
