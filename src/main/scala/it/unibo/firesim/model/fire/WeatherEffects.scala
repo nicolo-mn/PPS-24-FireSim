@@ -1,7 +1,7 @@
 package it.unibo.firesim.model.fire
 
 import it.unibo.firesim.config.Config.*
-import it.unibo.firesim.model.inBounds
+import it.unibo.firesim.model.map.inBounds
 
 import scala.annotation.tailrec
 

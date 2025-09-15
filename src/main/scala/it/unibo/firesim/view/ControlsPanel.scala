@@ -19,7 +19,8 @@ class ControlsPanel(simController: SimController)
     forestSoilStr,
     grassSoilStr,
     rockSoilStr,
-    waterSoilStr
+    waterSoilStr,
+    stationSoilStr
   )
 
   private val inGameAvailableSoils = Seq(fireSoilStr, emptySoilStr)

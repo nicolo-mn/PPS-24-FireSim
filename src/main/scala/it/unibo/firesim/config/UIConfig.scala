@@ -43,9 +43,9 @@ object UIConfig:
   val forestSoilStr: String = "Forest\uD83C\uDF32"
   val emptySoilStr: String = "Empty\uD83D\uDED1"
   val burntSoilStr: String = "Burnt"
-  val stationSoilStr: String = "Station"
-  val rockSoilStr: String = "Rock"
+  val stationSoilStr: String = "Station\uD83D\uDE81"
+  val rockSoilStr: String = "Rock\u26F0"
   val firefighterStr: String = "Firefighter"
-  val waterSoilStr: String = "Water"
+  val waterSoilStr: String = "Water\uD83D\uDCA7"
   val minGridSize: Int = 6
   val maxGridSize: Int = 150
