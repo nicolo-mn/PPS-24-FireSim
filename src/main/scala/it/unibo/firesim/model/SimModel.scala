@@ -7,7 +7,8 @@ import it.unibo.firesim.util.{RNG, SimpleRNG}
 import it.unibo.firesim.model.firefighters.FireFighterState.*
 import it.unibo.firesim.model.firefighters.FireFighter
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
-import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, positionsOf, update, neighbors}
+import it.unibo.firesim.model.map.MapBuilderDSL.*
+import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, neighbors, positionsOf, update}
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.util.Random
@@ -53,12 +54,11 @@ class SimModel(
     this.rows = rows
     this.cols = cols
 
-    matrix = MapBuilder(rows, cols, random)
-      .withLakes()
-      .withForests()
-      .withGrass()
-      .withStations()
-      .build
+    matrix = buildMap(rows, cols, random):
+      withLakes
+      withForests
+      withGrass
+      withStations
 
     firefighters = matrix.positionsOf(Station).map(s =>
       createFireFighter:
