@@ -10,6 +10,8 @@ object Config:
   val lakeSeedFrequency = 0.01
   val forestSeedFrequency = 1.8
   val stationSeedsFrequency = 0.02
+  val forestFireSeedFrequency = 0.01
+  val grassFireSeedFrequency = 0.01
 
   val minLakeSizeRatio: Double = 1.5
   val maxLakeSizeRatio: Double = 3.0

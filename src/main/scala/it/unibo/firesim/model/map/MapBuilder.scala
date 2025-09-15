@@ -24,6 +24,10 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     matrix = mapGenerator.addStations(matrix, rows, cols, random)
     this
 
+  def withFires(): MapBuilder =
+    matrix = mapGenerator.addFires(matrix, rows, cols, random)
+    this
+
   def withCustomTerrain(positions: Seq[((Int, Int), CellType)]): MapBuilder =
     positions.foreach { case ((r, c), cellType) =>
       matrix = mapGenerator.addCustomTerrain(matrix, r, c, cellType)

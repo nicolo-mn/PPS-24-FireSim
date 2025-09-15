@@ -2,6 +2,7 @@ package it.unibo.firesim.model.map
 
 import it.unibo.firesim.config.Config.*
 import CellType.*
+import it.unibo.firesim.model.fire.FireStage
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.annotation.tailrec
@@ -15,6 +16,8 @@ trait MapGenerationStrategy:
   def addGrass(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
 
   def addStations(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
+
+  def addFires(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
 
   def addCustomTerrain(
       matrix: Matrix,
@@ -161,6 +164,31 @@ class BaseMapGeneration extends MapGenerationStrategy:
     stationSeeds.par.foldLeft(matrix)((m, pos) =>
       m.update(pos._1, pos._2, Station)
     )
+
+  override def addFires(
+      matrix: Matrix,
+      rows: Int,
+      cols: Int,
+      random: Random
+  ): Matrix =
+    var m = matrix
+    val forestFireSeedsCount =
+      roundedMeanMul(forestFireSeedFrequency, rows, cols) max 1
+    val grassFireSeedsCount = roundedMeanMul(grassFireSeedFrequency, rows, cols)
+
+    val forestFires =
+      random.shuffle(m.positionsOf(Forest)).take(forestFireSeedsCount)
+    val grassFires =
+      random.shuffle(m.positionsOf(Grass)).take(grassFireSeedsCount)
+
+    forestFires.foreach((r, c) =>
+      m = m.update(r, c, Burning(0, FireStage.Ignition, Forest))
+    )
+    grassFires.foreach((r, c) =>
+      m = m.update(r, c, Burning(0, FireStage.Ignition, Grass))
+    )
+
+    m
 
   override def addCustomTerrain(
       matrix: Matrix,

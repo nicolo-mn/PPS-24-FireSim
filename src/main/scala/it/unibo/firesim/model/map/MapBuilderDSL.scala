@@ -25,6 +25,9 @@ object MapBuilderDSL:
   def withStations(using builder: MapBuilder): Unit =
     builder.withStations()
 
+  def withFires(using builder: MapBuilder): Unit =
+    builder.withFires()
+
   def withCustomTerrain(positions: Seq[((Int, Int), CellType)])(using
       builder: MapBuilder
   ): Unit =

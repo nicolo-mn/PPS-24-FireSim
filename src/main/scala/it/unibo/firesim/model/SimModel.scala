@@ -51,6 +51,7 @@ class SimModel(
     *   The Matrix containing the generated cells
     */
   def generateMap(rows: Int, cols: Int): Matrix =
+    cycle = 0
     this.rows = rows
     this.cols = cols
 
@@ -59,6 +60,7 @@ class SimModel(
       withForests
       withGrass
       withStations
+      withFires
 
     firefighters = matrix.positionsOf(Station).map(s =>
       createFireFighter:
