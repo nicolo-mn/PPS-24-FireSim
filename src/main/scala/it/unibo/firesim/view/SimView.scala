@@ -1,7 +1,7 @@
 package it.unibo.firesim.view
 
 import it.unibo.firesim.config.UIConfig.*
-import it.unibo.firesim.controller.{CellViewType, SimController}
+import it.unibo.firesim.controller.*
 
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, WindowClosing}
@@ -15,7 +15,7 @@ class SimView(private val simController: SimController):
   private var firstClick: Option[(Int, Int)] = None
 
   private var gridSize: Int = askForGridSize()
-  simController.generateMap(gridSize, gridSize)
+  simController.handleViewMessage(GenerateMap(gridSize, gridSize))
 
   private val gridData: Seq[CellViewType] =
     Seq.fill(gridSize * gridSize)(CellViewType.Empty)
@@ -59,10 +59,10 @@ class SimView(private val simController: SimController):
       onWindowClose()
 
     case ButtonClicked(b) if b == controlsPanel.resetButton =>
-      simController.stopSimulation()
+      simController.handleViewMessage(StopSimulation)
       val newSize = askForGridSize()
       gridSize = newSize
-      simController.generateMap(gridSize, gridSize)
+      simController.handleViewMessage(GenerateMap(gridSize, gridSize))
       gridCanvas.reset(gridSize)
 
     case ButtonClicked(b) if b == controlsPanel.drawLineButton =>
@@ -80,7 +80,7 @@ class SimView(private val simController: SimController):
       title = "Confirm Exit"
     )
     if response == Dialog.Result.Yes then
-      simController.closing()
+      simController.handleViewMessage(Closing)
       mainFrame.dispose()
 
   def setViewMap(updatedGridCells: Seq[CellViewType]): Unit =
@@ -110,14 +110,14 @@ class SimView(private val simController: SimController):
     if controlsPanel.drawLineButton.selected then
       handleDrawLine(pos, selectedType)
     else
-      simController.placeCell(pos, selectedType)
+      simController.handleViewMessage(PlaceCell(pos, selectedType))
 
   private def handleHover(pos: (Int, Int)): Unit =
     if controlsPanel.brushToggle.selected then
       val selectedType = CellViewType.fromString(
         controlsPanel.soilTypeSelector.item
       ).getOrElse(CellViewType.Empty)
-      simController.placeCell(pos, selectedType)
+      simController.handleViewMessage(PlaceCell(pos, selectedType))
 
   private def handleDrawLine(
       pos: (Int, Int),
@@ -129,5 +129,5 @@ class SimView(private val simController: SimController):
       case Some(start) =>
         firstClick = None
         Future {
-          simController.placeLine(start, pos, cellViewType)
+          simController.handleViewMessage(PlaceLine(start, pos, cellViewType))
         }(ExecutionContext.global)

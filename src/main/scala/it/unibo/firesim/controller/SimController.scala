@@ -47,7 +47,7 @@ class SimController(
     * @param factor
     *   The speed factor used to divide the original tick milliseconds
     */
-  def updateSimulationSpeed(factor: Double): Unit =
+  private[controller] def updateSimulationSpeed(factor: Double): Unit =
     tickMs = (originalTickMs / factor).toInt
 
   /** Sets the wind speed from view to model.
@@ -55,7 +55,7 @@ class SimController(
     * @param speed
     *   The wind speed to update.
     */
-  override def setWindSpeed(speed: Int): Unit =
+  private[controller] def setWindSpeed(speed: Int): Unit =
     model.updateParams(_.copy(windSpeed = speed))
 
   /** Sets the wind angle from view to model.
@@ -63,7 +63,7 @@ class SimController(
     * @param angle
     *   The angle to update.
     */
-  override def setWindAngle(angle: Int): Unit =
+  private[controller] def setWindAngle(angle: Int): Unit =
     model.updateParams(_.copy(windAngle = angle))
 
   /** Sets the temperature from view to model.
@@ -71,7 +71,7 @@ class SimController(
     * @param temp
     *   The temperature to update.
     */
-  override def setTemperature(temp: Int): Unit =
+  private[controller] def setTemperature(temp: Int): Unit =
     model.updateParams(_.copy(temperature = temp))
 
   /** Sets the humidity from view to model.
@@ -79,7 +79,7 @@ class SimController(
     * @param humidity
     *   The humidity to update.
     */
-  override def setHumidity(humidity: Int): Unit =
+  private[controller] def setHumidity(humidity: Int): Unit =
     model.updateParams(_.copy(humidity = humidity))
 
   /** Makes model generate a map.
@@ -89,11 +89,12 @@ class SimController(
     * @param height
     *   The height of the map.
     */
-  override def generateMap(width: Int, height: Int): Unit = lock.synchronized {
-    this.width = width
-    this.height = height
-    lock.notifyAll()
-  }
+  private[controller] def generateMap(width: Int, height: Int): Unit =
+    lock.synchronized {
+      this.width = width
+      this.height = height
+      lock.notifyAll()
+    }
 
   /** Makes model try to place a cell.
     *
@@ -102,7 +103,10 @@ class SimController(
     * @param cellViewType
     *   The type of cell.
     */
-  override def placeCell(pos: (Int, Int), cellViewType: CellViewType): Unit =
+  private[controller] def placeCell(
+      pos: (Int, Int),
+      cellViewType: CellViewType
+  ): Unit =
     placeQueue.put(
       pos,
       CellTypeConverter.toModel(
@@ -112,7 +116,16 @@ class SimController(
       )
     )
 
-  override def placeLine(
+  /** Makes model try to place a line of cells
+    *
+    * @param start
+    *   Position start of the line
+    * @param end
+    *   Position end of the line
+    * @param cellViewType
+    *   type of line to place
+    */
+  private[controller] def placeLine(
       start: (Int, Int),
       end: (Int, Int),
       cellViewType: CellViewType
@@ -124,7 +137,7 @@ class SimController(
 
   /** Notifies controller that the simulation has been started.
     */
-  override def startSimulation(): Unit = lock.synchronized {
+  private[controller] def startSimulation(): Unit = lock.synchronized {
     if mapGenerated then
       running = true
       lock.notifyAll()
@@ -132,11 +145,11 @@ class SimController(
 
   /** Notifies controller that the simulation has been paused.
     */
-  override def pauseResumeSimulation(): Unit = running = !running
+  private[controller] def pauseResumeSimulation(): Unit = running = !running
 
   /** Notifies controller that the simulation has been stopped.
     */
-  override def stopSimulation(): Unit = lock.synchronized {
+  private[controller] def stopSimulation(): Unit = lock.synchronized {
     running = false
     mapGenerated = false
     width = 0
@@ -147,7 +160,7 @@ class SimController(
 
   /** Notifies controller that the program is closing.
     */
-  override def closing(): Unit = lock.synchronized {
+  private[controller] def closing(): Unit = lock.synchronized {
     isClosing = true
     running = false
     mapGenerated = false

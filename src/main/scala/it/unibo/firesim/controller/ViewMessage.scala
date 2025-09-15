@@ -80,3 +80,34 @@ case class PlaceCell(pos: (Int, Int), cellViewType: CellViewType)
 
   def execute(controller: SimController): Unit =
     controller.placeCell(pos, cellViewType)
+
+/** Message to update the simulation speed
+  * @param factor
+  *   speed value
+  */
+case class UpdateSimulationSpeed(factor: Double) extends ViewMessage:
+
+  def execute(controller: SimController): Unit =
+    controller.updateSimulationSpeed(factor)
+
+/** Message to place a line of cells on the map.
+  * @param start
+  *   Position start
+  * @param end
+  *   Position end
+  * @param cellViewType
+  *   type of the line to place
+  */
+case class PlaceLine(
+    start: (Int, Int),
+    end: (Int, Int),
+    cellViewType: CellViewType
+) extends ViewMessage:
+
+  def execute(controller: SimController): Unit =
+    controller.placeLine(start, end, cellViewType)
+
+/** Message for closing the program
+  */
+case object Closing extends ViewMessage:
+  def execute(controller: SimController): Unit = controller.closing()

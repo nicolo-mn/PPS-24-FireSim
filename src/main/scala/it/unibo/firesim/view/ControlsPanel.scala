@@ -1,7 +1,8 @@
 package it.unibo.firesim.view
 
 import it.unibo.firesim.config.UIConfig.*
-import it.unibo.firesim.controller.{SimController, SpeedType}
+import it.unibo.firesim.controller.*
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, SelectionChanged, ValueChanged}
@@ -123,7 +124,7 @@ class ControlsPanel(simController: SimController)
       soilTypeSelector.selection.item = fireSoilStr
 
     case ButtonClicked(`pauseResumeButton`) =>
-      simController.pauseResumeSimulation()
+      simController.handleViewMessage(PauseResumeSimulation)
       val isNowPaused = pauseResumeButton.text == "⏸ Pause"
       pauseResumeButton.text = if isNowPaused then "▶ Resume" else "⏸ Pause"
 
@@ -141,29 +142,29 @@ class ControlsPanel(simController: SimController)
         drawLineButton.enabled = true
 
     case SelectionChanged(`speedSelector`) =>
-      simController.updateSimulationSpeed(
+      simController.handleViewMessage(UpdateSimulationSpeed(
         speedSelector.selection.item.multiplier
-      )
+      ))
 
     case ValueChanged(`humiditySlider`) =>
       humidityLabel.text =
         humidityLabelText + humiditySlider.value + humidityUnit
-      simController.setHumidity(humiditySlider.value)
+      simController.handleViewMessage(SetHumidity(humiditySlider.value))
 
     case ValueChanged(`temperatureSlider`) =>
       temperatureLabel.text =
         temperatureLabelText + temperatureSlider.value + temperatureUnit
-      simController.setTemperature(temperatureSlider.value)
+      simController.handleViewMessage(SetTemperature(temperatureSlider.value))
 
     case ValueChanged(`windDirectionSlider`) =>
       windDirectionLabel.text =
         windDirectionLabelText + windDirectionSlider.value + windDirectionUnit
-      simController.setWindAngle(windDirectionSlider.value)
+      simController.handleViewMessage(SetWindAngle(windDirectionSlider.value))
 
     case ValueChanged(`windIntensitySlider`) =>
       windIntensityLabel.text =
         windIntensityLabelText + windIntensitySlider.value + windIntensityUnit
-      simController.setWindSpeed(windIntensitySlider.value)
+      simController.handleViewMessage(SetWindSpeed(windIntensitySlider.value))
   }
 
   private def onStart(): Unit =
@@ -177,7 +178,9 @@ class ControlsPanel(simController: SimController)
       ComboBox.newConstantModel(inGameAvailableSoils)
     )
     soilTypeSelector.selection.item = fireSoilStr
-    Future { simController.startSimulation() }(ExecutionContext.global)
+    Future { simController.handleViewMessage(StartSimulation) }(
+      ExecutionContext.global
+    )
 
 trait ControlsLine(comps: Component*):
   panel: BoxPanel =>
