@@ -1,4 +1,5 @@
-# PPS-24: FireSim
+# 🔥🚁 FireSim
+Un simulatore su sviluppo e contrasto di incendi boschivi.
 
 ## Sommario:
 - [Introduzione](0-introduction/index.md)
