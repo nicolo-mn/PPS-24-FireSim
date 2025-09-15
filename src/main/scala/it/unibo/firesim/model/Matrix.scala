@@ -61,3 +61,18 @@ extension (matrix: Matrix)
         case (cT, j) if f(cT) => (i, j)
       }
     }
+
+  /** @param r
+    *   Row index of the center
+    * @param c
+    *   Column index of the center
+    * @return
+    *   The positions of the cells adjacent to the center (including diagonal
+    *   ones)
+    */
+  def neighbors(r: Int, c: Int): Seq[(Int, Int)] =
+    for
+      dr <- -1 to 1
+      dc <- -1 to 1
+      if !(dr == 0 && dc == 0) && matrix.inBounds(r + dr, c + dc)
+    yield (r + dr, c + dc)
