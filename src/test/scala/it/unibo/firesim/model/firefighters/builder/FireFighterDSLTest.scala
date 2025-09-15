@@ -37,7 +37,6 @@ class FireFighterDSLTest extends AnyFlatSpec with Matchers:
       stationedIn(1, 1)
 
     firefighter1.neighborsInRay should be(Set((0, 0)))
-
     firefighter2.neighborsInRay should be(Set(
       (-1, -1),
       (-1, 0),
