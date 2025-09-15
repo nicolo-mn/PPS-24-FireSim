@@ -9,7 +9,7 @@ object FireFighterUtils:
   extension (f: FireFighter)
 
     def move: FireFighter =
-      val (nextPos, strategy) = f.moveStrategy.move()
+      val (nextPos, strategy) = f.moveStrategy.move
       f.copy(moveStrategy = strategy, position = nextPos)
 
     def changeTargetTo(target: (Int, Int)): FireFighter =

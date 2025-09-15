@@ -1,7 +1,7 @@
 package it.unibo.firesim.model.firefighters
 
 trait MoveStrategy:
-  def move(): ((Int, Int), MoveStrategy)
+  def move: ((Int, Int), MoveStrategy)
   def init(from: (Int, Int), to: (Int, Int)): MoveStrategy
 
 case class BresenhamMovement(
@@ -14,7 +14,7 @@ case class BresenhamMovement(
     err: Int
 ) extends MoveStrategy:
 
-  override def move(): ((Int, Int), MoveStrategy) =
+  override def move: ((Int, Int), MoveStrategy) =
     if position == target then
       (position, this)
     else
