@@ -14,8 +14,6 @@ object FireFighterUtils:
 
   /** Extension methods for the FireFighter class.
     *
-    * @param f
-    *   the firefighter instance to extend.
     */
   extension (f: FireFighter)
 
