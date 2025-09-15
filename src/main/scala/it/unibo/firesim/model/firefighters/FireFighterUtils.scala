@@ -1,5 +1,7 @@
 package it.unibo.firesim.model.firefighters
 
+import it.unibo.firesim.config.Config.{stationThreshold, targetThreshold}
+
 object FireFighterUtils:
 
   enum FireFighterAction:
@@ -28,3 +30,13 @@ object FireFighterUtils:
       then Option(Extinguish)
       else if !f.loaded && f.position == f.station then Option(Reload)
       else None
+
+    def isCloseToStation(candidate: (Int, Int)): Boolean = f.distance(
+      candidate,
+      f.station
+    ) < f.distance(f.target, f.station) * stationThreshold
+
+    def isCloseToTarget(candidate: (Int, Int)): Boolean = f.distance(
+      f.target,
+      candidate
+    ) < f.distance(f.target, f.station) * targetThreshold

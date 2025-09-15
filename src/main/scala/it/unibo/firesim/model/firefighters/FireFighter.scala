@@ -1,9 +1,7 @@
 package it.unibo.firesim.model.firefighters
 
-import it.unibo.firesim.config.Config.{stationThreshold, targetThreshold}
-import it.unibo.firesim.model.monads.ReaderStates.ReaderState
-
 object FireFighterState:
+  import it.unibo.firesim.model.monads.ReaderStates.ReaderState
   import it.unibo.firesim.model.firefighters.FireFighterUtils.*
   private type CellsOnFire = Set[(Int, Int)]
 
@@ -13,14 +11,8 @@ object FireFighterState:
         .collect { case c if c.nonEmpty => c.minBy(f.distance(f.position, _)) }
         .filter(candidate =>
           !fireCells.contains(f.target) ||
-            f.distance(
-              candidate,
-              f.station
-            ) < f.distance(f.target, f.station) * stationThreshold ||
-            f.distance(
-              f.target,
-              candidate
-            ) < f.distance(f.target, f.station) * targetThreshold
+            f.isCloseToStation(candidate) ||
+            f.isCloseToTarget(candidate)
         )
         .getOrElse(if f.loaded then f.target else f.station)
       (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
