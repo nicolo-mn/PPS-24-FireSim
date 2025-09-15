@@ -1,7 +1,19 @@
 package it.unibo.firesim.model.firefighters
 
+/** Provides movement strategies for firefighters.
+  */
 object MoveStrategy:
 
+  /** Calculates the approximate path between two points using Bresenham's line
+    * algorithm.
+    *
+    * @param from
+    *   the starting coordinate as a tuple of (Int, Int)
+    * @param to
+    *   the destination coordinate as a tuple of (Int, Int)
+    * @return
+    *   a lazy list of coordinates forming the movement path
+    */
   def bresenham(from: (Int, Int), to: (Int, Int)): LazyList[(Int, Int)] =
     val deltaX = math.abs(to._1 - from._1)
     val deltaY = -math.abs(to._2 - from._2)
@@ -10,7 +22,7 @@ object MoveStrategy:
     val err = math.abs(to._1 - from._1) - math.abs(to._2 - from._2)
 
     def next(x: Int, y: Int, err: Int): (Int, Int, Int) =
-      if (x, y) == to then
+      if to == (x, y) then
         (x, y, err)
       else
         var (nx, ny) = (x, y)

@@ -4,7 +4,7 @@ import it.unibo.firesim.model.firefighters.MoveStrategy.bresenham
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class MoveStrategyTest extends AnyFlatSpec with Matchers {
+class MoveStrategyTest extends AnyFlatSpec with Matchers:
 
   "BresenhamMovement" should "generate a straight horizontal path" in {
     val path = bresenham((0, 0), (3, 0)).take(4).toList
@@ -50,4 +50,3 @@ class MoveStrategyTest extends AnyFlatSpec with Matchers {
     val path = bresenham((2, 2), (2, 2)).take(3).toList
     path shouldBe List((2, 2), (2, 2), (2, 2))
   }
-}

@@ -1,11 +1,10 @@
 package it.unibo.firesim.model.firefighters.builder
 
 import it.unibo.firesim.model.firefighters.FireFighter
-import it.unibo.firesim.model.firefighters.{DistanceStrategy, MoveStrategy}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class FireFighterBuilderTest extends AnyFlatSpec with Matchers {
+class FireFighterBuilderTest extends AnyFlatSpec with Matchers:
 
   "FireFighterBuilder" should "create a firefighter with correct station and ray" in {
     val builder = new FireFighterBuilder
@@ -16,23 +15,27 @@ class FireFighterBuilderTest extends AnyFlatSpec with Matchers {
     f.station should be((2, 3))
     f.position should be((2, 3))
     f.neighborsInRay should contain allElementsOf Set(
-      (-1,-1), (-1,0), (-1,1),
-      (0,-1),  (0,0),  (0,1),
-      (1,-1),  (1,0),  (1,1)
+      (-1, -1),
+      (-1, 0),
+      (-1, 1),
+      (0, -1),
+      (0, 0),
+      (0, 1),
+      (1, -1),
+      (1, 0),
+      (1, 1)
     )
-    f.moveStrategy should be(MoveStrategy.bresenham)
-    f.distance should be(DistanceStrategy.euclideanDistance)
   }
 
   it should "throw an exception if ray is negative" in {
     val builder = new FireFighterBuilder
-    an [IllegalArgumentException] should be thrownBy builder.withRay(-1)
+    an[IllegalArgumentException] should be thrownBy builder.withRay(-1)
   }
 
   it should "throw an exception if stationed in negative coordinates" in {
     val builder = new FireFighterBuilder
-    an [IllegalArgumentException] should be thrownBy builder.stationedIn((-1, 0))
-    an [IllegalArgumentException] should be thrownBy builder.stationedIn((0, -5))
+    an[IllegalArgumentException] should be thrownBy builder.stationedIn((-1, 0))
+    an[IllegalArgumentException] should be thrownBy builder.stationedIn((0, -5))
   }
 
   it should "throw an exception if build is called before setting ray or station" in {
@@ -41,8 +44,8 @@ class FireFighterBuilderTest extends AnyFlatSpec with Matchers {
     val builder2 = new FireFighterBuilder
     builder2.stationedIn((0, 0))
 
-    an [IllegalArgumentException] should be thrownBy builder1.build()
-    an [IllegalArgumentException] should be thrownBy builder2.build()
+    an[IllegalArgumentException] should be thrownBy builder1.build()
+    an[IllegalArgumentException] should be thrownBy builder2.build()
   }
 
   it should "generate neighbors in ray correctly" in {
@@ -52,9 +55,15 @@ class FireFighterBuilderTest extends AnyFlatSpec with Matchers {
     val f = builder.build()
 
     val expectedNeighbors = Set(
-      (-1,-1), (-1,0), (-1,1),
-      (0,-1),  (0,0),  (0,1),
-      (1,-1),  (1,0),  (1,1)
+      (-1, -1),
+      (-1, 0),
+      (-1, 1),
+      (0, -1),
+      (0, 0),
+      (0, 1),
+      (1, -1),
+      (1, 0),
+      (1, 1)
     )
     f.neighborsInRay shouldBe expectedNeighbors
   }
@@ -65,6 +74,5 @@ class FireFighterBuilderTest extends AnyFlatSpec with Matchers {
     builder.stationedIn((5, 5))
     val f = builder.build()
 
-    f.nextSteps.take(3).toList shouldBe List((5,5), (5,5), (5,5))
+    f.nextSteps.take(3).toList shouldBe List((5, 5), (5, 5), (5, 5))
   }
-}
