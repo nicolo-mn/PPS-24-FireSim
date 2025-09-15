@@ -1,6 +1,8 @@
 package it.unibo.firesim.model.firefighters
 
 import it.unibo.firesim.model.monads.ReaderStates.ReaderState
+import it.unibo.firesim.model.firefighters.FireFighterUtils.*
+import it.unibo.firesim.model.firefighters.FireFighterUtils.FireFighterAction.*
 
 object FireFighterState:
 
@@ -27,31 +29,22 @@ object FireFighterState:
         else f.target
       else
         f.station
-      val updated = if f.target != newTarget then
-        f.copy(
-          moveStrategy = f.moveStrategy.init(f.position, newTarget),
-          target = newTarget
-        )
-      else f
-      val (nextPos, strategy) = updated.moveStrategy.move()
-      (updated.copy(moveStrategy = strategy, position = nextPos), ())
+      (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
     )
 
   def extinguishStep
       : ReaderState[CellsOnFire, FireFighter, CellsOnFire] =
     ReaderState[CellsOnFire, FireFighter, CellsOnFire]((fireCells, f) =>
-      if f.loaded && fireCells.contains(f.position) && f.position == f.target
-      then
-        (
-          f.copy(loaded = false),
-          f.actionableCells.map(d =>
-            (d._1 + f.position._1, d._2 + f.position._2)
-          ).filter(c => fireCells.contains(c)).toSet
-        )
-      else if !f.loaded && f.position == f.station then
-        (f.copy(loaded = true), Set.empty[(Int, Int)])
-      else
-        (f, Set.empty[(Int, Int)])
+      f.action(fireCells) match
+        case Some(Extinguish) =>
+          (
+            f.copy(loaded = false),
+            f.actionableCells.map(d =>
+              (d._1 + f.position._1, d._2 + f.position._2)
+            ).filter(fireCells.contains).toSet
+          )
+        case Some(Reload) => (f.copy(loaded = true), Set.empty[(Int, Int)])
+        case _            => (f, Set.empty[(Int, Int)])
     )
 
 /** Firefighter unit that extinguishes fire cells, returning to its fire station
