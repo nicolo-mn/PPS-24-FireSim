@@ -102,11 +102,17 @@ class SimModel(
     val (r, c) = pos
     val oldCell = matrix(r)(c)
 
+    if cellType == oldCell then return
+
     cellType match
       case Burning(_, _, _) if oldCell != Forest && oldCell != Grass => return
       case _                                                         =>
         if oldCell == Station then
           firefighters = firefighters.filter(f => f.station != pos)
+        if cellType == Station then
+          firefighters = firefighters :+ createFireFighter:
+            withRay(fireFighterRay)
+            stationedIn(pos)
         matrix = matrix.update(r, c, cellType)
 
   /** Game tick method
