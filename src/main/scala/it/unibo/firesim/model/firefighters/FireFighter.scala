@@ -1,5 +1,6 @@
 package it.unibo.firesim.model.firefighters
 
+import it.unibo.firesim.config.Config.{stationThreshold, targetThreshold}
 import it.unibo.firesim.model.monads.ReaderStates.ReaderState
 
 object FireFighterState:
@@ -15,11 +16,11 @@ object FireFighterState:
             f.distance(
               candidate,
               f.station
-            ) < f.distance(f.target, f.station) / 2 ||
+            ) < f.distance(f.target, f.station) * stationThreshold ||
             f.distance(
               f.target,
               candidate
-            ) < f.distance(f.target, f.station) / 2
+            ) < f.distance(f.target, f.station) * targetThreshold
         )
         .getOrElse(if f.loaded then f.target else f.station)
       (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
