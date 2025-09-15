@@ -7,7 +7,23 @@ import scala.collection.parallel.CollectionConverters.*
 import scala.annotation.tailrec
 import scala.util.Random
 
-object MapGenerator:
+trait MapGenerationStrategy:
+  def addLakes(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
+
+  def addForests(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
+
+  def addGrass(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
+
+  def addStations(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
+
+  def addCustomTerrain(
+      matrix: Matrix,
+      row: Int,
+      col: Int,
+      cellType: CellType
+  ): Matrix
+
+class BaseMapGeneration extends MapGenerationStrategy:
 
   private def roundedMeanMul(ratio: Double, rows: Int, cols: Int): Int =
     (ratio * (rows + cols) / 2).round.toInt
@@ -65,7 +81,12 @@ object MapGenerator:
 
     expand(Seq(seed), Set.empty, 0, matrix)
 
-  def addLakes(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix =
+  override def addLakes(
+      matrix: Matrix,
+      rows: Int,
+      cols: Int,
+      random: Random
+  ): Matrix =
     val lakeSeedsCount = roundedMeanMul(lakeSeedFrequency, rows, cols) max 1
     val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount, random)
     val minLakeSize = roundedMeanMul(minLakeSizeRatio, rows, cols)
@@ -81,7 +102,12 @@ object MapGenerator:
       )
     }
 
-  def addForests(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix =
+  override def addForests(
+      matrix: Matrix,
+      rows: Int,
+      cols: Int,
+      random: Random
+  ): Matrix =
     val forestSeedsCount = roundedMeanMul(forestSeedFrequency, rows, cols) max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount, random)
 
@@ -98,7 +124,12 @@ object MapGenerator:
       )
     }
 
-  def addGrass(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix =
+  override def addGrass(
+      matrix: Matrix,
+      rows: Int,
+      cols: Int,
+      random: Random
+  ): Matrix =
     val grassSeeds: Seq[(Int, Int)] = matrix.positionsOf(Forest).par
       .flatMap((r, c) => matrix.neighbors(r, c))
       .filter((r, c) => matrix(r)(c) == Rock)
@@ -117,7 +148,7 @@ object MapGenerator:
       )
     }
 
-  def addStations(
+  override def addStations(
       matrix: Matrix,
       rows: Int,
       cols: Int,
@@ -131,7 +162,7 @@ object MapGenerator:
       m.update(pos._1, pos._2, Station)
     )
 
-  def addCustomTerrain(
+  override def addCustomTerrain(
       matrix: Matrix,
       row: Int,
       col: Int,
