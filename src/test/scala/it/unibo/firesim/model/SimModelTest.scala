@@ -1,6 +1,7 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.map.{CellType, rows, cols}
+import it.unibo.firesim.model.map.{CellType, cols, rows}
+import it.unibo.firesim.model.map.CellType.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -21,23 +22,29 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     val cellTypes = matrix.flatten.distinct
 
     cellTypes should contain allElementsOf Seq(
-      CellType.Forest,
-      CellType.Grass,
-      CellType.Station,
-      CellType.Water
+      Forest,
+      Grass,
+      Station,
+      Water
     ) // Empty not included
   }
 
-  it should "generate a small map with at least one fire station and one forest" in {
+  it should "generate a small map with at least one fire station, one forest and one fire" in {
     val model = SimModel()
     val matrix = model.generateMap(5, 5)
 
     val fireStations =
-      matrix.flatten.count(_ == CellType.Station)
-    val forests = matrix.flatten.count(_ == CellType.Forest)
+      matrix.flatten.count(_ == Station)
+    val forests = matrix.flatten.count(_ == Forest)
+    val fires = matrix.flatten.count(ct =>
+      ct match
+        case Burning(_, _, _) => true
+        case _                => false
+    )
 
     fireStations should be > 0
     forests should be > 0
+    fires should be > 0
   }
 
   it should "generate a map with low percentage of rock cells" in {
@@ -45,13 +52,13 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     val matrix = model.generateMap(100, 100)
 
     val emptyCellsCount =
-      matrix.flatten.count(_ == CellType.Rock)
+      matrix.flatten.count(_ == Rock)
     val totalCellsCount = matrix.rows * matrix.cols
 
     emptyCellsCount should be < (totalCellsCount * 0.1).toInt
   }
 
-  it should "Impostazione e recupero dei parametri funziona" in {
+  it should "set and get simulation parameters" in {
     val model = new SimModel()
     model.updateParams(_.copy(windSpeed = 5))
     model.updateParams(_.copy(humidity = 75))
