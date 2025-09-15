@@ -26,9 +26,9 @@ object FireFighterState:
         case Some(Extinguish) =>
           (
             f.copy(loaded = false),
-            f.actionableCells.map(d =>
+            f.neighborsInRay.map(d =>
               (d._1 + f.position._1, d._2 + f.position._2)
-            ).filter(fireCells.contains).toSet
+            ).intersect(fireCells)
           )
         case Some(Reload) => (f.copy(loaded = true), Set.empty[(Int, Int)])
         case _            => (f, Set.empty[(Int, Int)])
@@ -39,7 +39,7 @@ object FireFighterState:
   */
 case class FireFighter(
     station: (Int, Int),
-    actionableCells: Seq[(Int, Int)],
+    neighborsInRay: Set[(Int, Int)],
     position: (Int, Int),
     target: (Int, Int),
     loaded: Boolean,

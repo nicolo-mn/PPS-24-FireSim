@@ -3,12 +3,12 @@ package it.unibo.firesim.model.firefighters.builder
 import it.unibo.firesim.model.firefighters.{DistanceStrategy, BresenhamMovement, FireFighter}
 
 class FireFighterBuilder:
-  private var actionableCells = Seq.empty[(Int, Int)]
+  private var neighborsInRay = Seq.empty[(Int, Int)]
   private var station = Option.empty[(Int, Int)]
 
   def withRay(ray: Int): Unit =
     require(ray >= 0, "Cannot create a firefighter with a negative action ray!")
-    actionableCells = cellsInRay(ray)
+    neighborsInRay = cellsInRay(ray)
 
   def stationedIn(s: (Int, Int)): Unit =
     require(
@@ -19,13 +19,13 @@ class FireFighterBuilder:
 
   def build(): FireFighter =
     require(
-      actionableCells.nonEmpty && station.nonEmpty,
+      neighborsInRay.nonEmpty && station.nonEmpty,
       "Firefighters require a base station and ray of action!"
     )
     val s = station.get
     FireFighter(
       s,
-      actionableCells,
+      neighborsInRay.toSet,
       s,
       s,
       true,
