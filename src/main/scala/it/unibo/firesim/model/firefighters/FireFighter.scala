@@ -64,7 +64,7 @@ object FireFighterState:
   * @param nextSteps
   *   a lazy list of planned future positions.
   * @param moveStrategy
-  *   a function defining the movement strategy between two coordinates.
+  *   a function defining the movement strategy.
   * @param distance
   *   a function that computes the distance between two coordinates.
   */
