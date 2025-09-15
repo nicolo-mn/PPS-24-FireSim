@@ -1,6 +1,6 @@
 package it.unibo.firesim.model.firefighters.builder
 
-import it.unibo.firesim.model.firefighters.{ChebyshevDistance, BresenhamMovement, FireFighter}
+import it.unibo.firesim.model.firefighters.{DistanceStrategy, BresenhamMovement, FireFighter}
 
 class FireFighterBuilder:
   private var actionableCells = Seq.empty[(Int, Int)]
@@ -30,7 +30,7 @@ class FireFighterBuilder:
       s,
       true,
       BresenhamMovement(s, s, 0, 0, 0, 0, 0),
-      ChebyshevDistance()
+      DistanceStrategy.euclideanDistance
     )
 
   private def cellsInRay(ray: Int): Seq[(Int, Int)] =

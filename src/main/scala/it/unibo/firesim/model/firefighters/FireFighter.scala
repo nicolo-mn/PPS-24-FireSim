@@ -10,18 +10,18 @@ object FireFighterState:
     ReaderState[CellsOnFire, FireFighter, Unit]((fireCells, f) =>
       val newTarget = if f.loaded && fireCells.nonEmpty then
         val tmp =
-          fireCells.minBy(c => f.distanceStrategy.distance(f.position, c))
+          fireCells.minBy(c => f.distance(f.position, c))
         if !fireCells.contains(f.target) ||
           tmp == f.target ||
           f.position == f.station ||
-          f.distanceStrategy.distance(
+          f.distance(
             tmp,
             f.station
-          ) < f.distanceStrategy.distance(f.target, f.station) / 2 ||
-          f.distanceStrategy.distance(
+          ) < f.distance(f.target, f.station) / 2 ||
+          f.distance(
             f.target,
             tmp
-          ) < f.distanceStrategy.distance(f.target, f.station) / 2
+          ) < f.distance(f.target, f.station) / 2
         then
           tmp
         else f.target
@@ -64,5 +64,5 @@ case class FireFighter(
     target: (Int, Int),
     loaded: Boolean,
     moveStrategy: MoveStrategy,
-    distanceStrategy: DistanceStrategy
+    distance: ((Int, Int), (Int, Int)) => Double
 )

@@ -1,9 +1,8 @@
 package it.unibo.firesim.model.firefighters
 
-trait DistanceStrategy:
-  def distance(p1: (Int, Int), p2: (Int, Int)): Int
+object DistanceStrategy:
 
-class ChebyshevDistance extends DistanceStrategy:
-
-  override def distance(p1: (Int, Int), p2: (Int, Int)): Int =
-    math.max(math.abs(p1._1 - p2._1), math.abs(p1._2 - p2._2))
+  def euclideanDistance(p1: (Int, Int), p2: (Int, Int)): Double =
+    val xDiff = p1._1 - p2._1
+    val yDiff = p1._2 - p2._2
+    math.sqrt(xDiff * xDiff + yDiff * yDiff)
