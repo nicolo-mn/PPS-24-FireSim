@@ -13,7 +13,6 @@ object FireFighterUtils:
     case Reload
 
   /** Extension methods for the FireFighter class.
-    *
     */
   extension (f: FireFighter)
 
