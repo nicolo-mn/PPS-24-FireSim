@@ -43,6 +43,7 @@ case class FireFighter(
     position: (Int, Int),
     target: (Int, Int),
     loaded: Boolean,
-    moveStrategy: MoveStrategy,
+    nextSteps: LazyList[(Int, Int)],
+    moveStrategy: ((Int, Int), (Int, Int)) => LazyList[(Int, Int)],
     distance: ((Int, Int), (Int, Int)) => Double
 )

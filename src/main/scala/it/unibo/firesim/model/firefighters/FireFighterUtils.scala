@@ -11,12 +11,11 @@ object FireFighterUtils:
   extension (f: FireFighter)
 
     def move: FireFighter =
-      val (nextPos, strategy) = f.moveStrategy.move
-      f.copy(moveStrategy = strategy, position = nextPos)
+      f.copy(nextSteps = f.nextSteps.tail, position = f.nextSteps.head)
 
     def changeTargetTo(target: (Int, Int)): FireFighter =
       f.copy(
-        moveStrategy = f.moveStrategy.init(f.position, target),
+        nextSteps = f.moveStrategy(f.position, target),
         target = target
       )
 

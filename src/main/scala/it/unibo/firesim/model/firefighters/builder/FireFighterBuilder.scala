@@ -1,6 +1,6 @@
 package it.unibo.firesim.model.firefighters.builder
 
-import it.unibo.firesim.model.firefighters.{DistanceStrategy, BresenhamMovement, FireFighter}
+import it.unibo.firesim.model.firefighters.{DistanceStrategy, FireFighter, MoveStrategy}
 
 class FireFighterBuilder:
   private var neighborsInRay = Seq.empty[(Int, Int)]
@@ -29,7 +29,8 @@ class FireFighterBuilder:
       s,
       s,
       true,
-      BresenhamMovement(s, s, 0, 0, 0, 0, 0),
+      LazyList.continually(s),
+      MoveStrategy.bresenham,
       DistanceStrategy.euclideanDistance
     )
 

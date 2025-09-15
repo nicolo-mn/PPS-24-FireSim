@@ -1,42 +1,27 @@
 package it.unibo.firesim.model.firefighters
 
-trait MoveStrategy:
-  def move: ((Int, Int), MoveStrategy)
-  def init(from: (Int, Int), to: (Int, Int)): MoveStrategy
+object MoveStrategy:
 
-case class BresenhamMovement(
-    position: (Int, Int),
-    target: (Int, Int),
-    deltaX: Int,
-    deltaY: Int,
-    stepX: Int,
-    stepY: Int,
-    err: Int
-) extends MoveStrategy:
+  def bresenham(from: (Int, Int), to: (Int, Int)): LazyList[(Int, Int)] =
+    val deltaX = math.abs(to._1 - from._1)
+    val deltaY = -math.abs(to._2 - from._2)
+    val stepX = if from._1 < to._1 then 1 else -1
+    val stepY = if from._2 < to._2 then 1 else -1
+    val err = math.abs(to._1 - from._1) - math.abs(to._2 - from._2)
 
-  override def move: ((Int, Int), MoveStrategy) =
-    if position == target then
-      (position, this)
-    else
-      var (nx, ny) = position
-      val e2 = 2 * err
-      var newErr = err
-      if e2 >= deltaY then
-        newErr += deltaY
-        nx += stepX
-      if e2 <= deltaX then
-        newErr += deltaX
-        ny += stepY
-      ((nx, ny), copy(position = (nx, ny), err = newErr))
+    def next(x: Int, y: Int, err: Int): (Int, Int, Int) =
+      if (x, y) == to then
+        (x, y, err)
+      else
+        var (nx, ny) = (x, y)
+        val e2 = 2 * err
+        var newErr = err
+        if e2 >= deltaY then
+          newErr += deltaY
+          nx += stepX
+        if e2 <= deltaX then
+          newErr += deltaX
+          ny += stepY
+        (nx, ny, newErr)
 
-  override def init(from: (Int, Int), to: (Int, Int)): MoveStrategy =
-    BresenhamMovement(
-      position = from,
-      target = to,
-      deltaX = math.abs(to._1 - from._1),
-      deltaY = -math.abs(to._2 - from._2),
-      stepX = if from._1 < to._1 then 1 else -1,
-      stepY = if from._2 < to._2 then 1 else -1,
-      err =
-        math.abs(to._1 - from._1) - math.abs(to._2 - from._2)
-    )
+    LazyList.iterate(next(from._1, from._2, err))(next).map(e => (e._1, e._2))
