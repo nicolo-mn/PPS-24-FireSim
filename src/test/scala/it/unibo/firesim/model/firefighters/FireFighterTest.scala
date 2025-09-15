@@ -127,3 +127,10 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val (_, e3) = updater(updatedFires, s2)
     e3.isEmpty should be(true)
   }
+
+  it should "return to the station if there are no more cells on fire" in {
+    val initialFires = Set((2, 0))
+    val (s1, _) = updater(initialFires, fireFighter)
+    val (s2, _) = updater(Set.empty[(Int, Int)], s1)
+    s2.position should be((0, 0))
+  }
