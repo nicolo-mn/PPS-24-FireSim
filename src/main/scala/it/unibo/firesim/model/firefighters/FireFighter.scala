@@ -15,15 +15,16 @@ object FireFighterState:
     */
   def moveStep: ReaderState[CellsOnFire, FireFighter, Unit] =
     ReaderState[CellsOnFire, FireFighter, Unit]((fireCells, f) =>
-      val newTarget = Option.when(f.loaded && fireCells.nonEmpty)(fireCells)
-        .map(_.minBy(f.distance(f.position, _)))
-        .filter(candidate =>
-          !fireCells.contains(f.target) ||
-            f.isCloseToStation(candidate) ||
-            f.isCloseToTarget(candidate)
+      val newTarget = Option.when(!f.loaded || fireCells.isEmpty)(f.station)
+        .getOrElse(
+          Option(fireCells)
+            .map(_.minBy(f.distance(f.position, _)))
+            .filter(candidate =>
+              !fireCells.contains(f.target) ||
+                f.isCloseToStation(candidate) ||
+                f.isCloseToTarget(candidate)
+            ).getOrElse(f.target)
         )
-        .getOrElse(if f.loaded && fireCells.nonEmpty then f.target
-        else f.station)
       (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
     )
 
