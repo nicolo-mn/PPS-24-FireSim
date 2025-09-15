@@ -1,6 +1,6 @@
 package it.unibo.firesim.model.fire
 
-import it.unibo.firesim.model.CellType
+import it.unibo.firesim.model.map.CellType
 
 extension (cell: CellType)
 

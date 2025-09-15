@@ -1,6 +1,8 @@
 package it.unibo.firesim.model.fire
 
-import it.unibo.firesim.model.{CellType, Matrix, SimParams, inBounds, update}
+import it.unibo.firesim.model.map.{CellType, Matrix}
+import it.unibo.firesim.model.SimParams
+import it.unibo.firesim.model.map.{inBounds, update}
 import it.unibo.firesim.util.RNG
 
 /** Executes one simulation step of fire spread across the grid.

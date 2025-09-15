@@ -1,13 +1,13 @@
 package it.unibo.firesim.model
 
-import CellType.*
+import it.unibo.firesim.model.map.CellType.*
 import it.unibo.firesim.model.fire.*
 import it.unibo.firesim.config.Config.*
 import it.unibo.firesim.util.{RNG, SimpleRNG}
 import it.unibo.firesim.model.firefighters.FireFighterState.*
 import it.unibo.firesim.model.firefighters.FireFighter
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
-import it.unibo.firesim.model.map.MapBuilder
+import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, positionsOf, update, neighbors}
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.util.Random

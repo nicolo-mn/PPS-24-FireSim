@@ -1,7 +1,8 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.model.{CellType, Matrix, SimModel, update}
-import it.unibo.firesim.util.{Line, Logger}
+import it.unibo.firesim.model.map.{CellType, Matrix}
+import it.unibo.firesim.model.SimModel
+import it.unibo.firesim.model.map.update
 import it.unibo.firesim.util.Line.*
 import it.unibo.firesim.view.SimView
 
@@ -117,7 +118,7 @@ class SimController(
       end: (Int, Int),
       cellViewType: CellViewType
   ): Unit =
-    Line.lineBetween(
+    lineBetween(
       start,
       end
     ).withType(cellViewType).foreach(placeCell)

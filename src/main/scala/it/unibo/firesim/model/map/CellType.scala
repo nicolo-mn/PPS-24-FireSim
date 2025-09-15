@@ -1,4 +1,4 @@
-package it.unibo.firesim.model
+package it.unibo.firesim.model.map
 
 import it.unibo.firesim.model.fire.FireStage
 

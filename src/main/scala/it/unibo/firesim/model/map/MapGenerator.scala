@@ -1,8 +1,7 @@
 package it.unibo.firesim.model.map
 
 import it.unibo.firesim.config.Config.*
-import it.unibo.firesim.model.{CellType, Matrix, inBounds, update, positionsOf, neighbors}
-import it.unibo.firesim.model.CellType.*
+import CellType.*
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.annotation.tailrec

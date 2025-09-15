@@ -1,7 +1,8 @@
 package it.unibo.firesim.model.fire
 
 import it.unibo.firesim.config.Config.*
-import it.unibo.firesim.model.{CellType, Matrix, SimParams}
+import it.unibo.firesim.model.map.{CellType, Matrix}
+import it.unibo.firesim.model.SimParams
 
 /** A function type representing the probability that a given cell will ignite
   * during a simulation cycle

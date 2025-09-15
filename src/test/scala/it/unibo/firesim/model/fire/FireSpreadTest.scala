@@ -2,9 +2,10 @@ package it.unibo.firesim.model.fire
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import it.unibo.firesim.model.{CellType, Matrix, SimParams}
-import CellType.Grass
+import it.unibo.firesim.model.SimParams
+import it.unibo.firesim.model.map.CellType.Grass
 import it.unibo.firesim.model.fire.FireStage.{Active, Ignition, Smoldering}
+import it.unibo.firesim.model.map.{CellType, Matrix}
 import it.unibo.firesim.util.*
 
 class FireSpreadTest extends AnyFlatSpec with Matchers:

@@ -1,7 +1,6 @@
 package it.unibo.firesim.model.map
 
-import it.unibo.firesim.model.{CellType, Matrix}
-import it.unibo.firesim.model.CellType.*
+import CellType.*
 
 import scala.util.Random
 
