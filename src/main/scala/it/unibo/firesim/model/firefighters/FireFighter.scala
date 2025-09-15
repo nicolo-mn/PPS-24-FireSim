@@ -9,7 +9,22 @@ object FireFighterState:
   def moveStep: ReaderState[CellsOnFire, FireFighter, Unit] =
     ReaderState[CellsOnFire, FireFighter, Unit]((fireCells, f) =>
       val newTarget = if f.loaded && fireCells.nonEmpty then
-        fireCells.minBy(c => f.distanceStrategy.distance(f.position, c))
+        val tmp =
+          fireCells.minBy(c => f.distanceStrategy.distance(f.position, c))
+        if !fireCells.contains(f.target) ||
+          tmp == f.target ||
+          f.position == f.station ||
+          f.distanceStrategy.distance(
+            tmp,
+            f.station
+          ) < f.distanceStrategy.distance(f.target, f.station) / 2 ||
+          f.distanceStrategy.distance(
+            f.target,
+            tmp
+          ) < f.distanceStrategy.distance(f.target, f.station) / 2
+        then
+          tmp
+        else f.target
       else
         f.station
       val updated = if f.target != newTarget then
@@ -25,7 +40,8 @@ object FireFighterState:
   def extinguishStep
       : ReaderState[CellsOnFire, FireFighter, CellsOnFire] =
     ReaderState[CellsOnFire, FireFighter, CellsOnFire]((fireCells, f) =>
-      if f.loaded && fireCells.contains(f.position) then
+      if f.loaded && fireCells.contains(f.position) && f.position == f.target
+      then
         (
           f.copy(loaded = false),
           f.actionableCells.map(d =>
