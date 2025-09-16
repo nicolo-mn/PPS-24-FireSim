@@ -36,7 +36,7 @@ e infine chiamare il metodo `handleQueuedCells` per far inserire al model le cel
 ## View
 Per realizzare la GUI è stato utilizzato Scala Swing. L'interfaccia grafica è composta da un `Panel` che contiene la griglia con cui l'utente può interagire e da un `BoxPanel` contenente i vari controlli. 
 
-L'utente può interagire con la griglia con click e trascinamenti che permettono il posizionamento di celle, convertiti in coordinate logiche da `pixelToCell` e inviati al controller sotto forma di messaggi `ViewMessage`.
+L’utente può interagire con la griglia tramite click e trascinamenti, che consentono il posizionamento delle celle. Le coordinate grafiche ottenute dall’interazione vengono convertite in coordinate logiche attraverso il metodo pixelToCell, così da poter essere elaborate dal controller.
 
 I controlli sono organizzati in righe attraverso l'uso di ulteriori `BoxPanel`. Poiché ogni riga ha caratteristiche in comune, come la spaziatura tra i vari controlli, un trait con self-types è stato utilizzato per decorare ogni `BoxPanel`. 
 
@@ -46,7 +46,7 @@ Uno `SplitPane` è utilizzato per dividere le due aree. La griglia è responsive
 
 Le possibili operazioni lunghe e potenzialmente bloccanti, come l'avvio della simulazione o il calcolo per il posizionamento di una linea, vengono eseguite in background in modo da poter mantenere la View reattiva.
 
-
+La View è disaccoppiata dalla logica di simulazione: essa si limita a tradurre le interazioni utente in ViewMessage inviati al Controller, seguendo il pattern architetturale MVC.
 
 
 [Indice](../index.md) |
