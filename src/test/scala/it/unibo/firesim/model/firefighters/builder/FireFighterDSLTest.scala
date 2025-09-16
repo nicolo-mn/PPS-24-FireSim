@@ -36,20 +36,16 @@ class FireFighterDSLTest extends AnyFlatSpec with Matchers:
       withRay(1)
       stationedIn(1, 1)
 
-    firefighter1.actionableCells should contain theSameElementsInOrderAs Seq((
-      0,
-      0
+    firefighter1.neighborsInRay should be(Set((0, 0)))
+    firefighter2.neighborsInRay should be(Set(
+      (-1, -1),
+      (-1, 0),
+      (-1, 1),
+      (0, -1),
+      (0, 0),
+      (0, 1),
+      (1, -1),
+      (1, 0),
+      (1, 1)
     ))
-    firefighter2.actionableCells should contain theSameElementsInOrderAs
-      Seq(
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-        (0, -1),
-        (0, 0),
-        (0, 1),
-        (1, -1),
-        (1, 0),
-        (1, 1)
-      )
   }
