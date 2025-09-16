@@ -34,8 +34,8 @@ class SimModel(
   private val firefightersUpdater =
     for
       _ <- moveStep
-      extinguished <- extinguishStep
-    yield extinguished
+      extinguishedCells <- actionStep
+    yield extinguishedCells
 
   private var cycle: Int = 0
   private var rows, cols: Int = 0

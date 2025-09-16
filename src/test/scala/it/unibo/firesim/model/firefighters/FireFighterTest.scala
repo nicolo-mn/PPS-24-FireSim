@@ -12,8 +12,8 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
   private val updater =
     for
       _ <- moveStep
-      extinguished <- extinguishStep
-    yield extinguished
+      extinguishedCells <- actionStep
+    yield extinguishedCells
 
   val fireFighter: FireFighter = createFireFighter:
     withRay(ray)

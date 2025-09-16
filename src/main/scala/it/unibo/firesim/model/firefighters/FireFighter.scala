@@ -35,7 +35,7 @@ object FireFighterState:
     *   a ReaderState that updates the FireFighter and returns the affected
     *   cells.
     */
-  def extinguishStep
+  def actionStep
       : ReaderState[CellsOnFire, FireFighter, CellsOnFire] =
     ReaderState[CellsOnFire, FireFighter, CellsOnFire]((fireCells, f) =>
       import it.unibo.firesim.model.firefighters.FireFighterUtils.FireFighterAction.*
