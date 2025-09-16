@@ -36,6 +36,8 @@ e infine chiamare il metodo `handleQueuedCells` per far inserire al model le cel
 ## View
 Per realizzare la GUI è stato utilizzato Scala Swing. L'interfaccia grafica è composta da un `Panel` che contiene la griglia con cui l'utente può interagire e da un `BoxPanel` contenente i vari controlli. 
 
+L'utente può interagire con la griglia con click e trascinamenti che permettono il posizionamento di celle, convertiti in coordinate logiche da `pixelToCell` e inviati al controller sotto forma di messaggi `ViewMessage`.
+
 I controlli sono organizzati in righe attraverso l'uso di ulteriori `BoxPanel`. Poiché ogni riga ha caratteristiche in comune, come la spaziatura tra i vari controlli, un trait con self-types è stato utilizzato per decorare ogni `BoxPanel`. 
 
 Le varie tipologie di celle sono identificate da un `enum` chiamato `CellViewType`. Le istanze di questa enumerazione sono ricevute dal controller per aggiornare la griglia, e sono utilizzate dalla view per associare un colore a ogni cella.
