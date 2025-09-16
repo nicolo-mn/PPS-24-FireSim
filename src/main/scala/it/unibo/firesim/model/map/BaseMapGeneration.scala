@@ -63,12 +63,9 @@ class BaseMapGeneration extends MapGenerationStrategy:
 
     expand(Seq(seed), Set.empty, 0, matrix)
 
-  override def addWater(
-      matrix: Matrix,
-      rows: Int,
-      cols: Int,
-      random: Random
-  ): Matrix =
+  override def addWater(matrix: Matrix, random: Random): Matrix =
+    val rows = matrix.rows
+    val cols = matrix.cols
     val lakeSeedsCount = roundedMeanMul(lakeSeedFrequency, rows, cols) max 1
     val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount, random)
     val minLakeSize = roundedMeanMul(minLakeSizeRatio, rows, cols)
@@ -84,12 +81,9 @@ class BaseMapGeneration extends MapGenerationStrategy:
       )
     }
 
-  override def addForests(
-      matrix: Matrix,
-      rows: Int,
-      cols: Int,
-      random: Random
-  ): Matrix =
+  override def addForests(matrix: Matrix, random: Random): Matrix =
+    val rows = matrix.rows
+    val cols = matrix.cols
     val forestSeedsCount = roundedMeanMul(forestSeedFrequency, rows, cols) max 1
     val forestSeeds = generateSeeds(rows, cols, forestSeedsCount, random)
 
@@ -106,12 +100,9 @@ class BaseMapGeneration extends MapGenerationStrategy:
       )
     }
 
-  override def addGrass(
-      matrix: Matrix,
-      rows: Int,
-      cols: Int,
-      random: Random
-  ): Matrix =
+  override def addGrass(matrix: Matrix, random: Random): Matrix =
+    val rows = matrix.rows
+    val cols = matrix.cols
     val grassSeeds: Seq[(Int, Int)] = matrix.positionsOf(Forest).par
       .flatMap((r, c) => matrix.neighbors(r, c))
       .filter((r, c) => matrix(r)(c) == Rock)
@@ -130,12 +121,9 @@ class BaseMapGeneration extends MapGenerationStrategy:
       )
     }
 
-  override def addStations(
-      matrix: Matrix,
-      rows: Int,
-      cols: Int,
-      random: Random
-  ): Matrix =
+  override def addStations(matrix: Matrix, random: Random): Matrix =
+    val rows = matrix.rows
+    val cols = matrix.cols
     val stationSeedsCount =
       roundedMeanMul(stationSeedsFrequency, rows, cols) max 1
     val stationSeeds =
@@ -144,12 +132,9 @@ class BaseMapGeneration extends MapGenerationStrategy:
       m.update(pos._1, pos._2, Station)
     )
 
-  override def addFires(
-      matrix: Matrix,
-      rows: Int,
-      cols: Int,
-      random: Random
-  ): Matrix =
+  override def addFires(matrix: Matrix, random: Random): Matrix =
+    val rows = matrix.rows
+    val cols = matrix.cols
     var m = matrix
     val forestFireSeedsCount =
       roundedMeanMul(forestFireSeedFrequency, rows, cols) max 1

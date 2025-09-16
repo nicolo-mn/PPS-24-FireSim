@@ -9,23 +9,23 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
   private var matrix: Matrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
 
   def withWater(): MapBuilder =
-    matrix = mapGenerator.addWater(matrix, rows, cols, random)
+    matrix = mapGenerator.addWater(matrix, random)
     this
 
   def withForests(): MapBuilder =
-    matrix = mapGenerator.addForests(matrix, rows, cols, random)
+    matrix = mapGenerator.addForests(matrix, random)
     this
 
   def withGrass(): MapBuilder =
-    matrix = mapGenerator.addGrass(matrix, rows, cols, random)
+    matrix = mapGenerator.addGrass(matrix, random)
     this
 
   def withStations(): MapBuilder =
-    matrix = mapGenerator.addStations(matrix, rows, cols, random)
+    matrix = mapGenerator.addStations(matrix, random)
     this
 
   def withFires(): MapBuilder =
-    matrix = mapGenerator.addFires(matrix, rows, cols, random)
+    matrix = mapGenerator.addFires(matrix, random)
     this
 
   def withCustomTerrain(positions: Seq[((Int, Int), CellType)]): MapBuilder =

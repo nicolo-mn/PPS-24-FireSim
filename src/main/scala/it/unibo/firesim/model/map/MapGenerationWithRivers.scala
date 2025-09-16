@@ -11,8 +11,6 @@ class MapGenerationWithRivers extends BaseMapGeneration:
   private def createRiver(
       matrix: Matrix,
       start: (Int, Int),
-      rows: Int,
-      cols: Int,
       random: Random
   ): Matrix =
     var m = matrix
@@ -39,13 +37,9 @@ class MapGenerationWithRivers extends BaseMapGeneration:
 
     m
 
-  override def addWater(
-      matrix: Matrix,
-      rows: Int,
-      cols: Int,
-      random: Random
-  ): Matrix =
-
+  override def addWater(matrix: Matrix, random: Random): Matrix =
+    val rows = matrix.rows
+    val cols = matrix.cols
     val lakeSeedsCount = roundedMeanMul(lakeSeedFrequency, rows, cols) max 1
     val lakeSeeds = generateSeeds(rows, cols, lakeSeedsCount, random)
     val minLakeSize = roundedMeanMul(minLakeSizeRatio, rows, cols)
@@ -63,7 +57,7 @@ class MapGenerationWithRivers extends BaseMapGeneration:
     }
 
     lakeSeeds.foreach { lakeSeed =>
-      m = createRiver(m, lakeSeed, rows, cols, random)
+      m = createRiver(m, lakeSeed, random)
     }
 
     m
