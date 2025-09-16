@@ -26,7 +26,7 @@ class MapGenerationWithRivers extends BaseMapGeneration:
         if m.inBounds(nr, nc) then
           m = m.update(nr, nc, Water)
 
-      angle += (random.nextDouble() - 0.5) * 0.6
+      angle += (random.nextDouble() - 0.5) * 0.8
 
       r += Math.round(Math.sin(angle)).toInt
       c += Math.round(Math.cos(angle)).toInt
