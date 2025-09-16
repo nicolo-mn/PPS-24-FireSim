@@ -1,6 +1,6 @@
 package it.unibo.firesim.model.firefighters.builder
 
-import it.unibo.firesim.model.firefighters.{DistanceStrategy, FireFighter, MoveStrategy}
+import it.unibo.firesim.model.firefighters.{FireFighter, MoveStrategy}
 
 /** Builder for constructing a FireFighter instance.
   *
@@ -55,8 +55,7 @@ class FireFighterBuilder:
       s,
       true,
       LazyList.continually(s),
-      MoveStrategy.bresenham,
-      DistanceStrategy.euclideanDistance
+      MoveStrategy.bresenham
     )
 
   private def cellsInRay(ray: Int): Seq[(Int, Int)] =

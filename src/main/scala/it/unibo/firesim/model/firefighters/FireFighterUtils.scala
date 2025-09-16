@@ -1,6 +1,7 @@
 package it.unibo.firesim.model.firefighters
 
 import it.unibo.firesim.config.Config.{stationThreshold, targetThreshold}
+import it.unibo.firesim.util.ChebyshevDistance.distance
 
 /** Utility object providing helper methods and actions for a firefighter.
   */
@@ -80,10 +81,10 @@ object FireFighterUtils:
       *   true if the candidate is within the allowable distance from the
       *   station.
       */
-    def isCloseToStation(candidate: (Int, Int)): Boolean = f.distance(
+    def isCloseToStation(candidate: (Int, Int)): Boolean = distance(
       candidate,
       f.station
-    ) < f.distance(f.target, f.station) * stationThreshold
+    ) < distance(f.target, f.station) * stationThreshold
 
     /** Checks if a position is sufficiently close to the current target.
       *
@@ -93,7 +94,7 @@ object FireFighterUtils:
       *   true if the candidate is within the allowable distance from the
       *   target.
       */
-    def isCloseToTarget(candidate: (Int, Int)): Boolean = f.distance(
+    def isCloseToTarget(candidate: (Int, Int)): Boolean = distance(
       f.target,
       candidate
-    ) < f.distance(f.target, f.station) * targetThreshold
+    ) < distance(f.target, f.station) * targetThreshold

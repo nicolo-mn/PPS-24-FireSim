@@ -5,6 +5,7 @@ package it.unibo.firesim.model.firefighters
 object FireFighterState:
   import it.unibo.firesim.model.monads.ReaderStates.ReaderState
   import it.unibo.firesim.model.firefighters.FireFighterUtils.*
+  import it.unibo.firesim.util.ChebyshevDistance.distance
   private type CellsOnFire = Set[(Int, Int)]
 
   /** Represent a move step for a firefighter. Determines the new target based
@@ -18,7 +19,7 @@ object FireFighterState:
       val newTarget = Option.when(!f.loaded || fireCells.isEmpty)(f.station)
         .getOrElse(
           Option(fireCells)
-            .map(_.minBy(f.distance(f.position, _)))
+            .map(_.minBy(distance(f.position, _)))
             .filter(candidate =>
               !fireCells.contains(f.target) ||
                 f.isCloseToStation(candidate) ||
@@ -77,6 +78,5 @@ case class FireFighter(
     target: (Int, Int),
     loaded: Boolean,
     nextSteps: LazyList[(Int, Int)],
-    moveStrategy: ((Int, Int), (Int, Int)) => LazyList[(Int, Int)],
-    distance: ((Int, Int), (Int, Int)) => Double
+    moveStrategy: ((Int, Int), (Int, Int)) => LazyList[(Int, Int)]
 )
