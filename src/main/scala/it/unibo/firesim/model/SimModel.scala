@@ -56,7 +56,7 @@ class SimModel(
     this.cols = cols
 
     matrix = buildMap(rows, cols, random):
-      withLakes
+      withWater
       withForests
       withGrass
       withStations

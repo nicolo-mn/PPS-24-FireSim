@@ -10,10 +10,7 @@ import scala.util.Random
 
 class BaseMapGeneration extends MapGenerationStrategy:
 
-  private def roundedMeanMul(ratio: Double, rows: Int, cols: Int): Int =
-    (ratio * (rows + cols) / 2).round.toInt
-
-  private def generateSeeds(
+  protected def generateSeeds(
       rows: Int,
       cols: Int,
       count: Int,
@@ -38,7 +35,7 @@ class BaseMapGeneration extends MapGenerationStrategy:
       return Seq((random.nextInt(rows), random.nextInt(cols)))
     random.shuffle(emptyCells).take(count)
 
-  private def growCluster(
+  protected def growCluster(
       matrix: Matrix,
       seed: (Int, Int),
       clusterSize: Int,
@@ -66,7 +63,7 @@ class BaseMapGeneration extends MapGenerationStrategy:
 
     expand(Seq(seed), Set.empty, 0, matrix)
 
-  override def addLakes(
+  override def addWater(
       matrix: Matrix,
       rows: Int,
       cols: Int,

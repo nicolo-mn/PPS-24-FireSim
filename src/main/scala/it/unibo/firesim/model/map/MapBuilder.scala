@@ -5,11 +5,11 @@ import CellType.*
 import scala.util.Random
 
 class MapBuilder(rows: Int, cols: Int, random: Random):
-  private val mapGenerator: MapGenerationStrategy = BaseMapGeneration()
+  private val mapGenerator: MapGenerationStrategy = MapGenerationWithRivers()
   private var matrix: Matrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
 
-  def withLakes(): MapBuilder =
-    matrix = mapGenerator.addLakes(matrix, rows, cols, random)
+  def withWater(): MapBuilder =
+    matrix = mapGenerator.addWater(matrix, rows, cols, random)
     this
 
   def withForests(): MapBuilder =

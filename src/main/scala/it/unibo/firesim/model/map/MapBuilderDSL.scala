@@ -13,8 +13,8 @@ object MapBuilderDSL:
     instruction(using builder)
     builder.build
 
-  def withLakes(using builder: MapBuilder): Unit =
-    builder.withLakes()
+  def withWater(using builder: MapBuilder): Unit =
+    builder.withWater()
 
   def withForests(using builder: MapBuilder): Unit =
     builder.withForests()

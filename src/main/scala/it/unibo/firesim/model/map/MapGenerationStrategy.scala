@@ -4,7 +4,10 @@ import scala.util.Random
 
 trait MapGenerationStrategy:
 
-  def addLakes(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
+  protected def roundedMeanMul(ratio: Double, rows: Int, cols: Int): Int =
+    (ratio * (rows + cols) / 2).round.toInt
+
+  def addWater(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
 
   def addForests(matrix: Matrix, rows: Int, cols: Int, random: Random): Matrix
 
