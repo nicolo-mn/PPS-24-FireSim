@@ -64,3 +64,18 @@ class MatrixTest extends AnyFlatSpec with Matchers:
       case _                => false
     } should be(Seq((0, 0), (1, 1), (2, 2)))
   }
+
+  it should "get the positions of the neighboring cells" in {
+    val matrix = Vector.tabulate(3, 3)((row, col) => Forest)
+
+    matrix.neighbors(1, 1) should contain allElementsOf Seq(
+      (0, 0),
+      (1, 0),
+      (2, 0),
+      (0, 2),
+      (1, 2),
+      (2, 2),
+      (0, 1),
+      (2, 1)
+    )
+  }
