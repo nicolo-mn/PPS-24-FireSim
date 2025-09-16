@@ -14,13 +14,14 @@ Inoltre, all’interno del codice è inclusa la documentazione Scaladoc, utile a
 Come mostrato nelle figure UML, SimController espone pubblicamente solo due metodi dell'interfaccia Controller.
 
 ### `handleViewMessage`
-Questo metodo permette alla View di inviare comandi al controller in modo disaccoppiato. Il controller riceve un oggetto `ViewMessage` e ne invoca l’esecuzione tramite `msg.execute(this)`, delegando al comando la logica specifica.
+Questo metodo permette alla View di inviare comandi al controller in modo disaccoppiato. La View crea un oggetto `ViewMessage` e lo passa al Controller, che ne invoca l’esecuzione tramite `msg.execute(this)`.In questo modo, la logica specifica del comando è delegata al messaggio stesso, anziché al controller.
 
-Questo approccio, basato sul Command Pattern, riduce l’accoppiamento tra View e Controller, migliora l’incapsulamento e rende più semplice aggiungere nuove operazioni senza modificare la View né la logica interna del controller.
+Questo approccio utilizza il Command Pattern, che riduce l’accoppiamento tra View e Controller, migliora l’incapsulamento e rende più semplice aggiungere nuove operazioni senza modificare la View né la logica interna del controller.
 
-`ViewMessage` è un sealed trait che rappresenta un comando inviato dalla View al Controller. Ogni sottoclasse incapsula i dati necessari per l’operazione e la logica di esecuzione, tramite il metodo execute(controller: SimController).
+`ViewMessage` è un sealed trait che rappresenta un comando inviato dalla View al Controller. Ogni sottoclasse incapsula sia i dati necessari per l’operazione sia la logica di esecuzione attraverso il metodo `execute(controller: SimController)`.
 
-In questo modo, la View non chiama direttamente i metodi del controller, ma si limita a creare e inviare un messaggio.
+Grazie a questo meccanismo, la View non chiama direttamente i metodi del controller, ma si limita a creare e inviare un messaggio, lasciando al comando il compito di agire sul controller.
+
 ### *`loop`*
 Questo metodo viene chiamato dal main thread e permette al controller di avviare il loop della simulazione.
 
