@@ -1,7 +1,7 @@
 package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.map.{CellType, Matrix}
-import it.unibo.firesim.model.SimModel
+import it.unibo.firesim.model.Model
 import it.unibo.firesim.model.map.update
 import it.unibo.firesim.util.Line.*
 import it.unibo.firesim.view.SimView
@@ -17,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue
   *   The simulation model.
   */
 class SimController(
-    model: SimModel
+    model: Model
 ) extends Controller:
 
   private val lock = Object()
