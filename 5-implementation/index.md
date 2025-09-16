@@ -14,10 +14,13 @@ Inoltre, all’interno del codice è inclusa la documentazione Scaladoc, utile a
 Come mostrato nelle figure UML, SimController espone pubblicamente solo due metodi dell'interfaccia Controller.
 
 ### `handleViewMessage`
-Questa soluzione elegante permette alla view di inviare messaggi al controller evitando di esporre troppi metodi diversi tra loro,
-migliorando l'incapsulamento del controller.
-[//]: # (aggiungi juri)
+Questo metodo permette alla View di inviare comandi al controller in modo disaccoppiato. Il controller riceve un oggetto `ViewMessage` e ne invoca l’esecuzione tramite `msg.execute(this)`, delegando al comando la logica specifica.
 
+Questo approccio, basato sul Command Pattern, riduce l’accoppiamento tra View e Controller, migliora l’incapsulamento e rende più semplice aggiungere nuove operazioni senza modificare la View né la logica interna del controller.
+
+`ViewMessage` è un sealed trait che rappresenta un comando inviato dalla View al Controller. Ogni sottoclasse incapsula i dati necessari per l’operazione e la logica di esecuzione, tramite il metodo execute(controller: SimController).
+
+In questo modo, la View non chiama direttamente i metodi del controller, ma si limita a creare e inviare un messaggio.
 ### *`loop`*
 Questo metodo viene chiamato dal main thread e permette al controller di avviare il loop della simulazione.
 
