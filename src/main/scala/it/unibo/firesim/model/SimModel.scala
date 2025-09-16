@@ -24,7 +24,7 @@ given BurnDurationPolicy: BurnDurationPolicy = defaultBurnDuration
 class SimModel(
     random: Random = Random(),
     initial: SimParams = SimParams(20, 90, 20, 50)
-):
+) extends Model:
 
   private val lock = new AnyRef
   private var params = initial
@@ -56,7 +56,7 @@ class SimModel(
     this.cols = cols
 
     matrix = buildMap(rows, cols, random):
-      withLakes
+      withWater
       withForests
       withGrass
       withStations

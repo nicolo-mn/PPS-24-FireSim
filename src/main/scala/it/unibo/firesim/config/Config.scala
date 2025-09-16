@@ -16,7 +16,7 @@ object Config:
   val grassFireSeedFrequency = 0.01
 
   val minLakeSizeRatio: Double = 1.5
-  val maxLakeSizeRatio: Double = 3.0
+  val maxLakeSizeRatio: Double = 4.0
   val minForestSizeRatio: Double = 0.3
   val maxForestSizeRatio: Double = 1.5
   val minGrassSizeRatio: Double = 0.1
