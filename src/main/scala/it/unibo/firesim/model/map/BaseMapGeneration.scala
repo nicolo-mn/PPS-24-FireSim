@@ -63,6 +63,13 @@ class BaseMapGeneration extends MapGenerationStrategy:
 
     expand(Seq(seed), Set.empty, 0, matrix)
 
+  /** @param matrix
+    *   The Matrix to modify
+    * @param random
+    *   The initialized random class
+    * @return
+    *   the modified Matrix with water terrain as lakes
+    */
   override def addWater(matrix: Matrix, random: Random): Matrix =
     val rows = matrix.rows
     val cols = matrix.cols
@@ -81,6 +88,13 @@ class BaseMapGeneration extends MapGenerationStrategy:
       )
     }
 
+  /** @param matrix
+    *   The Matrix to modify
+    * @param random
+    *   The initialized random class
+    * @return
+    *   the modified Matrix with forest terrain as clusters
+    */
   override def addForests(matrix: Matrix, random: Random): Matrix =
     val rows = matrix.rows
     val cols = matrix.cols
@@ -100,6 +114,13 @@ class BaseMapGeneration extends MapGenerationStrategy:
       )
     }
 
+  /** @param matrix
+    *   The Matrix to modify
+    * @param random
+    *   The initialized random class
+    * @return
+    *   the modified Matrix with grass terrain as contour to the forest clusters
+    */
   override def addGrass(matrix: Matrix, random: Random): Matrix =
     val rows = matrix.rows
     val cols = matrix.cols
@@ -121,6 +142,14 @@ class BaseMapGeneration extends MapGenerationStrategy:
       )
     }
 
+  /** @param matrix
+    *   The Matrix to modify
+    * @param random
+    *   The initialized random class
+    * @return
+    *   the modified Matrix with randomly positioned stations, preferably on
+    *   rocks
+    */
   override def addStations(matrix: Matrix, random: Random): Matrix =
     val rows = matrix.rows
     val cols = matrix.cols
@@ -132,6 +161,14 @@ class BaseMapGeneration extends MapGenerationStrategy:
       m.update(pos._1, pos._2, Station)
     )
 
+  /** @param matrix
+    *   The Matrix to modify
+    * @param random
+    *   The initialized random class
+    * @return
+    *   the modified Matrix with randomly positioned fires, only on forest or
+    *   grass terrain
+    */
   override def addFires(matrix: Matrix, random: Random): Matrix =
     val rows = matrix.rows
     val cols = matrix.cols
@@ -152,6 +189,17 @@ class BaseMapGeneration extends MapGenerationStrategy:
 
     m
 
+  /** @param matrix
+    *   The Matrix to modify
+    * @param row
+    *   the row of the cell
+    * @param col
+    *   the column of the cell
+    * @param cellType
+    *   the type of cell
+    * @return
+    *   the modified Matrix with the custom terrain in the specified position
+    */
   override def addCustomTerrain(
       matrix: Matrix,
       row: Int,

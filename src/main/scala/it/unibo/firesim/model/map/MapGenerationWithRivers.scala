@@ -37,6 +37,13 @@ class MapGenerationWithRivers extends BaseMapGeneration:
 
     m
 
+  /** @param matrix
+    *   The Matrix to modify
+    * @param random
+    *   The initialized random class
+    * @return
+    *   the modified Matrix with water terrain as lakes and rivers
+    */
   override def addWater(matrix: Matrix, random: Random): Matrix =
     val rows = matrix.rows
     val cols = matrix.cols
