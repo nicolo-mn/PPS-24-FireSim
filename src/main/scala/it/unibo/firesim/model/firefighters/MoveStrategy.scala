@@ -1,7 +1,6 @@
 package it.unibo.firesim.model.firefighters
 
-/** Provides movement strategies for firefighters.
-  */
+/** Provides movement strategies for firefighters. */
 object MoveStrategy:
 
   /** Calculates the approximate path between two points using Bresenham's line

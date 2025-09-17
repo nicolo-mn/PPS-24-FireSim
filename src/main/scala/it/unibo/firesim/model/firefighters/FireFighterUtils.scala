@@ -7,14 +7,12 @@ import it.unibo.firesim.util.ChebyshevDistance.distance
   */
 object FireFighterUtils:
 
-  /** Enumeration representing the possible actions a firefighter can take.
-    */
+  /** Enumeration representing the possible actions a firefighter can take. */
   enum FireFighterAction:
     case Extinguish
     case Reload
 
-  /** Extension methods for the FireFighter class.
-    */
+  /** Extension methods for the FireFighter class. */
   extension (f: FireFighter)
 
     /** Updates the firefighter by moving to the next position in the planned

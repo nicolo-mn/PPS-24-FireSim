@@ -19,7 +19,7 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     withRay(ray)
     stationedIn(station)
 
-  "FireFighter" should "move towards the closest fire" in {
+  "FireFighter" should "move towards the closest fire from the station" in {
     val cellsOnFire = Set((3, 0), (0, 4))
     val (updated, _) = updater(cellsOnFire, fireFighter)
     val (updated2, _) = updater(cellsOnFire, updated)

@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 class MoveStrategyTest extends AnyFlatSpec with Matchers:
 
-  "BresenhamMovement" should "generate a straight horizontal path" in {
+  "Bresenham algorithm" should "generate a straight horizontal path" in {
     val path = bresenham((0, 0), (3, 0)).take(5).toList
     path shouldBe List(
       (0, 0),
