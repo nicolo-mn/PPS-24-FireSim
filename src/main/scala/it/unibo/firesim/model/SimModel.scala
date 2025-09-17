@@ -7,6 +7,7 @@ import it.unibo.firesim.util.{RNG, SimpleRNG}
 import it.unibo.firesim.model.firefighters.FireFighterState.*
 import it.unibo.firesim.model.firefighters.FireFighter
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
+import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import it.unibo.firesim.model.map.MapBuilderDSL.*
 import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, neighbors, positionsOf, update}
 

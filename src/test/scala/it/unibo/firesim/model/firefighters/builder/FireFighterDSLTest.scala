@@ -1,6 +1,7 @@
 package it.unibo.firesim.model.firefighters.builder
 
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
+import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

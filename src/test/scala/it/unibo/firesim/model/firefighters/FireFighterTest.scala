@@ -23,8 +23,8 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val cellsOnFire = Set((3, 0), (0, 4))
     val (updated, _) = updater(cellsOnFire, fireFighter)
     val (updated2, _) = updater(cellsOnFire, updated)
-    updated.position should be((1, 0))
-    updated2.position should be((2, 0))
+    updated.steps.head should be((1, 0))
+    updated2.steps.head should be((2, 0))
   }
 
   it should "use Bresenham algorithm to move" in {
@@ -33,18 +33,18 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val (s2, _) = updater(cellsOnFire, s1)
     val (s3, _) = updater(cellsOnFire, s2)
     val (s4, _) = updater(cellsOnFire, s3)
-    s1.position should be((1, 1))
-    s2.position should be((2, 1))
-    s3.position should be((3, 2))
-    s4.position should be((4, 2))
+    s1.steps.head should be((1, 1))
+    s2.steps.head should be((2, 1))
+    s3.steps.head should be((3, 2))
+    s4.steps.head should be((4, 2))
   }
 
   it should "extinguish cell only when it reaches a cell on fire" in {
     val cellsOnFire = Set((2, 0))
     val (s1, e1) = updater(cellsOnFire, fireFighter)
     val (s2, e2) = updater(cellsOnFire, s1)
-    (s1.position, e1) should be(((1, 0), Set()))
-    (s2.position, e2) should be(((2, 0), cellsOnFire))
+    (s1.steps.head, e1) should be(((1, 0), Set()))
+    (s2.steps.head, e2) should be(((2, 0), cellsOnFire))
   }
 
   it should "adjust its direction if close enough cells to the station are set on fire" in {
@@ -52,8 +52,8 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val updatedFires = initialFires + ((1, 1))
     val (s1, _) = updater(initialFires, fireFighter)
     val (s2, _) = updater(updatedFires, s1)
-    s1.position should be((1, 0))
-    s2.position should be((1, 1))
+    s1.steps.head should be((1, 0))
+    s2.steps.head should be((1, 1))
   }
 
   it should "not adjust its direction if close enough cells to the station are set on fire" in {
@@ -61,8 +61,8 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val updatedFires = initialFires + ((1, 1))
     val (s1, _) = updater(initialFires, fireFighter)
     val (s2, _) = updater(updatedFires, s1)
-    s1.position should be((1, 0))
-    s2.position should be((1, 1))
+    s1.steps.head should be((1, 0))
+    s2.steps.head should be((1, 1))
   }
 
   it should "not adjust its direction when the fire is coming from two opposite directions" in {
@@ -72,9 +72,9 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val (s2, _) = updater(fires1, s1)
     val fires2 = fires1 ++ Set((7, 0), (0, 8))
     val (s3, _) = updater(fires2, s2)
-    s1.position should be((0, 1))
-    s2.position should be((0, 2))
-    s3.position should be((0, 3))
+    s1.steps.head should be((0, 1))
+    s2.steps.head should be((0, 2))
+    s3.steps.head should be((0, 3))
   }
 
   it should "adjust its direction using Bresenham algorithm" in {
@@ -85,17 +85,17 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val (s3, _) = updater(initialFires, s2)
     val (s4, _) = updater(updatedFires, s3)
     val (s5, _) = updater(updatedFires, s4)
-    s1.position should be((0, 1))
-    s2.position should be((1, 2))
-    s3.position should be((1, 3))
-    s4.position should be((2, 2))
-    s5.position should be((2, 1))
+    s1.steps.head should be((0, 1))
+    s2.steps.head should be((1, 2))
+    s3.steps.head should be((1, 3))
+    s4.steps.head should be((2, 2))
+    s5.steps.head should be((2, 1))
   }
 
   it should "extinguish all cells on fire in its range" in {
     val cellsOnFire = Set((0, 1), (0, 2), (1, 2))
     val (s1, e1) = updater(cellsOnFire, fireFighter)
-    (s1.position, e1) should be(((0, 1), cellsOnFire))
+    (s1.steps.head, e1) should be(((0, 1), cellsOnFire))
   }
 
   it should "return to the station to recharge after every operation" in {
@@ -110,13 +110,13 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val (s5, _) = updater(updatedFires, s4)
     val (s6, _) = updater(updatedFires, s5)
     val (s7, _) = updater(updatedFires, s6)
-    s1.position should be((1, 0))
-    s2.position should be((2, 0))
-    s3.position should be((1, 0))
-    s4.position should be(station)
-    s5.position should be((0, 1))
-    s6.position should be((0, 2))
-    s7.position should be((0, 3))
+    s1.steps.head should be((1, 0))
+    s2.steps.head should be((2, 0))
+    s3.steps.head should be((1, 0))
+    s4.steps.head should be(station)
+    s5.steps.head should be((0, 1))
+    s6.steps.head should be((0, 2))
+    s7.steps.head should be((0, 3))
   }
 
   it should "not extinguish cells while unloaded" in {
@@ -132,5 +132,5 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     val initialFires = Set((2, 0))
     val (s1, _) = updater(initialFires, fireFighter)
     val (s2, _) = updater(Set.empty[(Int, Int)], s1)
-    s2.position should be((0, 0))
+    s2.steps.head should be((0, 0))
   }

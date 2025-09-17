@@ -36,4 +36,4 @@ object MoveStrategy:
           ny += stepY
         (nx, ny, newErr)
 
-    LazyList.iterate(next(from._1, from._2, err))(next).map(e => (e._1, e._2))
+    LazyList.iterate((from._1, from._2, err))(next).map(e => (e._1, e._2))

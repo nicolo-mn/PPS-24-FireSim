@@ -24,7 +24,10 @@ object FireFighterUtils:
       *   an updated FireFighter with the new position and steps.
       */
     def move: FireFighter =
-      f.copy(nextSteps = f.nextSteps.tail, position = f.nextSteps.head)
+      f.copy(steps = f.steps.tail)
+
+    /** Firefighter current position */
+    def position: (Int, Int) = f.steps.head
 
     /** Changes the target of the firefighter and computes new movement steps.
       *
@@ -35,7 +38,7 @@ object FireFighterUtils:
       */
     def changeTargetTo(target: (Int, Int)): FireFighter =
       f.copy(
-        nextSteps = f.moveStrategy(f.position, target),
+        steps = f.moveStrategy(f.position, target),
         target = target
       )
 

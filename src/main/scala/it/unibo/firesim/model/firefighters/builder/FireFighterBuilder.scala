@@ -52,7 +52,6 @@ class FireFighterBuilder:
       s,
       neighborsInRay.toSet,
       s,
-      s,
       true,
       LazyList.continually(s),
       MoveStrategy.bresenham

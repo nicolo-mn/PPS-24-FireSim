@@ -29,7 +29,7 @@ object FireFighterState:
       (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
     )
 
-  /** Executes an action to either extinguish a fire or reload equipment.
+  /** Executes an action to either extinguish a fire or reload.
     *
     * @return
     *   a ReaderState that updates the FireFighter and returns the affected
@@ -58,23 +58,22 @@ object FireFighterState:
   *   the coordinates of the fire station.
   * @param neighborsInRay
   *   a set of relative coordinates indicating neighboring positions.
-  * @param position
-  *   the current position of the firefighter.
   * @param target
   *   the current target coordinates.
   * @param loaded
-  *   indicates whether the firefighter is equipped.
-  * @param nextSteps
-  *   a lazy list of planned future positions.
+  *   indicates whether the firefighter is loaded with water/foam to extinguish
+  *   a fire.
+  * @param steps
+  *   a lazy list of where the head is the current position and the tail
+  *   contains the future planned positions.
   * @param moveStrategy
-  *   a function defining the movement strategy.
+  *   a function defining the movement algorithm.
   */
 case class FireFighter(
     station: (Int, Int),
     neighborsInRay: Set[(Int, Int)],
-    position: (Int, Int),
     target: (Int, Int),
     loaded: Boolean,
-    nextSteps: LazyList[(Int, Int)],
+    steps: LazyList[(Int, Int)],
     moveStrategy: ((Int, Int), (Int, Int)) => LazyList[(Int, Int)]
 )

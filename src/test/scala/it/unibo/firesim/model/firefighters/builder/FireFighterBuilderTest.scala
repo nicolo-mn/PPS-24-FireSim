@@ -1,6 +1,7 @@
 package it.unibo.firesim.model.firefighters.builder
 
 import it.unibo.firesim.model.firefighters.FireFighter
+import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -74,5 +75,5 @@ class FireFighterBuilderTest extends AnyFlatSpec with Matchers:
     builder.stationedIn((5, 5))
     val f = builder.build()
 
-    f.nextSteps.take(3).toList shouldBe List((5, 5), (5, 5), (5, 5))
+    f.steps.take(3).toList shouldBe List((5, 5), (5, 5), (5, 5))
   }
