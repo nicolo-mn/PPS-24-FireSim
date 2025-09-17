@@ -6,14 +6,24 @@ Inoltre, all’interno del codice è inclusa la documentazione Scaladoc, utile a
 ### Juri Guglielmi
 
 ### Riccardo Mazzi
+Ho implementato l'interfaccia Model e i suoi metodi in SimModel chiamati dal controller di cui i più importanti sono: `updateState` per far avanzare la simulazione e `generateMap` per generare la mappa con le dimensioni specificate dall'utente.
+Per gestire la mappa come matrice di celle, ho creato il tipo `Matrix` e l'enumerazione `CellType` insieme a Nicolò e Juri. `Matrix` è un vettore di vettori di celle, sfruttando l'immutabilità dei `Vector` di Scala ed evitando i _side effect_ di strutture dati mutabili.
+In `Matrix` abbiamo anche definito alcuni _extension methods_ utili a controllare indici interni alla matrice, a trovare i vicini di una cella, le posizioni di un certo tipo di celle, ecc.
 
+La generazione della mappa è stata separata dal SimModel e inserita nel package `map`, per evitare _god classes_.
+Ho utilizzato il pattern Strategy in `MapGenerationStrategy` per definire facilmente due tipi di generatori (base e base con fiumi) e per permettere in futuro di aggiungere facilmente altri algoritmi di generazione più o meno avanzati.
+Ho usato il pattern Builder in `MapBuilder` per poter costruire facilmente una mappa senza doverla salvare ad ogni step sequenziale.
+Ho implementato un DSL in `MapBuilderDSL` per rendere la costruzione della mappa ancora più intuitiva e vicina al linguaggio comune.
+
+I diversi step di creazione e update della mappa vengono parallelizzati usando il `.par` della libreria _Parallel Collections_, ottenendo un miglioramento nelle performance della simulazione (verificato con test manuali).
 
 ### Nicolò Monaldini
 
 ## Controller
 Come mostrato nelle figure UML, SimController espone pubblicamente solo due metodi dell'interfaccia Controller.
 
-### `handleViewMessage`
+### `handleViewMessage` (Juri Guglielmi)
+
 Questo metodo permette alla View di inviare comandi al controller in modo disaccoppiato. La View crea un oggetto `ViewMessage` e lo passa al Controller, che ne invoca l’esecuzione tramite `msg.execute(this)`.In questo modo, la logica specifica del comando è delegata al messaggio stesso, anziché al controller.
 
 Questo approccio utilizza il Command Pattern, che riduce l’accoppiamento tra View e Controller, migliora l’incapsulamento e rende più semplice aggiungere nuove operazioni senza modificare la View né la logica interna del controller.
@@ -22,7 +32,8 @@ Questo approccio utilizza il Command Pattern, che riduce l’accoppiamento tra V
 
 Grazie a questo meccanismo, la View non chiama direttamente i metodi del controller, ma si limita a creare e inviare un messaggio, lasciando al comando il compito di agire sul controller.
 
-### *`loop`*
+### `loop` (Riccardo Mazzi)
+
 Questo metodo viene chiamato dal main thread e permette al controller di avviare il loop della simulazione.
 
 Il controller salva i millisecondi da aspettare tra un tick e l'altro passati come argomento del metodo.
@@ -36,6 +47,9 @@ Per sincronizzare i due thread e permettere al main thread di lasciare le risors
 Usando queste variabili thread safe, all'interno del loop il main thread potrà aspettare prima che la mappa sia generata,
 usare il metodo `onTick` e quindi chiamare il model per avanzare nella simulazione (se questa sta runnando),
 e infine chiamare il metodo `handleQueuedCells` per far inserire al model le celle piazzate dall'utente (dopo aver fatto avanzare il model, assicurando una corretta sincronizzazione).
+
+Per permettere una corretta conversione tra i tipi di celle del model e della view, il Controller offre un enum apposito `CellViewType` e una classe statica per la conversione in entrambi i sensi: `CellTypeConverter`.
+Sarà poi la specifica view (indipendente e quindi aggiornabile con facilità) a dover convertire i tipi di cella in colori, testi, celle o altro da mostrare all'utente.
 
 ## View
 Per realizzare la GUI è stato utilizzato Scala Swing. L'interfaccia grafica è composta da un `Panel` che contiene la griglia con cui l'utente può interagire e da un `BoxPanel` contenente i vari controlli. 
