@@ -89,7 +89,7 @@ class SimView(private val simController: SimController):
 
   @tailrec
   private def askForGridSize(): Int =
-    Dialog.showInput(null, "Enter grid size:", initial = "10") match
+    Dialog.showInput(null, "Enter grid size:", initial = "80") match
       case None => sys.exit(0)
       case Some(input)
           if input.toIntOption.isDefined && input.toInt >= minGridSize && input.toInt <= maxGridSize =>
