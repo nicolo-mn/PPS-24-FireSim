@@ -107,25 +107,38 @@ Mi sono occupato principalmente dell'implementazione dei vigili dei fuoco, in pa
 - Implementazione della classe `FireFighter`
 - Implementazione della monade `ReaderState` utilizzata per aggiornare lo stato dei vigili del fuoco
 - Implementazione di funzioni monadiche adibite all'aggiornamento delle istanze `FireFighter`
-- Implementazione di un piccolo DSL per la creazione di istanze `FireFighter`
+- Implementazione di un DSL per la creazione di istanze `FireFighter`
 
 #### FireFighter
 I vigili del fuoco sono stati pensati come dei record immutabili, per questo motivo sono stati implementati con una case class.
-<!-- TODO: Aggiungi codice case class -->
-Ogni `FireFighter` ha una posizione e un target, che rappresenta la cella verso cui sta andando. Un campo booleano `loaded` rappresenta la presenta del carico di acqua e schiuma utilizzato per spegnere il fuoco: nel momento in cui si raggiunge la cella infuocata target si utilizza il carico per spegnere le celle infuocate in un certo raggio d'azione, rappresentato tramite il campo `neighborsInRay`, un `Set` di offset rispetto alla posizione corrente.
+<!-- TODO: Sostituisci (Int, Int) se si cambiano -->
+```scala
+case class FireFighter(
+    station: (Int, Int),
+    neighborsInRay: Set[(Int, Int)],
+    target: (Int, Int),
+    loaded: Boolean,
+    steps: LazyList[(Int, Int)],
+    moveStrategy: ((Int, Int), (Int, Int)) => LazyList[(Int, Int)]
+)
+```
 
-La logica di movimento è separata dalla classe utilizzando il pattern strategy. Come algoritmo per il movimento è stato utilizzato l'algoritmo della linea di Bresenham, per simulare un movimento realistico.
+Ogni istanza di `FireFighter` si muove nella mappa dirigendosi verso celle infuocate circondate da celle erbose o foreste, che sono quelle da salvare. L'obiettivo può essere aggiornato dinamicamente, ad esempio se compaiono celle particolarmente vicine alla stazione o alla posizione attuale o se la cella obiettivo precedente si spegne o non è più circondata da celle salvabili. Il campo `target` rappresenta la cella verso cui sta andando. Un campo booleano `loaded` rappresenta la presenza del carico di acqua e schiuma utilizzato per spegnere il fuoco: nel momento in cui si raggiunge la cella target in fiamme si utilizza il carico per spegnere le celle infuocate in un certo raggio d'azione, rappresentato tramite il campo `neighborsInRay`, un `Set` di offset rispetto alla posizione corrente. Dopo aver utilizzato il carico ogni vigile del fuoco ritorna verso la propria stazione per ricaricarsi e ripartire.
 
-Il campo `steps` contiene una `LazyList` rappresentante i prossimi passi che il vigile del fuoco dovrà fare. Tale lista pensata come un iteratore, che arrivato alla traguardo continua a restituire come prossimo elemento il traguardo stesso. Non è stato utilizzato un `Iterator` poiché mutabile, quindi le istanze di `FireFighter` ottenute con il metodo `copy` avrebbero condiviso la stessa istanza.
+La logica di movimento è separata dalla classe utilizzando il pattern Strategy. Come algoritmo per il movimento è stato utilizzato l'algoritmo della linea di Bresenham, per simulare un movimento realistico.
 
-<!-- TODO: Aggiungi codice lazy list -->
+Il campo `steps` contiene una `LazyList` rappresentante i prossimi passi che il vigile del fuoco dovrà fare. Tale lista è pensata come un iteratore, che arrivato alla traguardo continua a restituire come prossimo elemento il traguardo stesso indefinitamente. Non è stato utilizzato un `Iterator` poiché mutabile, quindi le istanze di `FireFighter` ottenute con il metodo `copy` avrebbero condiviso la stessa istanza.
 
+```scala
+def next(x: Int, y: Int, err: Int): (Int, Int, Int) = ...
+LazyList.iterate((from._1, from._2, err))(next).map(e => (e._1, e._2))
+```
 #### Monade ReaderState
 Per l'aggiornamento delle istanze `FireFighter`, che sono modellate come record, è stata utilizzata una versione modificata della monade `State` vista a lezione. 
 
 La necessità della modifica sorge dal fatto che i `FireFighter` devono essere aggiornati sulla base delle celle infuocate a ogni istante, mentre la monade `State` prevede l'aggiornamento di uno stato solamente a partire dallo stato stesso (il metodo `run`, infatti, prende come argomento solo uno stato `s`).
 
-Ispirandomi alla monade `Reader` di Haskell, che modella una computazione concatenabile in cui un environment immutabile viene passato tra i vari step concatenati, ho modificato la monade `State` per accettare nel suo metodo `run`, oltre allo stato `s`, anche un environment `e`.
+Traendo spunto dalla monade `Reader` di Haskell, che modella una computazione concatenabile in cui un environment immutabile viene passato tra i vari step concatenati, ho modificato la monade `State` per accettare nel suo metodo `run`, oltre allo stato `s`, anche un environment `e`.
 ```scala
 case class ReaderState[E, S, A](run: (E, S) => (S, A))
 ```
@@ -139,10 +152,11 @@ ReaderState((e, s) =>
 )
 ```
 <!-- TODO: Diagramma? -->
-#### Aggiornato di istanze `FireFighter`
+#### Aggiornamento di istanze `FireFighter`
+
 Per l'aggiornamento dei vigili del fuoco sono state utilizzate due operazioni monadiche:
-- `moveStep`: prende in input le celle infuocate e un vigile del fuoco, restituisce in output il vigile del fuoco aggiornato con la posizione cambiata e un risultato di tipo `Unit`.
-- `actionStep`: prende in input le celle infuocate e un vigile del fuoco, effettua un azione che può essere spegnere delle celle infuocate o ricaricare il carico del vigile del fuoco, restituisce in output il vigile del fuoco aggiornato ed un `Set` di celle che sono state spente.
+- `moveStep`: prende in input le celle infuocate ed un'istanza `FireFighter`, restituisce in output un'istanza con la posizione cambiata e un risultato di tipo `Unit`. Per scegliere la cella verso cui dirigersi viene utilizzata una funzione di scoring lower-is-better, che consiste nella media pesata tra la distanza dalla stazione e dalla posizione attuale del vigile del fuoco. Nel caso in cui la cella target precedente sia ancora valida, ovvero sia in fiamme e circondata da celle salvabili, si è scelto di richiedere che la nuova cella obiettivo abbia il valore della media pesata inferiore di almeno un decimo rispetto alla corrente, per evitare cambiamenti di obiettivo troppo frequenti.
+- `actionStep`: prende in input le celle infuocate e un'istanza `FireFighter`, effettua un'azione che può essere spegnere delle celle infuocate o ricaricare il carico del vigile del fuoco, restituisce in output un'istanza aggiornata ed un `Set` di posizioni di celle che sono state spente.
 
 Queste operazioni sono concatenate in un'unica computazione monadica:
 ```scala
@@ -153,14 +167,66 @@ for
 yield extinguishedCells
 ```
 
+Per rendere più idiomatiche queste operazioni sono stati utilizzati degli extension methods per la case class `FireFighter`, tra i quali:
+- un metodo `position` per ottenere la posizione corrente del vigile del fuoco, ovvero la testa della lista `steps`.
+- un'`enum FireFighterAction`, che rappresenta le azioni effettuabili da un `FireFighter` (`Extinguish` e `Reload`) e un metodo `action` che verifica l'azione da svolgere, per poter modellare `actionStep` attraverso un `match-case`. 
+- una funzione curried `when` per aggiornare un'istanza di `FireFighter` tramite una funzione di mapping al verificarsi di una condizione, per modellare funzionalmente un aggiornamento condizionale.
+
+Questi accorgimenti migliorano la leggibilità di `moveStep` e `actionStep`, di seguito riportati:
+
+```scala
+  def moveStep: ReaderState[CellsOnFire, FireFighter, Unit] =
+    ReaderState[CellsOnFire, FireFighter, Unit]((fireCells, f) =>
+      val newTarget = Option.when(!f.loaded || fireCells.isEmpty)(f.station)
+        .getOrElse(
+          Option(fireCells)
+            .map(_.minBy(f.score))
+            .filter(candidate =>
+              !fireCells.contains(
+                f.target
+              ) || f.score(candidate) < f.score(f.target) * correctionThreshold
+            ).getOrElse(f.target)
+        )
+      (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
+    )
+  def actionStep
+      : ReaderState[CellsOnFire, FireFighter, CellsOnFire] =
+    ReaderState[CellsOnFire, FireFighter, CellsOnFire]((fireCells, f) =>
+      import it.unibo.firesim.model.firefighters.FireFighterUtils.FireFighterAction.*
+      f.action(fireCells) match
+        case Some(Extinguish) =>
+          (
+            f.copy(loaded = false),
+            f.neighborsInRay.map(d =>
+              (d._1 + f.position._1, d._2 + f.position._2)
+            ).intersect(fireCells)
+          )
+        case Some(Reload) => (f.copy(loaded = true), Set.empty[(Int, Int)])
+        case _            => (f, Set.empty[(Int, Int)])
+    )
+```
+
 #### Builder e DSL
-Per la costruzione delle istanze `FireFighter` è stato utilizzato il pattern builder. Sebbene nell'implementazione attuale non siano previsti molti campi da inizializzare, l'utilizzo del pattern builder permette di costruire facilmente un piccolo DSL che lo usi, tramite la significant indentation di Scala, come mostrato di seguito:
+Per la costruzione delle istanze `FireFighter` è stato utilizzato il pattern Builder. Sebbene nell'implementazione attuale non siano previsti molti campi da inizializzare, l'utilizzo del pattern Builder permette di costruire facilmente un piccolo DSL che lo usi, per sfruttare la significant indentation di Scala per creare istanze di `FireFighter` in modo dichiarativo, come mostrato di seguito:
 ```scala
 createFireFighter:
     withRay(ray)
     stationedIn(s)
 ```
-La funzione `createFireFighter` utilizza il meccanismo given/using per prendere in input una context function che necessità di un'istanza given di tipo `FireFigtherBuilder`. 
+La funzione `createFireFighter` utilizza il meccanismo given/using per prendere in input una context function che richiede un'istanza `given` di tipo `FireFighterBuilder`, che sarà composta da chiamate a funzioni del DSL. 
+```scala
+def createFireFighter(instructions: FireFighterBuilder ?=> Unit)
+  : FireFighter =
+given builder: FireFighterBuilder = FireFighterBuilder()
+instructions(using builder)
+builder.build()
+
+def withRay(ray: Int)(using builder: FireFighterBuilder): Unit =
+  builder.withRay(ray)
+
+def stationedIn(s: (Int, Int))(using builder: FireFighterBuilder): Unit =
+  builder.stationedIn(s)
+```
 
 ## Controller
 Come mostrato nelle figure UML, SimController espone pubblicamente solo due metodi dell'interfaccia Controller.
