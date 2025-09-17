@@ -2,8 +2,9 @@ package it.unibo.firesim.config
 
 object Config:
   val fireFighterRay: Int = 3
-  val targetThreshold = 0.5
-  val stationThreshold = 0.5
+  val distanceFromStationWeight = 0.6
+  val distanceFromPosWeight = 0.4
+  val correctionThreshold = 0.9
   val lakeGrowthProbability = 0.8
   val forestGrowthProbability = 0.7
   val grassGrowthProbability = 0.8

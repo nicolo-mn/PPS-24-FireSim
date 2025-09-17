@@ -1,6 +1,6 @@
 package it.unibo.firesim.model.firefighters
 
-import it.unibo.firesim.config.Config.{stationThreshold, targetThreshold}
+import it.unibo.firesim.config.Config.{distanceFromPosWeight, distanceFromStationWeight}
 import it.unibo.firesim.util.ChebyshevDistance.distance
 
 /** Utility object providing helper methods and actions for a firefighter.
@@ -74,28 +74,15 @@ object FireFighterUtils:
       else if !f.loaded && f.position == f.station then Option(Reload)
       else None
 
-    /** Checks if a position is sufficiently close to the base station.
+    /** Determines the weighted score of a candidate target
       *
       * @param candidate
-      *   the candidate position.
+      *   the candidate target to score.
       * @return
-      *   true if the candidate is within the allowable distance from the
-      *   station.
+      *   the weighted score of a candidate target
       */
-    def isCloseToStation(candidate: (Int, Int)): Boolean = distance(
-      candidate,
-      f.station
-    ) < distance(f.target, f.station) * stationThreshold
-
-    /** Checks if a position is sufficiently close to the current target.
-      *
-      * @param candidate
-      *   the candidate position.
-      * @return
-      *   true if the candidate is within the allowable distance from the
-      *   target.
-      */
-    def isCloseToTarget(candidate: (Int, Int)): Boolean = distance(
-      f.target,
-      candidate
-    ) < distance(f.target, f.station) * targetThreshold
+    def score(candidate: (Int, Int)): Double =
+      distance(candidate, f.station) * distanceFromStationWeight + distance(
+        candidate,
+        f.position
+      ) * distanceFromPosWeight

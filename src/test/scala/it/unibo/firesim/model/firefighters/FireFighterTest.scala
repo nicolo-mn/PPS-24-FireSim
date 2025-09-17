@@ -47,7 +47,7 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     (s2.steps.head, e2) should be(((2, 0), cellsOnFire))
   }
 
-  it should "adjust its direction if close enough cells to the station are set on fire" in {
+  it should "adjust its direction if cells with a lower enough score are set on fire" in {
     val initialFires = Set((4, 0))
     val updatedFires = initialFires + ((1, 1))
     val (s1, _) = updater(initialFires, fireFighter)
@@ -56,25 +56,13 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     s2.steps.head should be((1, 1))
   }
 
-  it should "not adjust its direction if close enough cells to the station are set on fire" in {
-    val initialFires = Set((4, 0))
-    val updatedFires = initialFires + ((1, 1))
-    val (s1, _) = updater(initialFires, fireFighter)
-    val (s2, _) = updater(updatedFires, s1)
-    s1.steps.head should be((1, 0))
-    s2.steps.head should be((1, 1))
-  }
-
-  it should "not adjust its direction when the fire is coming from two opposite directions" in {
+  it should "not adjust its direction if cells with a slightly lower score are set on fire" in {
     val initialFires = Set((10, 0), (0, 9))
     val (s1, _) = updater(initialFires, fireFighter)
     val fires1 = initialFires ++ Set((9, 0), (8, 0))
     val (s2, _) = updater(fires1, s1)
-    val fires2 = fires1 ++ Set((7, 0), (0, 8))
-    val (s3, _) = updater(fires2, s2)
     s1.steps.head should be((0, 1))
     s2.steps.head should be((0, 2))
-    s3.steps.head should be((0, 3))
   }
 
   it should "adjust its direction using Bresenham algorithm" in {
