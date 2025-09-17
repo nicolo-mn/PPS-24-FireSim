@@ -6,6 +6,7 @@ import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
 
 class FireFighterUtilsTest extends AnyFlatSpec with Matchers:
+
   private val f =
     createFireFighter:
       withRay(1)
@@ -45,7 +46,9 @@ class FireFighterUtilsTest extends AnyFlatSpec with Matchers:
   }
 
   it should "return Reload when unloaded and at the station" in {
-    f.copy(loaded = false).action(Set.empty) should be(Some(FireFighterAction.Reload))
+    f.copy(loaded =
+      false
+    ).action(Set.empty) should be(Some(FireFighterAction.Reload))
   }
 
   it should "return None if no action is possible" in {

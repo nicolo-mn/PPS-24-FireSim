@@ -2,9 +2,8 @@ package it.unibo.firesim.model.firefighters.builder
 
 import it.unibo.firesim.model.firefighters.FireFighter
 
-/** DSL for creating and configuring a firefighting unit.
-  *
-  * Provides helper methods to build a firefighter instance.
+/** DSL for creating and configuring a firefighter, provides helper methods to
+  * build a firefighter instance.
   */
 object FireFighterDSL:
 

@@ -39,7 +39,7 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
     s4.steps.head should be((4, 2))
   }
 
-  it should "extinguish cell only when it reaches a cell on fire" in {
+  it should "extinguish cell only when it reaches its targeted cell on fire" in {
     val cellsOnFire = Set((2, 0))
     val (s1, e1) = updater(cellsOnFire, fireFighter)
     val (s2, e2) = updater(cellsOnFire, s1)

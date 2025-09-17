@@ -69,7 +69,7 @@ class FireFighterBuilderTest extends AnyFlatSpec with Matchers:
     f.neighborsInRay shouldBe expectedNeighbors
   }
 
-  it should "create a LazyList of positions representing the station" in {
+  it should "create a LazyList that continually returns the position of the station" in {
     val builder = new FireFighterBuilder
     builder.withRay(0)
     builder.stationedIn((5, 5))

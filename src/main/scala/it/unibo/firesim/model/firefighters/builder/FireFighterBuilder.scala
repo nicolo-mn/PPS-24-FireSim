@@ -3,8 +3,6 @@ package it.unibo.firesim.model.firefighters.builder
 import it.unibo.firesim.model.firefighters.{FireFighter, MoveStrategy}
 
 /** Builder for constructing a FireFighter instance.
-  *
-  * Provides methods to configure a firefighter's base station and action ray.
   */
 class FireFighterBuilder:
   private var neighborsInRay = Seq.empty[(Int, Int)]

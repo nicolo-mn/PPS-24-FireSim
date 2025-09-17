@@ -29,7 +29,8 @@ object FireFighterState:
       (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
     )
 
-  /** Executes an action to either extinguish a fire or reload.
+  /** Executes an action to either extinguish a fire or reload, if the
+    * conditions to do so are met.
     *
     * @return
     *   a ReaderState that updates the FireFighter and returns the affected

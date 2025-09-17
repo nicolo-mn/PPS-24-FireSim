@@ -24,7 +24,11 @@ object FireFighterUtils:
     def move: FireFighter =
       f.copy(steps = f.steps.tail)
 
-    /** Firefighter current position */
+    /** Firefighter current position
+      *
+      * @return
+      *   the firefighter position
+      */
     def position: (Int, Int) = f.steps.head
 
     /** Changes the target of the firefighter and computes new movement steps.
@@ -47,7 +51,7 @@ object FireFighterUtils:
       * @param map
       *   a function to transform the firefighter if the condition is met.
       * @return
-      *   an updated FireFighter if the condition holds; otherwise, the
+      *   an updated FireFighter if the condition is met, otherwise, the
       *   original.
       */
     def when(cond: FireFighter => Boolean)(map: FireFighter => FireFighter)
@@ -58,8 +62,8 @@ object FireFighterUtils:
       * cells.
       *
       * If the firefighter is loaded and at a fire cell matching its target,
-      * returns Extinguish. Otherwise, if not loaded and at the station, returns
-      * Reload.
+      * returns Extinguish. If not loaded and at the station, returns Reload.
+      * Otherwise, returns an empty Option.
       *
       * @param fireCells
       *   the set of fire cell positions.
