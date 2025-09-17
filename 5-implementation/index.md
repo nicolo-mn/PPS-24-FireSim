@@ -4,6 +4,91 @@ Inoltre, all’interno del codice è inclusa la documentazione Scaladoc, utile a
 
 ## Model
 ### Juri Guglielmi
+Il mio contributo si è concentrato sul modulo di propagazione del fuoco, dove ho sviluppato le strategie per il calcolo della probabilità di ignizione e della durata della combustione, e ho progettato un’architettura estendibile che permette di arricchire il modello con effetti ambientali(vento, umidità, presenza di corpi idrici) tramite decoratori funzionali e un DSL basato sul Builder pattern.
+
+#### Scelte Tecniche e Adozione dello Strategy Pattern
+L'intera architettura del modulo si fonda sui principi della programmazione funzionale, in particolare sull'immutabilità dei dati e sull'uso di funzioni pure. Questo significa che le strutture dati, come la griglia di simulazione, non vengono mai modificate; al contrario, ogni ciclo, gestito dalla funzione fireSpread, prende lo stato corrente come input e ne produce uno completamente nuovo.
+
+Il nucleo della simulazione è rappresentato dalla funzione `fireSpread`, che orchestra l'evoluzione del fuoco in un singolo ciclo di simulazione. La funzione fireSpread non modifica lo stato, ma ne crea uno nuovo . La scelta tecnica fondamentale è stata quella di disaccoppiare l'algoritmo principale dalle logiche specifiche che ne governano il comportamento. Questo è stato ottenuto definendo le politiche di simulazione come tipi funzionali, realizzando un'applicazione concreta dello Strategy pattern.
+
+Nello specifico, sono state definite due strategie principali:
+- `ProbabilityCalc`: Una funzione che determina la probabilità di ignizione di una cella, tenendo conto delle sue proprietà, dei parametri globali e del contesto della griglia.
+- `BurnDurationPolicy`: Una funzione che stabilisce se una cella che sta bruciando ha esaurito il suo ciclo di vita e deve quindi estinguersi.
+
+```scala
+// Strategia per il calcolo della probabilità di ignizione
+type ProbabilityCalc = (CellType, SimParams, Int, Int, Matrix) => Double
+
+// Strategia per la durata della combustione
+type BurnDurationPolicy = (CellType, Int, Int) => Boolean
+```
+Questa astrazione consente di definire e "iniettare" implementazioni concrete di queste politiche nel motore di simulazione. La funzione fireSpread riceve tali strategie come parametri contestuali(`using`), rimanendo agnostica rispetto alla loro implementazione specifica. Ciò permette di modificare radicalmente il comportamento della simulazione semplicemente fornendo una funzione diversa, senza alterare il codice del ciclo principale.
+
+```scala
+def fireSpread(
+    matrix: Matrix,
+    burning: Set[(Int, Int)],
+    params: SimParams,
+    currentCycle: Int,
+    rng: RNG
+)(using
+    prob: ProbabilityCalc, // Utilizzo della strategia di probabilità
+    burn: BurnDurationPolicy // Utilizzo della strategia di combustione
+): (Matrix, Set[(Int, Int)], RNG) = {
+  // ... logica di simulazione ...
+}
+```
+È stata fornita un'implementazione di default per entrambe sia per la `ProbabilityCalc` che per la `BurnDurationPolicy`. La prima,  modella un comportamento di base del fuoco in funzione di parametri come l'infiammabilità della vegetazione, la temperatura, l'umidità e l'influenza delle celle vicine in fiamme, mentre per la seconda ogni cella infiammabile possiede un tempo di durata di combustione e controlla quando siamo arrivati al termine. 
+
+#### Modularità degli effetti ambientali
+Per modellare fenomeni ambientali complessi, come vento o umidità costiera, che modificano la probabilità di ignizione, è stato adottato un approccio ispirato al Decorator design pattern, implementato in chiave funzionale. In questo contesto, i decoratori sono funzioni di ordine superiore che prendono una `ProbabilityCalc` come input e ne restituiscono una nuova arricchita con logiche aggiuntive, senza modificare lo stato originale.
+
+Ad esempio, la funzione `directionalWindProbabilityDynamic` agisce da decoratore. Prende in input una funzione di probabilità di base `(base: ProbabilityCalc)` e restituisce una nuova funzione che, prima di eseguire il calcolo di base, verifica la presenza di celle in fiamme nella direzione del vento e, in caso affermativo, applica un fattore di potenziamento(`windBoost`) alla probabilità calcolata.
+
+```scala
+def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
+  (cell, params, r, c, matrix) =>
+    // ... logica per calcolare il windBoost ...
+    val neighborIsBurning =
+      matrix.inBounds(rr, cc) && matrix(rr)(cc).isBurning
+    val speedFactor = baseWindBoost + math.tanh(
+      params.windSpeed / windNormalization
+    ) * maxWindBoost
+    val windBoost = if neighborIsBurning then speedFactor else baseWindBoost
+    
+    // Invoca la funzione base e ne modifica il risultato
+    val baseProb = base(cell, params, r, c, matrix)
+    math.min(baseProb * windBoost, maxProbability)
+```
+Analogamente, `humidityAware` applica una penalità quando l’umidità supera un certo livello, mentre `waterHumidityWind` riduce la probabilità di ignizione per celle riceventi vento umido da corpi idrici vicini. Questo approccio consente di combinare effetti ambientali in maniera modulare e componibile.
+
+#### Composizione delle politiche tramite Builder Pattern
+Per semplificare la combinazione dei vari decoratori e la costruzione di una `ProbabilityCalc` complessa, è stato introdotto il `ProbabilityBuilder`. Questa classe implementa una DSL fluente, seguendo il Builder design pattern.
+
+Il builder parte da una `ProbabilityCalc` di base e offre metodi per applicare i decoratori desiderati in modo sequenziale. Ogni metodo (es. `withWind`, `withWaterEffects`) restituisce una nuova istanza del builder con la funzione di calcolo aggiornata e decorata. 
+
+```scala
+case class ProbabilityBuilder(private val currentCalc: ProbabilityCalc):
+
+  /** Adds the wind effect */
+  def withWind: ProbabilityBuilder =
+    copy(currentCalc = directionalWindProbabilityDynamic(currentCalc))
+
+  /** Adds a humidity penalty */
+  def withHumidityPenalty: ProbabilityBuilder =
+    copy(currentCalc = humidityAware(currentCalc))
+  
+  // ... altri metodi ...
+
+  /** Finalizes the builder and returns the composed `ProbabilityCalc` */
+  def build: ProbabilityCalc = currentCalc
+```
+L'utilizzo di una given Conversion di Scala permette inoltre di passare direttamente un'istanza del ProbabilityBuilder laddove è attesa una ProbabilityCalc, rendendo la configurazione della simulazione estremamente concisa e dichiarativa. Ad esempio, per creare una politica che includa vento ed effetti costieri, la sintassi è la seguente:
+```scala
+val customProbability: ProbabilityCalc = ProbabilityBuilder()
+  .withWind
+  .withWaterEffects
+```
 
 ### Riccardo Mazzi
 Ho implementato l'interfaccia Model e i suoi metodi in SimModel chiamati dal controller di cui i più importanti sono: `updateState` per far avanzare la simulazione e `generateMap` per generare la mappa con le dimensioni specificate dall'utente.
