@@ -18,5 +18,5 @@ lazy val root = (project in file("."))
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test",
     libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
-    assembly / mainClass := Some("it.unibo.firesim.main"),
+    assembly / mainClass := Some("it.unibo.firesim.Main"),
   )
