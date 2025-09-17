@@ -18,6 +18,64 @@ Ho implementato un DSL in `MapBuilderDSL` per rendere la costruzione della mappa
 I diversi step di creazione e update della mappa vengono parallelizzati usando il `.par` della libreria _Parallel Collections_, ottenendo un miglioramento nelle performance della simulazione (verificato con test manuali).
 
 ### Nicolò Monaldini
+Mi sono occupato principalmente dell'implementazione dei vigili dei fuoco, in particolare:
+- Implementazione della classe `FireFighter`
+- Implementazione della monade `ReaderState` utilizzata per aggiornare lo stato dei vigili del fuoco
+- Implementazione di funzioni monadiche adibite all'aggiornamento delle istanze `FireFighter`
+- Implementazione di un piccolo DSL per la creazione di istanze `FireFighter`
+
+#### FireFighter
+I vigili del fuoco sono stati pensati come dei record immutabili, per questo motivo sono stati implementati con una case class.
+<!-- TODO: Aggiungi codice case class -->
+Ogni `FireFighter` ha una posizione e un target, che rappresenta la cella verso cui sta andando. Un campo booleano `loaded` rappresenta la presenta del carico di acqua e schiuma utilizzato per spegnere il fuoco: nel momento in cui si raggiunge la cella infuocata target si utilizza il carico per spegnere le celle infuocate in un certo raggio d'azione, rappresentato tramite il campo `neighborsInRay`, un `Set` di offset rispetto alla posizione corrente.
+
+La logica di movimento è separata dalla classe utilizzando il pattern strategy. Come algoritmo per il movimento è stato utilizzato l'algoritmo della linea di Bresenham, per simulare un movimento realistico.
+
+Il campo `steps` contiene una `LazyList` rappresentante i prossimi passi che il vigile del fuoco dovrà fare. Tale lista pensata come un iteratore, che arrivato alla traguardo continua a restituire come prossimo elemento il traguardo stesso. Non è stato utilizzato un `Iterator` poiché mutabile, quindi le istanze di `FireFighter` ottenute con il metodo `copy` avrebbero condiviso la stessa istanza.
+
+<!-- TODO: Aggiungi codice lazy list -->
+
+#### Monade ReaderState
+Per l'aggiornamento delle istanze `FireFighter`, che sono modellate come record, è stata utilizzata una versione modificata della monade `State` vista a lezione. 
+
+La necessità della modifica sorge dal fatto che i `FireFighter` devono essere aggiornati sulla base delle celle infuocate a ogni istante, mentre la monade `State` prevede l'aggiornamento di uno stato solamente a partire dallo stato stesso (il metodo `run`, infatti, prende come argomento solo uno stato `s`).
+
+Ispirandomi alla monade `Reader` di Haskell, che modella una computazione concatenabile in cui un environment immutabile viene passato tra i vari step concatenati, ho modificato la monade `State` per accettare nel suo metodo `run`, oltre allo stato `s`, anche un environment `e`.
+```scala
+case class ReaderState[E, S, A](run: (E, S) => (S, A))
+```
+Tale environment sarà poi passato tra le varie operazioni che sono concatenate, come si può vedere nel metodo `flatMap`.
+```scala
+override def flatMap[B](f: A => ReaderState[E, S, B])
+  : ReaderState[E, S, B] =
+ReaderState((e, s) =>
+  m.apply(e, s) match
+    case (s2, a) => f(a).apply(e, s2)
+)
+```
+<!-- TODO: Diagramma? -->
+#### Aggiornato di istanze `FireFighter`
+Per l'aggiornamento dei vigili del fuoco sono state utilizzate due operazioni monadiche:
+- `moveStep`: prende in input le celle infuocate e un vigile del fuoco, restituisce in output il vigile del fuoco aggiornato con la posizione cambiata e un risultato di tipo `Unit`.
+- `actionStep`: prende in input le celle infuocate e un vigile del fuoco, effettua un azione che può essere spegnere delle celle infuocate o ricaricare il carico del vigile del fuoco, restituisce in output il vigile del fuoco aggiornato ed un `Set` di celle che sono state spente.
+
+Queste operazioni sono concatenate in un'unica computazione monadica:
+```scala
+private val firefightersUpdater =
+for
+  _ <- moveStep
+  extinguishedCells <- actionStep
+yield extinguishedCells
+```
+
+#### Builder e DSL
+Per la costruzione delle istanze `FireFighter` è stato utilizzato il pattern builder. Sebbene nell'implementazione attuale non siano previsti molti campi da inizializzare, l'utilizzo del pattern builder permette di costruire facilmente un piccolo DSL che lo usi, tramite la significant indentation di Scala, come mostrato di seguito:
+```scala
+createFireFighter:
+    withRay(ray)
+    stationedIn(s)
+```
+La funzione `createFireFighter` utilizza il meccanismo given/using per prendere in input una context function che necessità di un'istanza given di tipo `FireFigtherBuilder`. 
 
 ## Controller
 Come mostrato nelle figure UML, SimController espone pubblicamente solo due metodi dell'interfaccia Controller.
