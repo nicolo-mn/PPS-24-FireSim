@@ -63,7 +63,7 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
 Analogamente, `humidityAware` applica una penalità quando l’umidità supera un certo livello, mentre `waterHumidityWind` riduce la probabilità di ignizione per celle riceventi vento umido da corpi idrici vicini. Questo approccio consente di combinare effetti ambientali in maniera modulare e componibile.
 
 #### Composizione delle politiche tramite Builder Pattern
-Per semplificare la combinazione dei vari decoratori e la costruzione di una `ProbabilityCalc` complessa, è stato introdotto il `ProbabilityBuilder`. Questa classe implementa una DSL fluente, seguendo il Builder design pattern.
+Per semplificare la combinazione dei vari decoratori e la costruzione di una `ProbabilityCalc` complessa, è stato introdotto il `ProbabilityBuilder`. Questa classe implementa una DSL fluente, seguendo il Builder pattern.
 
 Il builder parte da una `ProbabilityCalc` di base e offre metodi per applicare i decoratori desiderati in modo sequenziale. Ogni metodo (es. `withWind`, `withWaterEffects`) restituisce una nuova istanza del builder con la funzione di calcolo aggiornata e decorata. 
 
@@ -83,7 +83,7 @@ case class ProbabilityBuilder(private val currentCalc: ProbabilityCalc):
   /** Finalizes the builder and returns the composed `ProbabilityCalc` */
   def build: ProbabilityCalc = currentCalc
 ```
-L'utilizzo di una given Conversion di Scala permette inoltre di passare direttamente un'istanza del ProbabilityBuilder laddove è attesa una ProbabilityCalc, rendendo la configurazione della simulazione estremamente concisa e dichiarativa. Ad esempio, per creare una politica che includa vento ed effetti costieri, la sintassi è la seguente:
+L'utilizzo di una `given Conversion` di Scala permette inoltre di passare direttamente un'istanza del `ProbabilityBuilder` laddove è attesa una `ProbabilityCalc`. Ad esempio, per creare una politica che includa vento ed effetti costieri, la sintassi è la seguente:
 ```scala
 val customProbability: ProbabilityCalc = ProbabilityBuilder()
   .withWind
