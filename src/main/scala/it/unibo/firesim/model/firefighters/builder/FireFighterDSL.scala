@@ -10,14 +10,15 @@ object FireFighterDSL:
 
   /** Creates a configured FireFighter.
     *
-    * @param instruction
+    * @param instructions
     *   a function to configure a given FireFighterBuilder
     * @return
     *   a built FireFighter instance
     */
-  def createFireFighter(instruction: FireFighterBuilder ?=> Unit): FireFighter =
+  def createFireFighter(instructions: FireFighterBuilder ?=> Unit)
+      : FireFighter =
     given builder: FireFighterBuilder = FireFighterBuilder()
-    instruction(using builder)
+    instructions(using builder)
     builder.build()
 
   /** Configures the action ray for the firefighter.
