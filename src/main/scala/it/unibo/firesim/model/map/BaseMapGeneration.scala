@@ -10,6 +10,9 @@ import scala.util.Random
 
 class BaseMapGeneration extends MapGenerationStrategy:
 
+  protected def roundedMeanMul(ratio: Double, rows: Int, cols: Int): Int =
+    (ratio * (rows + cols) / 2).round.toInt
+
   protected def generateSeeds(
       rows: Int,
       cols: Int,

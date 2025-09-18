@@ -114,7 +114,6 @@ class ControlsPanel(simController: SimController)
       onStart()
 
     case ButtonClicked(`resetButton`) =>
-      resetButton.enabled = true
       startButton.enabled = true
       pauseResumeButton.enabled = false
       pauseResumeButton.text = "⏸ Pause"
@@ -174,7 +173,6 @@ class ControlsPanel(simController: SimController)
   private def onStart(): Unit =
     startButton.enabled = false
     pauseResumeButton.enabled = true
-    resetButton.enabled = true
     drawLineButton.selected = false
     drawLineButton.enabled = true
     brushToggle.enabled = true

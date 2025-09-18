@@ -1,6 +1,6 @@
 package it.unibo.firesim.controller
 
-import it.unibo.firesim.model.map.{CellType, Matrix}
+import it.unibo.firesim.model.map.{CellType, Matrix, Position}
 import it.unibo.firesim.model.Model
 import it.unibo.firesim.model.map.update
 import it.unibo.firesim.util.Line.*
@@ -33,7 +33,7 @@ class SimController(
   @volatile private var tickMs: Int = 0
 
   private val simView: View = new SimView(this)
-  private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellType)]()
+  private val placeQueue = new LinkedBlockingQueue[(Position, CellType)]()
 
   /** Handles a message from the view by executing the corresponding action on
     * this controller.
@@ -105,7 +105,7 @@ class SimController(
     *   The type of cell.
     */
   private[controller] def placeCell(
-      pos: (Int, Int),
+      pos: Position,
       cellViewType: CellViewType
   ): Unit =
     placeQueue.put(
@@ -127,8 +127,8 @@ class SimController(
     *   type of line to place
     */
   private[controller] def placeLine(
-      start: (Int, Int),
-      end: (Int, Int),
+      start: Position,
+      end: Position,
       cellViewType: CellViewType
   ): Unit =
     lineBetween(
@@ -210,7 +210,7 @@ class SimController(
     model.updateState()
 
   private def handleQueuedCells(): Unit =
-    val buffer = new java.util.ArrayList[((Int, Int), CellType)]
+    val buffer = new java.util.ArrayList[(Position, CellType)]
     placeQueue.drainTo(buffer)
     val (newMatrix, newFirefighters) = model.placeCells(buffer.asScala.toSeq)
     matrix = newMatrix
