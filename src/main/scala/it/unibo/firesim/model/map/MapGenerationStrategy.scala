@@ -4,9 +4,6 @@ import scala.util.Random
 
 trait MapGenerationStrategy:
 
-  protected def roundedMeanMul(ratio: Double, rows: Int, cols: Int): Int =
-    (ratio * (rows + cols) / 2).round.toInt
-
   /** @param matrix
     *   The Matrix to modify
     * @param random
