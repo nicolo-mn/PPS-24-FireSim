@@ -61,7 +61,7 @@ class ControlsPanel(simController: SimController)
     min = minWindIntensity; max = maxWindIntensity; value = defaultWindIntensity
 
   pauseResumeButton.enabled = false
-  resetButton.enabled = false
+  resetButton.enabled = true
   speedSelector.selection.item = SpeedType.Speed1x
   soilTypeSelector.selection.item = fireSoilStr
   border = Swing.EmptyBorder(0, 0, 20, 0)
@@ -114,7 +114,6 @@ class ControlsPanel(simController: SimController)
       onStart()
 
     case ButtonClicked(`resetButton`) =>
-      resetButton.enabled = false
       startButton.enabled = true
       pauseResumeButton.enabled = false
       pauseResumeButton.text = "⏸ Pause"
@@ -171,7 +170,6 @@ class ControlsPanel(simController: SimController)
   private def onStart(): Unit =
     startButton.enabled = false
     pauseResumeButton.enabled = true
-    resetButton.enabled = true
     drawLineButton.selected = false
     brushToggle.enabled = true
     brushToggle.selected = false
