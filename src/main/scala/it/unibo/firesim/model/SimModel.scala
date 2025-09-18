@@ -9,7 +9,7 @@ import it.unibo.firesim.model.firefighters.FireFighter
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
 import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import it.unibo.firesim.model.map.MapBuilderDSL.*
-import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, Position, neighbors, positionsOf, update}
+import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, Position, neighbors, positionsOf, update, positionsOfBurning}
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.util.Random
@@ -123,10 +123,7 @@ class SimModel(
     */
   def updateState(): (Matrix, Seq[Position]) =
     val simParams = this.getSimParams
-    val burningCells = matrix.positionsOf {
-      case Burning(_, _, _) => true
-      case _                => false
-    }.toSet
+    val burningCells = matrix.positionsOfBurning().toSet
     val (updatedMatrix, updatedBurningCells, nextRandoms) =
       fireSpread(matrix, burningCells, simParams, cycle, rng)
     matrix = updatedMatrix

@@ -64,6 +64,15 @@ extension (matrix: Matrix)
       }
     }
 
+  /**
+   * @return The positions of burning cells independently of their burning cycle or other params
+   */
+  def positionsOfBurning(): Seq[Position] =
+    matrix.positionsOf {
+      case CellType.Burning(_, _, _) => true
+      case _                => false
+    }
+
   /** @param r
     *   Row index of the center
     * @param c

@@ -59,10 +59,7 @@ class MatrixTest extends AnyFlatSpec with Matchers:
       Ignition,
       Grass
     )) should be(Seq((0, 0)))
-    matrix.positionsOf {
-      case Burning(_, _, _) => true
-      case _                => false
-    } should be(Seq((0, 0), (1, 1), (2, 2)))
+    matrix.positionsOfBurning() should be(Seq((0, 0), (1, 1), (2, 2)))
   }
 
   it should "get the positions of the neighboring cells" in {

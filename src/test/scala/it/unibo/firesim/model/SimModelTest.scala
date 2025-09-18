@@ -1,6 +1,6 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.map.{CellType, cols, rows}
+import it.unibo.firesim.model.map.{CellType, cols, rows, positionsOfBurning}
 import it.unibo.firesim.model.map.CellType.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -36,11 +36,7 @@ class SimModelTest extends AnyFlatSpec with Matchers:
     val fireStations =
       matrix.flatten.count(_ == Station)
     val forests = matrix.flatten.count(_ == Forest)
-    val fires = matrix.flatten.count(ct =>
-      ct match
-        case Burning(_, _, _) => true
-        case _                => false
-    )
+    val fires = matrix.positionsOfBurning().length
 
     fireStations should be > 0
     forests should be > 0
