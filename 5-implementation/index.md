@@ -272,6 +272,8 @@ def stationedIn(s: (Int, Int))(using builder: FireFighterBuilder): Unit =
   builder.stationedIn(s)
 ```
 
+---
+
 ## Controller
 Come mostrato nelle figure UML, SimController espone pubblicamente solo due metodi dell'interfaccia Controller.
 
@@ -303,6 +305,8 @@ e infine chiamare il metodo `handleQueuedCells` per far inserire al model le cel
 
 Per permettere una corretta conversione tra i tipi di celle del model e della view, il Controller offre un enum apposito `CellViewType` e una classe statica per la conversione in entrambi i sensi: `CellTypeConverter`.
 Sarà poi la specifica view (indipendente e quindi aggiornabile con facilità) a dover convertire i tipi di cella in colori, testi, celle o altro da mostrare all'utente.
+
+---
 
 ## View
 Per realizzare la GUI è stato utilizzato Scala Swing. L'interfaccia grafica è composta da un `Panel` che contiene la griglia con cui l'utente può interagire e da un `BoxPanel` contenente i vari controlli. 
