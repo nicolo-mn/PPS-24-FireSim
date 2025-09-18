@@ -25,7 +25,24 @@ it should "throw an exception if stationed in negative coordinates" in {
     an[IllegalArgumentException] should be thrownBy builder.stationedIn((0, -5))
 }
 ```
+```scala
+"fireSpread" should "ignite adjacent flammable cells when probability is max" in {
+    val matrix: Matrix = Vector(
+      Vector(
+        CellType.Grass,
+        CellType.Burning(0, FireStage.Active, CellType.Grass)
+      ),
+      Vector(CellType.Grass, CellType.Grass)
+    )
 
+    val (result, newBurning, _) =
+      fireSpread(matrix, Set((0, 1)), params, 1, rng)
+
+    result(0)(0) shouldBe a[CellType.Burning]
+    result(0)(0).asInstanceOf[CellType.Burning].originalType shouldBe Grass
+    result(1)(0) shouldBe a[CellType.Burning]
+  }
+```
 [Indice](../index.md) |
 [<](../5-implementation/index.md) |
 [>](../7-retrospective/index.md)
