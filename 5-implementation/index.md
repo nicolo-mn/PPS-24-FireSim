@@ -155,15 +155,14 @@ Mi sono occupato principalmente dell'implementazione dei vigili dei fuoco, in pa
 
 #### FireFighter
 I vigili del fuoco sono stati pensati come dei record immutabili, per questo motivo sono stati implementati con una case class.
-<!-- TODO: Sostituisci (Int, Int) se si cambiano -->
 ```scala
 case class FireFighter(
-    station: (Int, Int),
-    neighborsInRay: Set[(Int, Int)],
-    target: (Int, Int),
+    station: Position,
+    neighborsInRay: Set[Offset],
+    target: Position,
     loaded: Boolean,
-    steps: LazyList[(Int, Int)],
-    moveStrategy: ((Int, Int), (Int, Int)) => LazyList[(Int, Int)]
+    steps: LazyList[Position],
+    moveStrategy: (Position, Position) => LazyList[Position]
 )
 ```
 
@@ -219,35 +218,36 @@ Per rendere più idiomatiche queste operazioni sono stati utilizzati degli exten
 Questi accorgimenti migliorano la leggibilità di `moveStep` e `actionStep`, di seguito riportati:
 
 ```scala
-  def moveStep: ReaderState[CellsOnFire, FireFighter, Unit] =
-    ReaderState[CellsOnFire, FireFighter, Unit]((fireCells, f) =>
-      val newTarget = Option.when(!f.loaded || fireCells.isEmpty)(f.station)
-        .getOrElse(
-          Option(fireCells)
-            .map(_.minBy(f.score))
-            .filter(candidate =>
-              !fireCells.contains(
-                f.target
-              ) || f.score(candidate) < f.score(f.target) * correctionThreshold
-            ).getOrElse(f.target)
+def moveStep: ReaderState[CellsOnFire, FireFighter, Unit] =
+  ReaderState[CellsOnFire, FireFighter, Unit]((fireCells, f) =>
+    val newTarget = Option.when(!f.loaded || fireCells.isEmpty)(f.station)
+      .getOrElse(
+        Option(fireCells)
+          .map(_.minBy(f.score))
+          .filter(candidate =>
+            !fireCells.contains(
+              f.target
+            ) || f.score(candidate) < f.score(f.target) * correctionThreshold
+          ).getOrElse(f.target)
+      )
+    (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
+  )
+
+def actionStep
+    : ReaderState[CellsOnFire, FireFighter, CellsOnFire] =
+  ReaderState[CellsOnFire, FireFighter, CellsOnFire]((fireCells, f) =>
+    import it.unibo.firesim.model.firefighters.FireFighterUtils.FireFighterAction.*
+    f.action(fireCells) match
+      case Some(Extinguish) =>
+        (
+          f.copy(loaded = false),
+          f.neighborsInRay.map(d =>
+            (d._1 + f.position._1, d._2 + f.position._2)
+          ).intersect(fireCells)
         )
-      (f.when(_.target != newTarget)(_ changeTargetTo newTarget).move, ())
-    )
-  def actionStep
-      : ReaderState[CellsOnFire, FireFighter, CellsOnFire] =
-    ReaderState[CellsOnFire, FireFighter, CellsOnFire]((fireCells, f) =>
-      import it.unibo.firesim.model.firefighters.FireFighterUtils.FireFighterAction.*
-      f.action(fireCells) match
-        case Some(Extinguish) =>
-          (
-            f.copy(loaded = false),
-            f.neighborsInRay.map(d =>
-              (d._1 + f.position._1, d._2 + f.position._2)
-            ).intersect(fireCells)
-          )
-        case Some(Reload) => (f.copy(loaded = true), Set.empty[(Int, Int)])
-        case _            => (f, Set.empty[(Int, Int)])
-    )
+      case Some(Reload) => (f.copy(loaded = true), Set.empty[Position])
+      case _            => (f, Set.empty[Position])
+  )
 ```
 
 #### Builder e DSL
@@ -260,15 +260,15 @@ createFireFighter:
 La funzione `createFireFighter` utilizza il meccanismo given/using per prendere in input una context function che richiede un'istanza `given` di tipo `FireFighterBuilder`, che sarà composta da chiamate a funzioni del DSL. 
 ```scala
 def createFireFighter(instructions: FireFighterBuilder ?=> Unit)
-  : FireFighter =
-given builder: FireFighterBuilder = FireFighterBuilder()
-instructions(using builder)
-builder.build()
+    : FireFighter =
+  given builder: FireFighterBuilder = FireFighterBuilder()
+  instructions(using builder)
+  builder.build()
 
 def withRay(ray: Int)(using builder: FireFighterBuilder): Unit =
   builder.withRay(ray)
 
-def stationedIn(s: (Int, Int))(using builder: FireFighterBuilder): Unit =
+def stationedIn(s: Position)(using builder: FireFighterBuilder): Unit =
   builder.stationedIn(s)
 ```
 
