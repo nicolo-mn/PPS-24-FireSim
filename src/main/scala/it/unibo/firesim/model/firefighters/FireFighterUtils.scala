@@ -1,6 +1,8 @@
 package it.unibo.firesim.model.firefighters
 
 import it.unibo.firesim.config.Config.{distanceFromPosWeight, distanceFromStationWeight}
+import it.unibo.firesim.model.firefighters.FireFighterState.CellsOnFire
+import it.unibo.firesim.model.map.Position
 import it.unibo.firesim.util.ChebyshevDistance.distance
 
 /** Utility object providing helper methods and actions for a firefighter.
@@ -29,7 +31,7 @@ object FireFighterUtils:
       * @return
       *   the firefighter position
       */
-    def position: (Int, Int) = f.steps.head
+    def position: Position = f.steps.head
 
     /** Changes the target of the firefighter and computes new movement steps.
       *
@@ -38,7 +40,7 @@ object FireFighterUtils:
       * @return
       *   an updated FireFighter with a new target and movement steps.
       */
-    def changeTargetTo(target: (Int, Int)): FireFighter =
+    def changeTargetTo(target: Position): FireFighter =
       f.copy(
         steps = f.moveStrategy(f.position, target),
         target = target
@@ -71,7 +73,7 @@ object FireFighterUtils:
       *   an Option containing the corresponding FireFighterAction; otherwise,
       *   None.
       */
-    def action(fireCells: Set[(Int, Int)]): Option[FireFighterAction] =
+    def action(fireCells: CellsOnFire): Option[FireFighterAction] =
       import FireFighterAction.*
       if f.loaded && fireCells.contains(f.position) && f.position == f.target
       then Option(Extinguish)
@@ -85,7 +87,7 @@ object FireFighterUtils:
       * @return
       *   the weighted score of a candidate target
       */
-    def score(candidate: (Int, Int)): Double =
+    def score(candidate: Position): Double =
       distance(candidate, f.station) * distanceFromStationWeight + distance(
         candidate,
         f.position

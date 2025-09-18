@@ -2,6 +2,7 @@ package it.unibo.firesim.model.firefighters
 
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
 import it.unibo.firesim.model.firefighters.FireFighterState.*
+import it.unibo.firesim.model.map.Position
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -119,6 +120,6 @@ class FireFighterTest extends AnyFlatSpec with Matchers:
   it should "return to the station if there are no more cells on fire" in {
     val initialFires = Set((2, 0))
     val (s1, _) = updater(initialFires, fireFighter)
-    val (s2, _) = updater(Set.empty[(Int, Int)], s1)
+    val (s2, _) = updater(Set.empty[Position], s1)
     s2.steps.head should be((0, 0))
   }

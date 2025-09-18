@@ -1,6 +1,7 @@
 package it.unibo.firesim.model.firefighters.builder
 
 import it.unibo.firesim.model.firefighters.FireFighter
+import it.unibo.firesim.model.map.Position
 
 /** DSL for creating and configuring a firefighter, provides helper methods to
   * build a firefighter instance.
@@ -33,5 +34,5 @@ object FireFighterDSL:
     * @param s
     *   a tuple of coordinates representing the station location
     */
-  def stationedIn(s: (Int, Int))(using builder: FireFighterBuilder): Unit =
+  def stationedIn(s: Position)(using builder: FireFighterBuilder): Unit =
     builder.stationedIn(s)

@@ -1,12 +1,13 @@
 package it.unibo.firesim.model.firefighters.builder
 
 import it.unibo.firesim.model.firefighters.{FireFighter, MoveStrategy}
+import it.unibo.firesim.model.map.{Offset, Position}
 
 /** Builder for constructing a FireFighter instance.
   */
 class FireFighterBuilder:
-  private var neighborsInRay = Seq.empty[(Int, Int)]
-  private var station = Option.empty[(Int, Int)]
+  private var neighborsInRay = Seq.empty[Offset]
+  private var station = Option.empty[Position]
 
   /** Sets the action ray for the firefighter.
     *
@@ -26,7 +27,7 @@ class FireFighterBuilder:
     * @throws IllegalArgumentException
     *   if any coordinate is negative.
     */
-  def stationedIn(s: (Int, Int)): Unit =
+  def stationedIn(s: Position): Unit =
     require(
       s._1 >= 0 && s._2 >= 0,
       "Cannot station a firefighter in a negative cell!"
@@ -55,7 +56,7 @@ class FireFighterBuilder:
       MoveStrategy.bresenham
     )
 
-  private def cellsInRay(ray: Int): Seq[(Int, Int)] =
+  private def cellsInRay(ray: Int): Seq[Offset] =
     for
       dr <- -ray to ray
       dc <- -ray to ray

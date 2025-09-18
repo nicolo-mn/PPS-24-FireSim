@@ -1,12 +1,14 @@
 package it.unibo.firesim.model.firefighters
 
+import it.unibo.firesim.model.map.{Offset, Position}
+
 /** Utility object for operations related to a firefighter's state transitions.
   */
 object FireFighterState:
   import it.unibo.firesim.model.monads.ReaderStates.ReaderState
   import it.unibo.firesim.model.firefighters.FireFighterUtils.*
   import it.unibo.firesim.config.Config.correctionThreshold
-  private type CellsOnFire = Set[(Int, Int)]
+  type CellsOnFire = Set[Position]
 
   /** Represent a move step for a firefighter. Determines the new target based
     * on the current state and fire cells, updating the firefighter.
@@ -48,8 +50,8 @@ object FireFighterState:
               (d._1 + f.position._1, d._2 + f.position._2)
             ).intersect(fireCells)
           )
-        case Some(Reload) => (f.copy(loaded = true), Set.empty[(Int, Int)])
-        case _            => (f, Set.empty[(Int, Int)])
+        case Some(Reload) => (f.copy(loaded = true), Set.empty[Position])
+        case _            => (f, Set.empty[Position])
     )
 
 /** Firefighter unit that extinguishes fire cells, returning to its fire station
@@ -71,10 +73,10 @@ object FireFighterState:
   *   a function defining the movement algorithm.
   */
 case class FireFighter(
-    station: (Int, Int),
-    neighborsInRay: Set[(Int, Int)],
-    target: (Int, Int),
+    station: Position,
+    neighborsInRay: Set[Offset],
+    target: Position,
     loaded: Boolean,
-    steps: LazyList[(Int, Int)],
-    moveStrategy: ((Int, Int), (Int, Int)) => LazyList[(Int, Int)]
+    steps: LazyList[Position],
+    moveStrategy: (Position, Position) => LazyList[Position]
 )

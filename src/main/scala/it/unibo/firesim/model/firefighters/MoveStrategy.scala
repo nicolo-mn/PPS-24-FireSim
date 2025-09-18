@@ -1,5 +1,7 @@
 package it.unibo.firesim.model.firefighters
 
+import it.unibo.firesim.model.map.Position
+
 /** Provides movement strategies for firefighters. */
 object MoveStrategy:
 
@@ -7,13 +9,13 @@ object MoveStrategy:
     * algorithm.
     *
     * @param from
-    *   the starting coordinate as a tuple of (Int, Int)
+    *   the starting coordinate as a Position
     * @param to
-    *   the destination coordinate as a tuple of (Int, Int)
+    *   the destination coordinate as a Position
     * @return
     *   a lazy list of coordinates forming the movement path
     */
-  def bresenham(from: (Int, Int), to: (Int, Int)): LazyList[(Int, Int)] =
+  def bresenham(from: Position, to: Position): LazyList[Position] =
     val deltaX = math.abs(to._1 - from._1)
     val deltaY = -math.abs(to._2 - from._2)
     val stepX = if from._1 < to._1 then 1 else -1
