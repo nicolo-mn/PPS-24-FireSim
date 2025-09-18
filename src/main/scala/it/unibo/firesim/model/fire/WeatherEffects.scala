@@ -23,7 +23,7 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
 
     val speedFactor = baseWindBoost + math.tanh(
       params.windSpeed / windNormalization
-    ) * maxWindBoost
+    )
     val windBoost = if neighborIsBurning then speedFactor else baseWindBoost
     val baseProb = base(cell, params, r, c, matrix)
     math.min(baseProb * windBoost, maxProbability)
