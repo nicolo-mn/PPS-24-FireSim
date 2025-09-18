@@ -7,9 +7,9 @@ Inoltre, all’interno del codice è inclusa la documentazione Scaladoc, utile a
 Il mio contributo si è concentrato sul modulo di propagazione del fuoco, dove ho sviluppato le strategie per il calcolo della probabilità di ignizione e della durata della combustione, e ho progettato un’architettura estendibile che permette di arricchire il modello con effetti ambientali(vento, umidità, presenza di corpi idrici) tramite decoratori funzionali e un DSL basato sul Builder pattern.
 
 #### Scelte Tecniche e Adozione dello Strategy Pattern
-L’architettura del modulo segue i principi della programmazione funzionale, privilegiando immutabilità dei dati e funzioni pure. La griglia di simulazione non viene mai modificata direttamente: ogni ciclo, gestito dalla funzione `fireSpread`, riceve lo stato corrente e ne restituisce uno nuovo.
+L'architettura del modulo adotta rigorosamente i principi della programmazione funzionale, privilegiando l'immutabilità dei dati e le funzioni pure. La griglia di simulazione, infatti, non viene mai modificata: la funzione fireSpread, nucleo della simulazione, riceve lo stato corrente e ne restituisce uno nuovo a ogni ciclo.
 
-`fireSpread` costituisce il nucleo della simulazione, orchestrando l’evoluzione del fuoco in un singolo ciclo. L’algoritmo principale è disaccoppiato dalle logiche specifiche di comportamento delle celle, implementate come tipi funzionali. Questa struttura realizza concretamente il Strategy pattern, permettendo di sostituire o combinare facilmente diverse politiche di simulazione.
+Questo approccio disaccoppia l'algoritmo principale dalle logiche specifiche di comportamento delle celle. Tali logiche sono implementate come tipi funzionali, realizzando concretamente lo Strategy Pattern e garantendo che diverse politiche di simulazione possano essere sostituite o combinate con la massima flessibilità.
 
 Nello specifico, sono state definite due strategie principali:
 - `ProbabilityCalc`: Una funzione che determina la probabilità di ignizione di una cella, tenendo conto delle sue proprietà, dei parametri globali e del contesto della griglia.
