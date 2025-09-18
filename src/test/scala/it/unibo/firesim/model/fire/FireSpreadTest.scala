@@ -77,16 +77,15 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     val params = SimParams(10, 10, 40, 10)
     val (result, _, _) = fireSpread(matrix, Set((0, 1)), params, 1, rng)
 
-    // Il fuoco si propaga nella prima riga
     result(0)(0) shouldBe a[CellType.Burning]
     result(0)(2) shouldBe a[CellType.Burning]
 
-    // La barriera d'acqua rimane intatta
+    // water should not become burning
     result(1)(0) shouldBe Water
     result(1)(1) shouldBe Water
     result(1)(2) shouldBe Water
 
-    // fire should not
+    // fire should not cross a non-flammable cells
     result(2)(0) shouldBe Grass
     result(2)(1) shouldBe Grass
     result(2)(2) shouldBe Grass
