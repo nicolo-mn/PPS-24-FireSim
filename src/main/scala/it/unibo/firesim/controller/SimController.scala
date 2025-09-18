@@ -2,7 +2,6 @@ package it.unibo.firesim.controller
 
 import it.unibo.firesim.model.map.{CellType, Matrix, Position}
 import it.unibo.firesim.model.Model
-import it.unibo.firesim.model.map.update
 import it.unibo.firesim.util.Line.*
 import it.unibo.firesim.view.{SimView, View}
 
@@ -23,6 +22,7 @@ class SimController(
   private val lock = Object()
 
   private var matrix: Matrix = Vector.empty
+  private var firefighters: Seq[Position] = Vector.empty
   private var originalTickMs: Int = 0
   private var currentGeneration: Int = 0
 
@@ -155,6 +155,8 @@ class SimController(
     mapGenerated = false
     width = 0
     height = 0
+    matrix = Vector.empty
+    firefighters = Vector.empty
     placeQueue.clear()
     lock.notifyAll()
   }
@@ -197,9 +199,14 @@ class SimController(
 
         handleQueuedCells()
 
-        simView.setViewMap(matrix.flatten.map(cT =>
-          CellTypeConverter.toView(cT)
-        ))
+        val viewMatrix: Vector[Vector[CellViewType]] = matrix.map(row =>
+          row.map(cT => CellTypeConverter.toView(cT))
+        )
+        val viewMatrixWithFirefighters =
+          firefighters.foldLeft(viewMatrix) { case (vm, (i, j)) =>
+            vm.updated(i, vm(i).updated(j, CellViewType.Firefighter))
+          }
+        simView.setViewMap(viewMatrixWithFirefighters.flatten)
 
         val elapsed = System.currentTimeMillis() - t0
         val remaining = this.tickMs - elapsed
@@ -214,6 +221,4 @@ class SimController(
     placeQueue.drainTo(buffer)
     val (newMatrix, newFirefighters) = model.placeCells(buffer.asScala.toSeq)
     matrix = newMatrix
-    newFirefighters.foreach((i, j) =>
-      matrix = matrix.update(i, j, CellType.Firefighter)
-    )
+    firefighters = newFirefighters

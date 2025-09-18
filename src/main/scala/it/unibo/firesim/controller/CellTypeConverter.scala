@@ -12,15 +12,14 @@ object CellTypeConverter:
   ): CellType = viewType match
     case CellViewType.Fire =>
       CellType.Burning(currentGeneration, Ignition, prevCell)
-    case CellViewType.Grass       => CellType.Grass
-    case CellViewType.Forest      => CellType.Forest
-    case CellViewType.Empty       => CellType.Empty
-    case CellViewType.Station     => CellType.Station
-    case CellViewType.Burnt       => CellType.Burnt
-    case CellViewType.Rock        => CellType.Rock
-    case CellViewType.Firefighter => CellType.Firefighter
-    case CellViewType.Water       => CellType.Water
-    case null                     =>
+    case CellViewType.Grass              => CellType.Grass
+    case CellViewType.Forest             => CellType.Forest
+    case CellViewType.Empty              => CellType.Empty
+    case CellViewType.Station            => CellType.Station
+    case CellViewType.Burnt              => CellType.Burnt
+    case CellViewType.Rock               => CellType.Rock
+    case CellViewType.Water              => CellType.Water
+    case CellViewType.Firefighter | null =>
       throw new IllegalArgumentException(s"Unknown CellViewType: $viewType")
 
   def toView(modelType: CellType): CellViewType = modelType match
@@ -31,7 +30,6 @@ object CellTypeConverter:
     case CellType.Station          => CellViewType.Station
     case CellType.Burnt            => CellViewType.Burnt
     case CellType.Rock             => CellViewType.Rock
-    case CellType.Firefighter      => CellViewType.Firefighter
     case CellType.Water            => CellViewType.Water
     case null                      =>
       throw new IllegalArgumentException(s"Unknown CellType: $modelType")
