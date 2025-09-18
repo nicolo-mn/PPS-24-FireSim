@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.MenuBar.NoMenuBar.{listenTo, reactions}
 
-class SimView(private val simController: SimController):
+class SimView(private val simController: SimController) extends View:
 
   private var firstClick: Option[(Int, Int)] = None
 
@@ -83,6 +83,10 @@ class SimView(private val simController: SimController):
       simController.handleViewMessage(Closing)
       mainFrame.dispose()
 
+  /** Updates the view map
+    * @param updatedGridCells
+    *   sequence of cells representing the updated map
+    */
   def setViewMap(updatedGridCells: Seq[CellViewType]): Unit =
     if updatedGridCells.length == gridSize * gridSize then
       gridCanvas.updateGrid(updatedGridCells)
