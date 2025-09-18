@@ -15,8 +15,9 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
   given prob: ProbabilityCalc = (_, _, _, _) => 1.0
 
   given burn: BurnDurationPolicy = defaultBurnDuration
+  val params: SimParams = SimParams(0, 0, 30, 10)
 
-  "fireSpread" should "ignite adjacent flammable cells when probability = 1" in {
+  "fireSpread" should "ignite adjacent flammable cells when probability is max" in {
     val matrix: Matrix = Vector(
       Vector(
         CellType.Grass,
@@ -24,10 +25,10 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
       ),
       Vector(CellType.Grass, CellType.Grass)
     )
-    val params = SimParams(0, 0, 30, 10)
 
     val (result, newBurning, _) =
       fireSpread(matrix, Set((0, 1)), params, 1, rng)
+
     result(0)(0) shouldBe a[CellType.Burning]
     result(0)(0).asInstanceOf[CellType.Burning].originalType shouldBe Grass
     result(1)(0) shouldBe a[CellType.Burning]
@@ -36,7 +37,6 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
   it should "turn burning cells to burnt after their burn duration" in {
     val testCell = CellType.Burning(0, Active, Grass)
     val matrix: Matrix = Vector(Vector(testCell))
-    val params = SimParams(0, 0, 20, 50)
 
     val testBurnDuration: BurnDurationPolicy = (cellType, start, current) =>
       (current - start) >= 3
@@ -55,7 +55,6 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
         CellType.Burning(0, FireStage.Active, CellType.Grass)
       )
     )
-    val params = SimParams(0, 0, 20, 50)
     given prob: ProbabilityCalc = (_, _, _, _) => 0.0
 
     val (newM, _, _) =
@@ -74,7 +73,6 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
       Vector(Water, Water, Water),
       Vector(Grass, Grass, Grass)
     )
-    val params = SimParams(10, 10, 40, 10)
     val (result, _, _) = fireSpread(matrix, Set((0, 1)), params, 1, rng)
 
     result(0)(0) shouldBe a[CellType.Burning]
@@ -134,7 +132,6 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
 
   it should "ignore positions in burning set that are not actually burning" in {
     val matrix: Matrix = Vector(Vector(CellType.Grass))
-    val params = SimParams(0, 0, 30, 10)
 
     // pass a grass inside the burn set
     val (result, _, _) = fireSpread(matrix, Set((0, 0)), params, 1, rng)
@@ -144,7 +141,6 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
   it should "keep a burning cell unchanged if it has not reached the next stage yet" in {
     val burningGrass = CellType.Burning(0, FireStage.Ignition, CellType.Grass)
     val matrix: Matrix = Vector(Vector(burningGrass))
-    val params = SimParams(0, 0, 30, 10)
 
     // currentCycle too low to change state
     val (result, _, _) = fireSpread(matrix, Set((0, 0)), params, 1, rng)
