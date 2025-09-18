@@ -4,7 +4,7 @@ import it.unibo.firesim.model.map.{CellType, Matrix}
 import it.unibo.firesim.model.Model
 import it.unibo.firesim.model.map.update
 import it.unibo.firesim.util.Line.*
-import it.unibo.firesim.view.SimView
+import it.unibo.firesim.view.{SimView, View}
 
 import scala.jdk.CollectionConverters.*
 import java.util.concurrent.LinkedBlockingQueue
@@ -32,7 +32,7 @@ class SimController(
   @volatile private var width, height: Int = 0
   @volatile private var tickMs: Int = 0
 
-  private val simView = new SimView(this)
+  private val simView: View = new SimView(this)
   private val placeQueue = new LinkedBlockingQueue[((Int, Int), CellType)]()
 
   /** Handles a message from the view by executing the corresponding action on
