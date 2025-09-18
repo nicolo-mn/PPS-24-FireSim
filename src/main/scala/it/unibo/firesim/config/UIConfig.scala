@@ -27,7 +27,7 @@ object UIConfig:
   val maxWindDirection: Int = 360
   val defaultWindDirection: Int = 90
   val minWindIntensity: Int = 0
-  val maxWindIntensity: Int = 150
+  val maxWindIntensity: Int = 50
   val defaultWindIntensity: Int = 20
   val humidityLabelText: String = "Current humidity: "
   val humidityUnit: String = " %"

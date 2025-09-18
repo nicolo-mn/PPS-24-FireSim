@@ -61,7 +61,7 @@ class ControlsPanel(simController: SimController)
     min = minWindIntensity; max = maxWindIntensity; value = defaultWindIntensity
 
   pauseResumeButton.enabled = false
-  resetButton.enabled = false
+  resetButton.enabled = true
   speedSelector.selection.item = SpeedType.Speed1x
   soilTypeSelector.selection.item = fireSoilStr
   border = Swing.EmptyBorder(0, 0, 20, 0)
@@ -114,10 +114,13 @@ class ControlsPanel(simController: SimController)
       onStart()
 
     case ButtonClicked(`resetButton`) =>
-      resetButton.enabled = false
+      resetButton.enabled = true
       startButton.enabled = true
       pauseResumeButton.enabled = false
       pauseResumeButton.text = "⏸ Pause"
+      drawLineButton.selected = false
+      drawLineButton.enabled = true
+      brushToggle.enabled = true
       brushToggle.selected = false
       soilTypeSelector.peer.setModel(
         ComboBox.newConstantModel(mapEditAvailableSoils)
@@ -173,6 +176,7 @@ class ControlsPanel(simController: SimController)
     pauseResumeButton.enabled = true
     resetButton.enabled = true
     drawLineButton.selected = false
+    drawLineButton.enabled = true
     brushToggle.enabled = true
     brushToggle.selected = false
     soilTypeSelector.peer.setModel(
