@@ -41,7 +41,7 @@ def fireSpread(
 È stata fornita un'implementazione di default per entrambe sia per la `ProbabilityCalc` che per la `BurnDurationPolicy`. La prima,  modella un comportamento di base del fuoco in funzione di parametri come l'infiammabilità della vegetazione, la temperatura, l'umidità e l'influenza delle celle vicine in fiamme, mentre per la seconda ogni cella infiammabile possiede un tempo di durata di combustione e controlla quando siamo arrivati al termine. 
 
 #### Modularità degli effetti ambientali
-Per modellare fenomeni ambientali complessi, come vento o umidità costiera, che modificano la probabilità di ignizione, è stato adottato un approccio ispirato al Decorator design pattern, implementato in chiave funzionale. In questo contesto, i decoratori sono funzioni di ordine superiore che prendono una `ProbabilityCalc` come input e ne restituiscono una nuova arricchita con logiche aggiuntive, senza modificare lo stato originale.
+Per modellare fenomeni ambientali complessi, come vento o umidità costiera, che modificano la probabilità di ignizione, è stato adottato un approccio ispirato al Decorator pattern, implementato in chiave funzionale. In questo contesto, i decoratori sono funzioni di ordine superiore che prendono una `ProbabilityCalc` come input e ne restituiscono una nuova arricchita con logiche aggiuntive, senza modificare lo stato originale.
 
 Ad esempio, la funzione `directionalWindProbabilityDynamic` agisce da decoratore. Prende in input una funzione di probabilità di base `(base: ProbabilityCalc)` e restituisce una nuova funzione che, prima di eseguire il calcolo di base, verifica la presenza di celle in fiamme nella direzione del vento e, in caso affermativo, applica un fattore di potenziamento(`windBoost`) alla probabilità calcolata.
 
@@ -63,7 +63,7 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
 Analogamente, `humidityAware` applica una penalità quando l’umidità supera un certo livello, mentre `waterHumidityWind` riduce la probabilità di ignizione per celle riceventi vento umido da corpi idrici vicini. Questo approccio consente di combinare effetti ambientali in maniera modulare e componibile.
 
 #### Composizione delle politiche tramite Builder Pattern
-Per semplificare la combinazione dei vari decoratori e la costruzione di una `ProbabilityCalc` complessa, è stato introdotto il `ProbabilityBuilder`. Questa classe implementa una DSL fluente, seguendo il Builder pattern.
+Per orchestrare la combinazione di questi decoratori in modo pulito e leggibile, ho implementato il Builder Pattern tramite la classe `ProbabilityBuilder`, che espone una DSL fluente.
 
 Il builder parte da una `ProbabilityCalc` di base e offre metodi per applicare i decoratori desiderati in modo sequenziale. Ogni metodo (es. `withWind`, `withWaterEffects`) restituisce una nuova istanza del builder con la funzione di calcolo aggiornata e decorata. 
 
