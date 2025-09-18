@@ -13,17 +13,28 @@ Controller e model sono stati pensati per gestire in modo ottimale i vari stati 
 
 
 ## Controller
-Il motore della simulazione è contenuto nella classe `SimController`, che gestisce il main loop.
-In questa classe sono contenuti i metodi per permettere la modifica dei parametri da parte dell'utente tramite l'interfaccia grafica, quali umidità, direzione e intensità del vento e temperatura.
-Il cambiamento dei parametri avviene istantaneamente nel model, ma all'inizio di ogni avanzamento della simulazione il model salva una copia di questi parametri per evitare inconsistenze.
-Nel momento in cui l'utente imposta le dimensioni della mappa il controller reagisce ordinandone al model la generazione, per poi ordinare alla view di mostrarla.
-Attraverso l'interfaccia grafica, l'utente può modificare celle della mappa dinamicamente, sia prima dell'inizio che durante il corso della simulazione.
-Ogni tipologia di cella è identificata da un'enumerazione sia nella view (`CellViewType`) che nel model (`CellType`), mantenute separate per garantire isolamento.
-Il controller, attraverso `CellTypeConverter` si occupa di svolgere la conversione nel passaggio di informazioni tra view e model.
-Mentre la simulazione è in corso, il controller innesca aggiornamenti del model ad intervalli regolari.
-Inoltre si occupa di ricevere e mettere in coda le celle cambiate dall'utente nella personalizzazione della mappa.
-Queste celle verranno poi notificate al model prima dell'aggiornamento successivo.
-Questo approccio all'aggiornamento della mappa asincrono permette di evitare inconsistenze nel model mentre la simulazione sta avanzando.
+
+Il motore della simulazione è contenuto nella classe **`SimController`**, che gestisce il **main loop**.
+In questa classe sono presenti i metodi che permettono all’utente, tramite l’interfaccia grafica, di modificare parametri come umidità, direzione e intensità del vento, temperatura.
+
+Il cambiamento dei parametri avviene **istantaneamente nel model**, ma all’inizio di ogni avanzamento della simulazione il model salva una **copia** dei parametri, evitando possibili **inconsistenze**.
+Quando l’utente imposta le **dimensioni della mappa**, il controller:
+- ordina al model la **generazione** della mappa
+- ordina alla view di **mostrarla**
+
+L’utente può modificare le celle della mappa dinamicamente prima dell’inizio o durante il corso della simulazione.
+
+Ogni tipologia di cella è identificata da un’enumerazione distinta:
+- nella **view** con `CellViewType`
+- nel **model** con `CellType`
+
+Le due enumerazioni sono mantenute separate per garantire **isolamento**.
+Il controller utilizza **`CellTypeConverter`** per la conversione delle informazioni tra view e model. 
+Durante la simulazione, il controller:
+- innesca aggiornamenti del model ad intervalli regolari
+- riceve e mette in coda le modifiche alle celle effettuate dall’utente
+
+Le celle modificate vengono notificate al model **prima dell’aggiornamento successivo**, così da evitare **inconsistenze** mentre la simulazione avanza.
 
 La comunicazione con la view avviene utilizzando il trait `ViewMessage`.
 Grazie al `Command Pattern`, la view può gestire in modo uniforme diversi tipi di input, come pulsanti per mettere in pausa o resettare la simulazione, o modifiche dei parametri.
@@ -47,7 +58,7 @@ Vi è la possibilità che una cella infuocata sia circondata da altre celle che 
 Ogni cella della griglia possiede una probabilità di accensione che dipende dal tipo di vegetazione associata(`Vegetation`).
 La propagazione del fuoco è modellata tramite più stadi di combustione rappresentati dall’enumerazione `FireStage` che vanno a differenziare la probabilità di incendiare una cella adiacente. 
 
-Il cuore del sistema della diffusione del fuoco è la funzione `fireSpread`, che ad ogni ciclo della simulazione calcola l'evoluzione della griglia.
+`SimModel` chiama poi la funzione `fireSpread`, che calcola l'evoluzione della diffusione del fuoco nella griglia.
 Questo processo è suddiviso in due fasi principali:
 - Aggiornamento delle celle in fiamme. Per ogni cella in combustione si verifica se la cella deve spegnersi attraverso l'utilizzo della `BurnDurationPolicy` che viene passata. Se la cella continua a bruciare, si controlla se può cambiare stadio di fuoco.
 - Propagazione verso i vicini. Per ogni cella vengono analizzati i vicini e viene prima calcolata la loro probabilità di ignizione attraverso una funzione `ProbabilityCalc`. La probabilità base può essere arricchita dinamicamente con effetti aggiuntivi, come vento o vicinanza a corpi d’acqua in direzione del vento, grazie a funzioni decorator che estendono il comportamento senza modificare la funzione originale.

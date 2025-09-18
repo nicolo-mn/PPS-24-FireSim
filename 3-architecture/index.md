@@ -13,9 +13,19 @@ Come mostrato in figura, le interfacce di `Model`, `View` e `Controller` permett
 - Controller: gestisce il loop della simulazione e collega view e model
   - Gestione dei tempi di simulazione
   - Conversione tra tipi di dati model e tipi di dati view
+  - Interroga il model per:
+    - Aggiornare parametri di simulazione
+    - Richiedere i parametri aggiornati
+    - Richiedere il numero di ciclo corrente
+    - Piazzare celle
+    - Aggiornare lo stato (i.e. far avanzare la simulazione)
+  - Interroga la view per mostrare la mappa aggiornata
 - View: si occupa della visualizzazione delle informazioni elaborate dal Model
   - Visualizzazione dei tipi di dati view ricevuti dal controller
   - Invio al controller di input ricevuti dall'utente
+    - Modifica dei parametri
+    - Personalizzazione della mappa
+    - Modifica e controllo del tempo di simulazione (start, stop, pause/resume, velocità)
 
 ![Architettura MVC](../img/mvc-architecture.png)
 

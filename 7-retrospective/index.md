@@ -52,7 +52,9 @@ La quarta sprint si è concentrata sull'aggiunta di ulteriori utility di view, q
 | Handle draw line button that works for every type of cell        | P2       | juriGug   | M    | Sprint 4 |
 
 ## Sprint 5
-La quinta sprint si è concentrata sul refactoring della view, riducendo il numero di componenti Swing utilizzati evitando lag, si è, inoltre, deciso di modificare la logica di movimento dei vigili del fuoco per dare la priorità alle celle più vicine alla propria stazione. Tramite l'uso di `scala-parallel-collections` si è parallelizzato l'algoritmo di map generation e l'aggiornamento dei vigili del fuoco, per rendere l'esperienza d'uso più fluida, permettendo di utilizzare mappe con dimensione maggiore senza lag.
+La quinta sprint si è concentrata sul refactoring della view, riducendo il numero di componenti Swing utilizzati evitando lag.
+Si è inoltre deciso di modificare la logica di movimento dei vigili del fuoco per dare la priorità alle celle più vicine alla propria stazione.
+Tramite l'uso di `scala-parallel-collections` si è parallelizzato l'algoritmo di map generation e l'aggiornamento dei vigili del fuoco, per rendere l'esperienza d'uso più fluida, permettendo di utilizzare mappe con dimensione maggiore senza lag.
 
 | Title                                                                        | Priority | Assignees | Size | Sprint   |
 |------------------------------------------------------------------------------|----------|-----------|------|----------|

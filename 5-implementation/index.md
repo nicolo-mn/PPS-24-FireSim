@@ -297,14 +297,15 @@ Tenendo traccia dei valori attuali e originali si potrà poi cambiare la velocit
 Sia il main thread che il thread della view accederanno ad alcune variabili condivise, principalmente flag booleani ma anche le dimensioni della mappa scelte dall'utente e i millisecondi della velocità di simulazione citati prima.
 Queste variabili sono dichiarate con il tag `volatile` per un accesso thread safe.
 
-Per sincronizzare i due thread e permettere al main thread di lasciare le risorse mentre la mappa non è stata ancora generata si usa una variabile `lock`.
+Si usa una variabile `lock` per sincronizzare i due thread e permettere al main thread di lasciare le risorse mentre la mappa non è stata ancora generata.
 
-Usando queste variabili thread safe, all'interno del loop il main thread potrà aspettare prima che la mappa sia generata,
-usare il metodo `onTick` e quindi chiamare il model per avanzare nella simulazione (se questa sta runnando),
-e infine chiamare il metodo `handleQueuedCells` per far inserire al model le celle piazzate dall'utente (dopo aver fatto avanzare il model, assicurando una corretta sincronizzazione).
+Usando queste variabili thread safe, all'interno del loop il main thread potrà
+ - Aspettare prima che la mappa sia generata
+ - Usare il metodo `onTick` e quindi chiamare il model per avanzare nella simulazione (se questa sta runnando)
+ - Chiamare il metodo `handleQueuedCells` per far inserire al model le celle piazzate dall'utente (dopo aver fatto avanzare il model, assicurando una corretta sincronizzazione).
 
 Per permettere una corretta conversione tra i tipi di celle del model e della view, il Controller offre un enum apposito `CellViewType` e una classe statica per la conversione in entrambi i sensi: `CellTypeConverter`.
-Sarà poi la specifica view (indipendente e quindi aggiornabile con facilità) a dover convertire i tipi di cella in colori, testi, celle o altro da mostrare all'utente.
+Sarà poi la specifica view (indipendente e quindi aggiornabile con facilità) a dover convertire i tipi di cella in colori, testi, o altro da mostrare all'utente.
 
 ---
 
