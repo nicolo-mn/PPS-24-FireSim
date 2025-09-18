@@ -90,3 +90,14 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     result(2)(1) shouldBe Grass
     result(2)(2) shouldBe Grass
   }
+
+  it should "not reignite burnt cells" in {
+    val matrix: Matrix = Vector(
+      Vector(CellType.Burnt),
+      Vector(CellType.Burning(0, FireStage.Active, CellType.Grass))
+    )
+    val params = SimParams(0, 0, 30, 10)
+
+    val (result, _, _) = fireSpread(matrix, Set((1, 0)), params, 1, rng)
+    result(0)(0) shouldBe CellType.Burnt
+  }

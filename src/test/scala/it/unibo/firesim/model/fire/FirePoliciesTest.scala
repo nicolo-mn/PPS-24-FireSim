@@ -3,7 +3,7 @@ package it.unibo.firesim.model.fire
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import it.unibo.firesim.model.SimParams
-import it.unibo.firesim.model.map.{CellType, Matrix}
+import it.unibo.firesim.model.map.CellType
 
 class FirePoliciesTest extends AnyFlatSpec with Matchers:
 
