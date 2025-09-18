@@ -75,5 +75,6 @@ Alla luce di numerosi test manuali svolti sull'applicazione, si sono individuati
 | Modify pause/resume button text depending on its state           | P2       | juriGug   | XS   | Sprint 6 |
 | Handle conflicts when both brush and draw line are active        | P2       | nicolo-mn | XS   | Sprint 6 |
 
+<!-- TODO: cambiare nomi github con nostri nomi -->
 [Indice](../index.md) |
 [<](../6-testing/index.md)

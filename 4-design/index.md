@@ -42,7 +42,7 @@ Ogni ciclo di aggiornamento del model consiste in svariati passaggi:
 
 I pompieri sono modellati come record immutabili tramite la case class `FireFighter`, che vengono aggiornati sulla base delle celle infuocate correnti.
 Vi è la possibilità che una cella infuocata sia circondata da altre celle che non possono prendere fuoco (come celle già bruciate); in questi casi i vigili del fuoco dovrebbero ignorarle per dirigersi verso celle circondate da altre a rischio di incendio.
-Per gestire questo edge case i vigili del fuoco considerano solo queste ultime nella decisione delle loro azioni.  
+`SimModel` aggiorna le istanze di `FireFighter` attraverso una computazione monadica che prende in input le celle infuocate, e restituisce in output le celle spente al passo corrente.
 
 Ogni cella della griglia possiede una probabilità di accensione che dipende dal tipo di vegetazione associata(`Vegetation`).
 La propagazione del fuoco è modellata tramite più stadi di combustione rappresentati dall’enumerazione `FireStage` che vanno a differenziare la probabilità di incendiare una cella adiacente. 

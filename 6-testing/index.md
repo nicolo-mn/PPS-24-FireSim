@@ -8,7 +8,18 @@ Per verificare la copertura dei test è stato utilizzato `sbt-scoverage` che ci 
 
 ## Esempi rilevanti
 <!-- TODO: quali test mettiamo? -->
+```scala
+"FireFighterBuilder" should "throw an exception if ray is negative" in {
+    val builder = new FireFighterBuilder
+    an[IllegalArgumentException] should be thrownBy builder.withRay(-1)
+}
 
+it should "throw an exception if stationed in negative coordinates" in {
+    val builder = new FireFighterBuilder
+    an[IllegalArgumentException] should be thrownBy builder.stationedIn((-1, 0))
+    an[IllegalArgumentException] should be thrownBy builder.stationedIn((0, -5))
+}
+```
 
 [Indice](../index.md) |
 [<](../5-implementation/index.md) |

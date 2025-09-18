@@ -254,7 +254,7 @@ Questi accorgimenti migliorano la leggibilità di `moveStep` e `actionStep`, di 
 Per la costruzione delle istanze `FireFighter` è stato utilizzato il pattern Builder. Sebbene nell'implementazione attuale non siano previsti molti campi da inizializzare, l'utilizzo del pattern Builder permette di costruire facilmente un piccolo DSL che lo usi, per sfruttare la significant indentation di Scala per creare istanze di `FireFighter` in modo dichiarativo, come mostrato di seguito:
 ```scala
 createFireFighter:
-    withRay(ray)
+    withRay(r)
     stationedIn(s)
 ```
 La funzione `createFireFighter` utilizza il meccanismo given/using per prendere in input una context function che richiede un'istanza `given` di tipo `FireFighterBuilder`, che sarà composta da chiamate a funzioni del DSL. 
@@ -311,13 +311,13 @@ Sarà poi la specifica view (indipendente e quindi aggiornabile con facilità) a
 ## View
 Per realizzare la GUI è stato utilizzato Scala Swing. L'interfaccia grafica è composta da un `Panel` che contiene la griglia con cui l'utente può interagire e da un `BoxPanel` contenente i vari controlli. 
 
-L’utente può interagire con la griglia tramite click e trascinamenti, che consentono il posizionamento delle celle. Le coordinate grafiche ottenute dall’interazione vengono convertite in coordinate logiche attraverso il metodo pixelToCell, così da poter essere elaborate dal controller.
+L’utente può interagire con la griglia tramite click e trascinamenti, che consentono il posizionamento delle celle. Le coordinate grafiche ottenute dall’interazione vengono convertite in coordinate logiche attraverso il metodo `pixelToCell`, così da poter essere elaborate dal controller.
 
 I controlli sono organizzati in righe attraverso l'uso di ulteriori `BoxPanel`. Poiché ogni riga ha caratteristiche in comune, come la spaziatura tra i vari controlli, un trait con self-types è stato utilizzato per decorare ogni `BoxPanel`. 
 
 Le varie tipologie di celle sono identificate da un `enum` chiamato `CellViewType`. Le istanze di questa enumerazione sono ricevute dal controller per aggiornare la griglia, e sono utilizzate dalla view per associare un colore a ogni cella.
 
-Uno `SplitPane` è utilizzato per dividere le due aree. La griglia è responsive, e reagisce al ridimensionamento della finestra e delle due aree. Questo è ottenuto tramite un metodo `gridGeometry` chiamato all'interno del metodo `paintComponent` del `Panel`, che utilizza la dimensione del `Panel` contenente la griglia per calcolare la dimensione e l'offset che questa deve avere. 
+Uno `SplitPane` è utilizzato per dividere l'area dei controlli dall'area contenente la griglia. Quest'ultima è responsive, e reagisce al ridimensionamento della finestra e al movimento del divisorio dello `SplitPane`. Questa proprietà è ottenuta tramite un metodo `gridGeometry` chiamato all'interno del metodo `paintComponent` del `Panel` contenente la griglia, che utilizza la sua dimensione per calcolare la dimensione e l'offset che la griglia deve avere. 
 
 Le possibili operazioni lunghe e potenzialmente bloccanti, come l'avvio della simulazione o il calcolo per il posizionamento di una linea, vengono eseguite in background in modo da poter mantenere la View reattiva.
 
