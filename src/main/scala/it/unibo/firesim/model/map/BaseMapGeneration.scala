@@ -15,7 +15,7 @@ class BaseMapGeneration extends MapGenerationStrategy:
       cols: Int,
       count: Int,
       random: Random
-  ): Seq[(Int, Int)] =
+  ): Seq[Position] =
     Seq.fill(count)((random.nextInt(rows), random.nextInt(cols)))
 
   private def generateSparseSeeds(
@@ -24,7 +24,7 @@ class BaseMapGeneration extends MapGenerationStrategy:
       count: Int,
       matrix: Matrix,
       random: Random
-  ): Seq[(Int, Int)] =
+  ): Seq[Position] =
 
     val emptyCells = (0 until rows).flatMap { r =>
       (0 until cols).collect {
@@ -37,7 +37,7 @@ class BaseMapGeneration extends MapGenerationStrategy:
 
   protected def growCluster(
       matrix: Matrix,
-      seed: (Int, Int),
+      seed: Position,
       clusterSize: Int,
       growthProbability: Double,
       growthType: CellType,
@@ -46,8 +46,8 @@ class BaseMapGeneration extends MapGenerationStrategy:
 
     @tailrec
     def expand(
-        queue: Seq[(Int, Int)],
-        visited: Set[(Int, Int)],
+        queue: Seq[Position],
+        visited: Set[Position],
         count: Int,
         m: Matrix
     ): Matrix =
@@ -124,7 +124,7 @@ class BaseMapGeneration extends MapGenerationStrategy:
   override def addGrass(matrix: Matrix, random: Random): Matrix =
     val rows = matrix.rows
     val cols = matrix.cols
-    val grassSeeds: Seq[(Int, Int)] = matrix.positionsOf(Forest).par
+    val grassSeeds: Seq[Position] = matrix.positionsOf(Forest).par
       .flatMap((r, c) => matrix.neighbors(r, c))
       .filter((r, c) => matrix(r)(c) == Rock)
       .seq

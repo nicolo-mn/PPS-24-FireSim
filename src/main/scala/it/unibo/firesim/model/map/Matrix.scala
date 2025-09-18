@@ -1,6 +1,8 @@
 package it.unibo.firesim.model.map
 
 type Matrix = Vector[Vector[CellType]]
+type Position = (Int, Int)
+type Offset = (Int, Int)
 
 extension (matrix: Matrix)
   /** Matrix rows

@@ -8,7 +8,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
   private val mapGenerator: MapGenerationStrategy = MapGenerationWithRivers()
   private var matrix: Matrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
 
-  /** adds water generation to the map
+  /** Adds water generation to the map
     * @return
     *   the builder
     */
@@ -16,7 +16,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     matrix = mapGenerator.addWater(matrix, random)
     this
 
-  /** adds forest generation to the map
+  /** Adds forest generation to the map
     * @return
     *   the builder
     */
@@ -24,7 +24,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     matrix = mapGenerator.addForests(matrix, random)
     this
 
-  /** adds grass generation to the map
+  /** Adds grass generation to the map
     * @return
     *   the builder
     */
@@ -32,7 +32,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     matrix = mapGenerator.addGrass(matrix, random)
     this
 
-  /** adds station placement to the map
+  /** Adds station placement to the map
     * @return
     *   the builder
     */
@@ -40,7 +40,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     matrix = mapGenerator.addStations(matrix, random)
     this
 
-  /** adds station placement to the map
+  /** Adds station placement to the map
     * @return
     *   the builder
     */
@@ -48,11 +48,13 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     matrix = mapGenerator.addFires(matrix, random)
     this
 
-  /** adds custom terrain placements to the map
+  /** Adds custom terrains to the map
+    * @param positions
+    *   The positions and type of cells to add
     * @return
     *   the builder
     */
-  def withCustomTerrain(positions: Seq[((Int, Int), CellType)]): MapBuilder =
+  def withCustomTerrain(positions: Seq[(Position, CellType)]): MapBuilder =
     positions.foreach { case ((r, c), cellType) =>
       matrix = mapGenerator.addCustomTerrain(matrix, r, c, cellType)
     }

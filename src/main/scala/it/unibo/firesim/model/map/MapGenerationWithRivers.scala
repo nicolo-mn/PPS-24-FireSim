@@ -10,7 +10,7 @@ class MapGenerationWithRivers extends BaseMapGeneration:
 
   private def createRiver(
       matrix: Matrix,
-      start: (Int, Int),
+      start: Position,
       random: Random
   ): Matrix =
     var m = matrix

@@ -60,10 +60,12 @@ object MapBuilderDSL:
     builder.withFires()
 
   /** Instruction to build map with custom terrain
+    * @param positions
+    *   The positions and cell types to add
     * @param builder
     *   used to build the map
     */
-  def withCustomTerrain(positions: Seq[((Int, Int), CellType)])(using
+  def withCustomTerrain(positions: Seq[(Position, CellType)])(using
       builder: MapBuilder
   ): Unit =
     builder.withCustomTerrain(positions)

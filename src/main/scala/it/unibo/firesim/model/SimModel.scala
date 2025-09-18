@@ -9,7 +9,7 @@ import it.unibo.firesim.model.firefighters.FireFighter
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
 import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import it.unibo.firesim.model.map.MapBuilderDSL.*
-import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, neighbors, positionsOf, update}
+import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, Position, neighbors, positionsOf, update}
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.util.Random
@@ -94,12 +94,12 @@ class SimModel(
     *   The updated game matrix, the list of positions of firefighters above the
     *   map
     */
-  def placeCells(cells: Seq[((Int, Int), CellType)])
-      : (Matrix, Seq[(Int, Int)]) =
+  def placeCells(cells: Seq[(Position, CellType)])
+      : (Matrix, Seq[Position]) =
     cells.foreach((p, cT) => placeCell(p, cT))
     (matrix, firefighters.map(f => f.position))
 
-  private def placeCell(pos: (Int, Int), cellType: CellType): Unit =
+  private def placeCell(pos: Position, cellType: CellType): Unit =
     val (r, c) = pos
     val oldCell = matrix(r)(c)
 
@@ -121,7 +121,7 @@ class SimModel(
     *   The updated game matrix and the list of positions of firefighters above
     *   the map
     */
-  def updateState(): (Matrix, Seq[(Int, Int)]) =
+  def updateState(): (Matrix, Seq[Position]) =
     val simParams = this.getSimParams
     val burningCells = matrix.positionsOf {
       case Burning(_, _, _) => true
@@ -135,18 +135,17 @@ class SimModel(
     val firefightersUpdates =
       firefighters.par.map(firefightersUpdater(actionableCells, _)).seq
     firefighters = firefightersUpdates.map(_._1)
-    extinguishCells(firefightersUpdates.foldLeft(Set.empty[(Int, Int)])(
-      (s, u) =>
-        s ++ u._2
+    extinguishCells(firefightersUpdates.foldLeft(Set.empty[Position])((s, u) =>
+      s ++ u._2
     ).toSeq)
 
     cycle += 1
     (matrix, firefighters.map(f => f.position))
 
-  private def extinguishCells(burntCells: Seq[(Int, Int)]): Unit =
+  private def extinguishCells(burntCells: Seq[Position]): Unit =
     burntCells.foreach(p => placeCell(p, Burnt))
 
-  private def isSavable(pos: (Int, Int)): Boolean =
+  private def isSavable(pos: Position): Boolean =
     matrix.neighbors(pos._1, pos._2).exists((r, c) =>
       matrix(r)(c) == Grass || matrix(r)(c) == Forest
     )

@@ -1,6 +1,6 @@
 package it.unibo.firesim.model
 
-import it.unibo.firesim.model.map.{CellType, Matrix}
+import it.unibo.firesim.model.map.{CellType, Matrix, Position}
 
 trait Model:
 
@@ -36,11 +36,11 @@ trait Model:
     *   The updated game matrix, the list of positions of firefighters above the
     *   map
     */
-  def placeCells(cells: Seq[((Int, Int), CellType)]): (Matrix, Seq[(Int, Int)])
+  def placeCells(cells: Seq[(Position, CellType)]): (Matrix, Seq[Position])
 
   /** Game tick method
     * @return
     *   The updated game matrix and the list of positions of firefighters above
     *   the map
     */
-  def updateState(): (Matrix, Seq[(Int, Int)])
+  def updateState(): (Matrix, Seq[Position])
