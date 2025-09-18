@@ -187,6 +187,7 @@ class SimController(
             simView.setViewMap(model.generateMap(height, width)
               .flatten.map(CellTypeConverter.toView))
             mapGenerated = true
+            currentGeneration = model.getCurrentCycle
           else lock.wait()
       }
 
