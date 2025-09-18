@@ -1,8 +1,7 @@
 package it.unibo.firesim.model.fire
 
-import it.unibo.firesim.model.map.{CellType, Matrix}
+import it.unibo.firesim.model.map.{CellType, Matrix, Position, inBounds, update}
 import it.unibo.firesim.model.SimParams
-import it.unibo.firesim.model.map.{inBounds, update}
 import it.unibo.firesim.util.RNG
 
 /** Executes one simulation step of fire spread across the grid.
@@ -29,21 +28,21 @@ import it.unibo.firesim.util.RNG
   */
 def fireSpread(
     matrix: Matrix,
-    burning: Set[(Int, Int)],
+    burning: Set[Position],
     params: SimParams,
     currentCycle: Int,
     rng: RNG
 )(using
     prob: ProbabilityCalc,
     burn: BurnDurationPolicy
-): (Matrix, Set[(Int, Int)], RNG) =
+): (Matrix, Set[Position], RNG) =
 
   val (stillBurningUpdates, extinguishedPositions) =
     updateBurningCells(matrix, burning, burn, currentCycle)
   val stillBurningPos = stillBurningUpdates.keys.toSet
 
   val ignitionCandidates = burning
-    .flatMap(pos => neighbors(pos._1, pos._2, matrix))
+    .flatMap(pos => neighbors(pos, matrix))
     .filter { pos =>
       val cell = matrix(pos._1)(pos._2)
       cell.isFlammable && !cell.isBurning
@@ -63,23 +62,23 @@ def fireSpread(
   val newBurningSet = stillBurningPos ++ newlyIgnited.keys
   (newMatrix, newBurningSet, finalRng)
 
-private def neighbors(r: Int, c: Int, matrix: Matrix): Seq[(Int, Int)] =
+private def neighbors(pos: Position, matrix: Matrix): Seq[(Int, Int)] =
   for
     dr <- -1 to 1
     dc <- -1 to 1
-    if !(dr == 0 && dc == 0) && matrix.inBounds(r + dr, c + dc)
-  yield (r + dr, c + dc)
+    if !(dr == 0 && dc == 0) && matrix.inBounds(pos._1 + dr, pos._2 + dc)
+  yield (pos._1 + dr, pos._2 + dc)
 
 private def updateBurningCells(
     matrix: Matrix,
-    burning: Set[(Int, Int)],
+    burning: Set[Position],
     burnt: BurnDurationPolicy,
     currentCycle: Int
-): (Map[(Int, Int), CellType], Set[(Int, Int)]) =
+): (Map[Position, CellType], Set[Position]) =
   // Iterate over burning cells and decide whether they keep burning,
   // transition to the next fire stage, or extinguish
   burning.foldLeft(
-    (Map.empty[(Int, Int), CellType], Set.empty[(Int, Int)])
+    (Map.empty[Position, CellType], Set.empty[Position])
   ) { case ((burningAcc, extinguishedAcc), pos) =>
     matrix(pos._1)(pos._2) match
 
@@ -109,7 +108,7 @@ private def updateBurningCells(
   }
 
 private def igniteNewFires(
-    ignitionCandidates: Set[(Int, Int)],
+    ignitionCandidates: Set[Position],
     prob: ProbabilityCalc,
     rng: RNG,
     params: SimParams,
@@ -121,7 +120,7 @@ private def igniteNewFires(
   ) { case ((ignitedAcc, r), pos) =>
 
     val cell = matrix(pos._1)(pos._2)
-    val ignitionProb = prob(cell, params, pos._1, pos._2, matrix)
+    val ignitionProb = prob(cell, params, pos, matrix)
     val (randVal, nextRng) = r.nextDouble
     if randVal < ignitionProb then
       val newBurningCell = CellType.Burning(

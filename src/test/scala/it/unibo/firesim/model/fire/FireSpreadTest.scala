@@ -12,7 +12,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
 
   val rng: RNG = SimpleRNG(42)
 
-  given prob: ProbabilityCalc = (_, _, _, _, _) => 1.0
+  given prob: ProbabilityCalc = (_, _, _, _) => 1.0
 
   given burn: BurnDurationPolicy = defaultBurnDuration
 
@@ -56,7 +56,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
       )
     )
     val params = SimParams(0, 0, 20, 50)
-    given prob: ProbabilityCalc = (_, _, _, _, _) => 0.0
+    given prob: ProbabilityCalc = (_, _, _, _) => 0.0
 
     val (newM, _, _) =
       fireSpread(matrix, Set((0, 1)), params, 1, rng)

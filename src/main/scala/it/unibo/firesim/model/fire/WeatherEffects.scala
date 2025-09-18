@@ -13,10 +13,10 @@ import scala.annotation.tailrec
   *   A new `ProbabilityCalc` function that includes the wind effect.
   */
 def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
-  (cell, params, r, c, matrix) =>
+  (cell, params, pos, matrix) =>
     val dir = fromAngle(params.windAngle)
-    val rr = r + dir.dr
-    val cc = c + dir.dc
+    val rr = pos._1 + dir.dr
+    val cc = pos._2 + dir.dc
 
     val neighborIsBurning =
       matrix.inBounds(rr, cc) && matrix(rr)(cc).isBurning
@@ -25,7 +25,7 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
       params.windSpeed / windNormalization
     )
     val windBoost = if neighborIsBurning then speedFactor else baseWindBoost
-    val baseProb = base(cell, params, r, c, matrix)
+    val baseProb = base(cell, params, pos, matrix)
     math.min(baseProb * windBoost, maxProbability)
 
 /** A `ProbabilityCalc` to add a high humidity penalty.
@@ -35,10 +35,10 @@ def directionalWindProbabilityDynamic(base: ProbabilityCalc): ProbabilityCalc =
   *   A new `ProbabilityCalc` function that includes the humidity penalty.
   */
 def humidityAware(base: ProbabilityCalc): ProbabilityCalc =
-  (cell, params, r, c, matrix) =>
+  (cell, params, pos, matrix) =>
     val penalty =
       if params.humidity > highHumidity then humidityPenalty else maxProbability
-    base(cell, params, r, c, matrix) * penalty
+    base(cell, params, pos, matrix) * penalty
 
   /** Reduces ignition probability for cells receiving humid wind from a body of
     * water, with an effect that diminishes with distance.
@@ -51,9 +51,9 @@ def humidityAware(base: ProbabilityCalc): ProbabilityCalc =
     */
 
 def waterHumidityWind(base: ProbabilityCalc): ProbabilityCalc =
-  (cell, params, r, c, matrix) =>
+  (cell, params, pos, matrix) =>
 
-    val baseProb = base(cell, params, r, c, matrix)
+    val baseProb = base(cell, params, pos, matrix)
     val windOrigin = fromAngle(params.windAngle)
 
     /** A tail-recursive helper function that searches for a water cell.
@@ -88,8 +88,8 @@ def waterHumidityWind(base: ProbabilityCalc): ProbabilityCalc =
           distance + 1
         )
 
-    val upwindR = r + windOrigin.dr
-    val upwindC = c + windOrigin.dc
+    val upwindR = pos._1 + windOrigin.dr
+    val upwindC = pos._2 + windOrigin.dc
     val waterDistance = findWaterUpwind(upwindR, upwindC, 1)
 
     waterDistance match

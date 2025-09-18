@@ -12,9 +12,9 @@ class FirePoliciesTest extends AnyFlatSpec with Matchers:
     val params = SimParams(0, 0, 30, 20)
 
     val forestProb =
-      defaultProbabilityCalc(CellType.Forest, params, 0, 0, dummyMatrix)
+      defaultProbabilityCalc(CellType.Forest, params, (0, 0), dummyMatrix)
     val grassProb =
-      defaultProbabilityCalc(CellType.Grass, params, 0, 1, dummyMatrix)
+      defaultProbabilityCalc(CellType.Grass, params, (0, 1), dummyMatrix)
 
     grassProb should be > forestProb
     forestProb should be <= 1.0

@@ -14,7 +14,7 @@ class ProbabilityBuilderTest extends AnyFlatSpec with Matchers:
       SimParams(windSpeed = 10, windAngle = 90, temperature = 25, humidity = 95)
     val matrix = Vector(Vector(Grass, CellType.Burning(0, Active, Grass)))
     val baseProbValue = 0.5
-    val baseCalc: ProbabilityCalc = (_, _, _, _, _) => baseProbValue
+    val baseCalc: ProbabilityCalc = (_, _, _, _) => baseProbValue
 
     val probWithWind = ProbabilityBuilder(baseCalc).withWind.build
     val probWithHumidity =
@@ -22,9 +22,9 @@ class ProbabilityBuilderTest extends AnyFlatSpec with Matchers:
     val probComposed =
       ProbabilityBuilder(baseCalc).withWind.withHumidityPenalty.build
 
-    val windRes = probWithWind(Grass, params, 0, 0, matrix)
-    val humidityRes = probWithHumidity(Grass, params, 0, 0, matrix)
-    val composedRes = probComposed(Grass, params, 0, 0, matrix)
+    val windRes = probWithWind(Grass, params, (0, 0), matrix)
+    val humidityRes = probWithHumidity(Grass, params, (0, 0), matrix)
+    val composedRes = probComposed(Grass, params, (0, 0), matrix)
 
     windRes should be > baseProbValue
     humidityRes should be < baseProbValue

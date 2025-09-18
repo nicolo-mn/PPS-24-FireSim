@@ -9,7 +9,7 @@ import it.unibo.firesim.model.map.{CellType, Matrix}
 
 class WeatherEffectsTest extends AnyFlatSpec with Matchers:
 
-  val baseCalc: ProbabilityCalc = (_, _, _, _, _) => 0.5
+  val baseCalc: ProbabilityCalc = (_, _, _, _) => 0.5
 
   it should "apply a penalty if humidity is high" in {
     val matrix = Vector(Vector(CellType.Burning(0, Ignition, Grass)))
@@ -18,9 +18,9 @@ class WeatherEffectsTest extends AnyFlatSpec with Matchers:
     val humidityAdjusted = humidityAware(baseCalc)
 
     val lowProb =
-      humidityAdjusted(CellType.Forest, lowHumidityParams, 0, 0, matrix)
+      humidityAdjusted(CellType.Forest, lowHumidityParams, (0, 0), matrix)
     val highProb =
-      humidityAdjusted(CellType.Forest, highHumidityParams, 0, 0, matrix)
+      humidityAdjusted(CellType.Forest, highHumidityParams, (0, 0), matrix)
 
     highProb should be < lowProb
   }
@@ -40,15 +40,14 @@ class WeatherEffectsTest extends AnyFlatSpec with Matchers:
     val windAdjusted = directionalWindProbabilityDynamic(baseCalc)
 
     // (1, 2) is to the East (downwind), (1, 0) is to the West (upwind)
-    val downwindProb = windAdjusted(matrix(1)(2), params, 1, 2, matrix)
-    val upwindProb = windAdjusted(matrix(1)(0), params, 1, 0, matrix)
+    val downwindProb = windAdjusted(matrix(1)(2), params, (1, 2), matrix)
+    val upwindProb = windAdjusted(matrix(1)(0), params, (1, 0), matrix)
 
     downwindProb should be > upwindProb
     upwindProb shouldBe baseCalc(
       matrix(1)(0),
       params,
-      1,
-      0,
+      (1, 0),
       matrix
     ) // No boost upwind
   }
@@ -68,8 +67,9 @@ class WeatherEffectsTest extends AnyFlatSpec with Matchers:
       )
     val withWater = waterHumidityWind(baseCalc)
 
-    val cellWithUpwindWaterProb = withWater(matrix(0)(0), params, 0, 0, matrix)
-    val normalCellProb = withWater(matrix(1)(0), params, 1, 0, matrix)
+    val cellWithUpwindWaterProb =
+      withWater(matrix(0)(0), params, (0, 0), matrix)
+    val normalCellProb = withWater(matrix(1)(0), params, (1, 0), matrix)
 
     cellWithUpwindWaterProb should be < normalCellProb
   }
