@@ -45,7 +45,7 @@ extension (matrix: Matrix)
     * @return
     *   The positions of the cells of that particular type
     */
-  def positionsOf(cellType: CellType): Seq[(Int, Int)] =
+  def positionsOf(cellType: CellType): Seq[Position] =
     matrix.zipWithIndex.flatMap { case (row, i) =>
       row.zipWithIndex.collect {
         case (cT, j) if cT == cellType => (i, j)
@@ -57,7 +57,7 @@ extension (matrix: Matrix)
     * @return
     *   The positions of the cells with CellType mapped to true
     */
-  def positionsOf(f: CellType => Boolean): Seq[(Int, Int)] =
+  def positionsOf(f: CellType => Boolean): Seq[Position] =
     matrix.zipWithIndex.flatMap { case (row, i) =>
       row.zipWithIndex.collect {
         case (cT, j) if f(cT) => (i, j)
@@ -72,7 +72,7 @@ extension (matrix: Matrix)
     *   The positions of the cells adjacent to the center (including diagonal
     *   ones)
     */
-  def neighbors(r: Int, c: Int): Seq[(Int, Int)] =
+  def neighbors(r: Int, c: Int): Seq[Position] =
     for
       dr <- -1 to 1
       dc <- -1 to 1
