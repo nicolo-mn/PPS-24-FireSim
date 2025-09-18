@@ -16,7 +16,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
 
   given burn: BurnDurationPolicy = defaultBurnDuration
 
-  "fireSpread" should "turn flammable cells into burning with max probability and a burning neighbor" in {
+  "fireSpread" should "ignite adjacent flammable cells when probability = 1" in {
     val matrix: Matrix = Vector(
       Vector(
         CellType.Grass,
@@ -33,7 +33,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     result(1)(0) shouldBe a[CellType.Burning]
   }
 
-  it should "turn burning cells into burnt after after their burn duration" in {
+  it should "turn burning cells to burnt after their burn duration" in {
     val testCell = CellType.Burning(0, Active, Grass)
     val matrix: Matrix = Vector(Vector(testCell))
     val params = SimParams(0, 0, 20, 50)
@@ -64,7 +64,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     newM(0)(1) shouldBe a[CellType.Burning]
   }
 
-  it should "be stopped by non-flammable cells" in {
+  "fire" should "be stopped by non-flammable cells" in {
     // G = Grass, B = Burning, W = Water
     // G B G
     // W W W  <- non-flammable
@@ -91,7 +91,7 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
     result(2)(2) shouldBe Grass
   }
 
-  it should "not reignite burnt cells" in {
+  "fireSpread" should "not reignite burnt cells" in {
     val matrix: Matrix = Vector(
       Vector(CellType.Burnt),
       Vector(CellType.Burning(0, FireStage.Active, CellType.Grass))
@@ -100,4 +100,53 @@ class FireSpreadTest extends AnyFlatSpec with Matchers:
 
     val (result, _, _) = fireSpread(matrix, Set((1, 0)), params, 1, rng)
     result(0)(0) shouldBe CellType.Burnt
+  }
+
+  it should "transition a burning cell through fire stages over time" in {
+    val grassBurning = CellType.Burning(0, FireStage.Ignition, CellType.Grass)
+    val matrix: Matrix = Vector(Vector(grassBurning))
+    val params = SimParams(0, 0, 30, 10)
+    val grassBurnDuration = Grass.vegetation.burnDuration
+    // Ignition -> Active
+    val (matrixAfter4Cycles, _, _) = fireSpread(
+      matrix,
+      Set((0, 0)),
+      params,
+      (grassBurnDuration * FireStage.Ignition.threshold).toInt + 1,
+      rng
+    )
+    val cellAfter4Cycles =
+      matrixAfter4Cycles(0)(0).asInstanceOf[CellType.Burning]
+    cellAfter4Cycles.fireStage shouldBe FireStage.Active
+
+    // Active -> Smoldering
+    val (matrixAfter9Cycles, _, _) = fireSpread(
+      matrix,
+      Set((0, 0)),
+      params,
+      (grassBurnDuration * FireStage.Active.threshold).toInt + 1,
+      rng
+    )
+    val cellAfter9Cycles =
+      matrixAfter9Cycles(0)(0).asInstanceOf[CellType.Burning]
+    cellAfter9Cycles.fireStage shouldBe FireStage.Smoldering
+  }
+
+  it should "ignore positions in burning set that are not actually burning" in {
+    val matrix: Matrix = Vector(Vector(CellType.Grass))
+    val params = SimParams(0, 0, 30, 10)
+
+    // pass a grass inside the burn set
+    val (result, _, _) = fireSpread(matrix, Set((0, 0)), params, 1, rng)
+    result(0)(0) shouldBe CellType.Grass
+  }
+
+  it should "keep a burning cell unchanged if it has not reached the next stage yet" in {
+    val burningGrass = CellType.Burning(0, FireStage.Ignition, CellType.Grass)
+    val matrix: Matrix = Vector(Vector(burningGrass))
+    val params = SimParams(0, 0, 30, 10)
+
+    // currentCycle too low to change state
+    val (result, _, _) = fireSpread(matrix, Set((0, 0)), params, 1, rng)
+    result(0)(0) shouldBe burningGrass
   }

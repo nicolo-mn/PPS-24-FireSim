@@ -17,12 +17,12 @@ class WeatherEffectsTest extends AnyFlatSpec with Matchers:
     val highHumidityParams = SimParams(1, 0, 30, 90)
     val humidityAdjusted = humidityAware(baseCalc)
 
-    val lowProb =
+    val lowHumidityProb =
       humidityAdjusted(CellType.Forest, lowHumidityParams, (0, 0), matrix)
-    val highProb =
+    val highHumidityProb =
       humidityAdjusted(CellType.Forest, highHumidityParams, (0, 0), matrix)
 
-    highProb should be < lowProb
+    highHumidityProb should be < lowHumidityProb
   }
 
   it should "boost probability only for cells downwind from a fire" in {
@@ -52,12 +52,12 @@ class WeatherEffectsTest extends AnyFlatSpec with Matchers:
     ) // No boost upwind
   }
 
-  it should "apply a penalty for water directly upwind" in {
+  it should "apply a penalty for cells that receive moisture from the wind" in {
     val matrix: Matrix = Vector(
       Vector(Grass, Grass),
       Vector(Grass, Water)
     )
-    // Wind from South-West (225 deg), so (1,1) is upwind of (0,0)
+    // Wind from South-East (135 deg), so (1,1) is upwind of (0,0)
     val params =
       SimParams(
         windSpeed = 10,

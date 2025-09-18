@@ -31,3 +31,27 @@ class ProbabilityBuilderTest extends AnyFlatSpec with Matchers:
     composedRes should be < windRes
     composedRes should not be baseProbValue
   }
+
+  it should "correctly compose probability functions" in {
+    val builder = ProbabilityBuilder().withWind.withWaterEffects
+    val composedFunc = builder
+
+    // Manually compose for comparison
+    val manualComposedFunc = waterHumidityWind(
+      directionalWindProbabilityDynamic(defaultProbabilityCalc)
+    )
+
+    val matrix = Vector(
+      Vector(
+        CellType.Water,
+        CellType.Burning(0, FireStage.Active, CellType.Grass)
+      )
+    )
+    val params =
+      SimParams(windSpeed = 50, windAngle = 90, temperature = 30, humidity = 30)
+
+    val probBuilder = composedFunc(CellType.Grass, params, (0, 0), matrix)
+    val probManual = manualComposedFunc(CellType.Grass, params, (0, 0), matrix)
+
+    probBuilder shouldBe probManual
+  }

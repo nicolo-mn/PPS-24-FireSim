@@ -7,10 +7,10 @@ import it.unibo.firesim.config.Config.*
   * @param probabilityFactor
   *   multiplier applied to the ignition probability for neighboring cells
   *   during this stage.
-  * @param activationThreshold
+  * @param threshold
   *   fraction (0.0–1.0) of the burn duration at which the stage transitions.
   */
-enum FireStage(val probabilityFactor: Double, val activationThreshold: Double):
+enum FireStage(val probabilityFactor: Double, val threshold: Double):
 
   /** Initial stage of a fire: newly ignited, moderate probability factor.
     */
@@ -44,6 +44,6 @@ object FireStage:
   def nextStage(start: Int, currentCycle: Int, burnDuration: Int): FireStage =
     val ratio = (currentCycle - start).toDouble / burnDuration
     ratio match
-      case r if r <= Ignition.activationThreshold => Ignition
-      case r if r <= Active.activationThreshold   => Active
-      case _                                      => Smoldering
+      case r if r <= Ignition.threshold => Ignition
+      case r if r <= Active.threshold   => Active
+      case _                            => Smoldering
