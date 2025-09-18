@@ -13,30 +13,47 @@ Controller e model sono stati pensati per gestire in modo ottimale i vari stati 
 
 
 ## Controller
-Il motore della simulazione è contenuto nella classe `SimController`, che gestisce il loop della simulazione. In questa classe sono mantenuti i parametri modificabili dall'utente tramite l'interfaccia grafica, come i parametri quali umidità, direzione e intensità del vento e temperatura. Nel momento in cui l'utente imposta le dimensioni della mappa il controller reagisce ordinando al model la generazione della mappa, che poi verrà renderizzata dalla view. L'utente, attraverso l'interfaccia grafica, può modificare celle della mappa dinamicamente, sia mentre la simulazione è in corso che nella fase precedente, utilizzata per definire la struttura della mappa. Ogni tipologia di cella è identificata da un'enumerazione sia nella view (`CellViewType`) che nel model (`CellType`), mantenute separate per garantire un isolamente tra view e model. Il controller, attraverso `CellTypeConverter` che si occupa di svolgere la conversione nel passaggio di informazioni tra view e model. Mentre la simulazione è in corso, il controller innesca aggiornamenti del model ad intervalli regolari; esso si occupa anche di ricevere e salvare temporaneamente gli input dell'utente, che verranno poi applicati all'aggiornamento successivo del model. Questo approccio alla ricezione di input permette di evitare inconsistenze dovute alla modifica di parametri nel model mentre un aggiornamento è in atto.
+Il motore della simulazione è contenuto nella classe `SimController`, che gestisce il main loop.
+In questa classe sono contenuti i metodi per permettere la modifica dei parametri da parte dell'utente tramite l'interfaccia grafica, quali umidità, direzione e intensità del vento e temperatura.
+Il cambiamento dei parametri avviene istantaneamente nel model, ma all'inizio di ogni avanzamento della simulazione il model salva una copia di questi parametri per evitare inconsistenze.
+Nel momento in cui l'utente imposta le dimensioni della mappa il controller reagisce ordinandone al model la generazione, per poi ordinare alla view di mostrarla.
+Attraverso l'interfaccia grafica, l'utente può modificare celle della mappa dinamicamente, sia prima dell'inizio che durante il corso della simulazione.
+Ogni tipologia di cella è identificata da un'enumerazione sia nella view (`CellViewType`) che nel model (`CellType`), mantenute separate per garantire isolamento.
+Il controller, attraverso `CellTypeConverter` si occupa di svolgere la conversione nel passaggio di informazioni tra view e model.
+Mentre la simulazione è in corso, il controller innesca aggiornamenti del model ad intervalli regolari.
+Inoltre si occupa di ricevere e mettere in coda le celle cambiate dall'utente nella personalizzazione della mappa.
+Queste celle verranno poi notificate al model prima dell'aggiornamento successivo.
+Questo approccio all'aggiornamento della mappa asincrono permette di evitare inconsistenze nel model mentre la simulazione sta avanzando.
 
-<!-- TODO: viene effettivamente  utilizzato? -->
-La comunicazione con la view avviene tramite il trait `ViewMessage`. Grazie al `Command Pattern`, la view può gestire in modo uniforme diversi tipi di input, come pulsanti per mettere in pausa o resettare la simulazione, o modifiche dei parametri. In questo modo, la view non chiama direttamente i metodi del controller, garantendo un disaccoppiamento chiaro e sicuro.
+La comunicazione con la view avviene utilizzando il trait `ViewMessage`.
+Grazie al `Command Pattern`, la view può gestire in modo uniforme diversi tipi di input, come pulsanti per mettere in pausa o resettare la simulazione, o modifiche dei parametri.
+In questo modo, la view non chiama direttamente i metodi del controller, garantendo un disaccoppiamento chiaro e sicuro.
 
 ## Model
-La mappa della simulazione è rappresentata attraverso una matrice di `CellType`. Quando l'utente sceglie le dimensioni della mappa una prima mappa è generata casualmente, inserendo aree boschive, laghi, aree erbose e stazioni dei pompieri. L'algoritmo di generazione della mappa è definito nella classe `MapBuilder`, che attraverso il pattern builder permette di generare la mappa dividendo le varie fasi dell'algoritmo (come la generazione di laghi, foreste ed aree erbose) ed evitando di avere un unico metodo monolitico. Il pattern builder è applicato anche ai pompieri, che vengono creati specificando il raggio di azione e la stazione in cui sono posizionati separatamente.
+La mappa della simulazione è rappresentata attraverso una matrice di `CellType`.
+Quando l'utente sceglie le dimensioni della mappa questa viene generata casualmente, inserendo aree boschive, rocciose, erbose, ma anche laghi, fiumi e stazioni dei pompieri.
+L'algoritmo di generazione della mappa è definito nella classe `MapBuilder`, che attraverso il pattern builder permette di generare la mappa dividendo le varie fasi dell'algoritmo (come la generazione di laghi, foreste ed aree erbose) ed evitando di avere un unico metodo monolitico. 
+Per ogni stazione presente nella mappa generata, vengono creati i vigili del fuoco specificando il raggio di azione e la stazione in cui sono posizionati separatamente, seguendo il pattern builder.
 
 Ogni ciclo di aggiornamento del model consiste in svariati passaggi:
-- Aggiornamento dei parametri ricevuti dal controller
-- Aggiornamento delle celle infuocate tramite l'algoritmo di diffusione del fuoco
+- Copia dei parametri di simulazione aggiornati dal controller
+- Aggiornamento delle celle infuocate e autonomamente spente tramite l'algoritmo di diffusione del fuoco
 - Aggiornamento della posizione dei vigili del fuoco e delle eventuali celle infuocate da loro spente
 
-I pompieri sono modellati come record monadici immutabili tramite la case class `FireFighter`, che vengono aggiornati sulla base delle celle infuocate correnti. Vi è la possibilità che una cella infuocata sia circondata da altre celle che non possono prendere fuoco (come celle già bruciate); in questi casi i vigili del fuoco dovrebbero ignorarle per dirigersi verso celle circondate da altre a rischio di incendio. Per gestire questo edge case i vigili del fuoco considerano solo queste ultime nella decisione delle loro azioni.  
+I pompieri sono modellati come record immutabili tramite la case class `FireFighter`, che vengono aggiornati sulla base delle celle infuocate correnti.
+Vi è la possibilità che una cella infuocata sia circondata da altre celle che non possono prendere fuoco (come celle già bruciate); in questi casi i vigili del fuoco dovrebbero ignorarle per dirigersi verso celle circondate da altre a rischio di incendio.
+Per gestire questo edge case i vigili del fuoco considerano solo queste ultime nella decisione delle loro azioni.  
 
-Ogni cella della griglia possiede una probabilità di accensione che dipende dal tipo di vegetazione associata(`Vegetation`). La propagazione del fuoco è modellata tramite più stadi di combustione rappresentati dall’enumerazione `FireStage` che vanno a differenziare la probabilità di incendiare una cella adiacente. 
+Ogni cella della griglia possiede una probabilità di accensione che dipende dal tipo di vegetazione associata(`Vegetation`).
+La propagazione del fuoco è modellata tramite più stadi di combustione rappresentati dall’enumerazione `FireStage` che vanno a differenziare la probabilità di incendiare una cella adiacente. 
 
-Il cuore del sistema della diffusione del fuoco è la funzione `fireSpread`, che ad ogni ciclo della simulazione calcola l'evoluzione della griglia. Questo processo è suddiviso in due fasi principali:
-- Aggiornamento delle celle in fiamme. Per ogni cella in combustione si verifica se la cella deve spegnersi attraverso l'uilizzo della `BurnDurationPolicy` che viene passata. Se la cella continua a bruciare, si controlla se può cambiare stadio di fuoco.
-- Propagazione verso i vicini. Per ogni cella vengono analizzati i vicini e viene prima calcolata la loro probabilità di igniezione attraverso una funzione `ProbabilityCalc`. La probabilità base può essere arricchita dinamicamente con effetti aggiuntivi, come vento o vicinanza a corpi d’acqua in direzione del vento, grazie a funzioni decorator che estendono il comportamento senza modificare la funzione originale.
+Il cuore del sistema della diffusione del fuoco è la funzione `fireSpread`, che ad ogni ciclo della simulazione calcola l'evoluzione della griglia.
+Questo processo è suddiviso in due fasi principali:
+- Aggiornamento delle celle in fiamme. Per ogni cella in combustione si verifica se la cella deve spegnersi attraverso l'utilizzo della `BurnDurationPolicy` che viene passata. Se la cella continua a bruciare, si controlla se può cambiare stadio di fuoco.
+- Propagazione verso i vicini. Per ogni cella vengono analizzati i vicini e viene prima calcolata la loro probabilità di ignizione attraverso una funzione `ProbabilityCalc`. La probabilità base può essere arricchita dinamicamente con effetti aggiuntivi, come vento o vicinanza a corpi d’acqua in direzione del vento, grazie a funzioni decorator che estendono il comportamento senza modificare la funzione originale.
 
 ## View
-L'interfaccia grafica mostra la mappa della simulazione aggiornata in tempo reale, con celle colorate con diversi colori a seconda del loro tipo o dell'entità che vi è posizionata.
-In particolare:
+L'interfaccia grafica mostra la mappa della simulazione aggiornata in tempo reale, convertendo i `CellViewType` offerti dal controller con celle colorate a seconda del tipo:
 - Rosso per il fuoco
 - Verde per le aree boschive
 - Verde chiaro per le aree erbose
@@ -49,27 +66,31 @@ L'utente ha a disposizione vari controlli per gestire lo stato di avanzamento de
 
 L'utente ha la possibilità di modificare celle della mappa selezionando il tipo di cella da inserire tramite una scelta multipla (che cambia dinamicamente nel momento in cui si comincia la simulazione) e cliccando sulla cella interessata. 
 
-Poiché l'applicazione prevede una fase iniziale di modifica della mappa, vi sono strumenti che permettono la modifica di molteplici celle della mappa, come uno strumento pennello per calorare le celle su cui passa il puntatore o uno strumento linea che permette di colorare una linea tra due punti, anche diagonale. 
+Poiché l'applicazione prevede una fase iniziale di modifica della mappa, vi sono strumenti che permettono la modifica di molteplici celle della mappa, come uno strumento pennello per colorare le celle su cui passa il puntatore o uno strumento linea che permette di colorare una linea tra due punti, anche diagonale. 
 
 
 ## Pattern di progettazione
 
-### Factory
-Il pattern factory è stato utilizzato in quanto supportato facilmente dai companion object, tramite i quali è possibile creare istanze in modo idiomatico nascondendo la complessità del processo di creazione.
-
 ### Strategy
-Il pattern strategy è stato utilizzando all'interno di `FireFighter` per separare l'algoritmo di movimento dal resto della classe e anche in `FireSpread` per separare il calcolo della probabilità di ignizione e della durata di combustione di una cella dal resto dell'avanzamento della gestione del fuoco.
+Il pattern strategy è stato utilizzato:
+ - All'interno di `FireFighter` per separare l'algoritmo di movimento dal resto della classe
+ - In `FireSpread` per separare il calcolo della probabilità di ignizione e della durata di combustione di una cella dal resto dell'avanzamento della gestione del fuoco
+ - In `SimModel` per separare l'algoritmo di generazione della mappa e per facilitare lo sviluppo di algoritmi diversi da quello base, come mostrato nell'UML di seguito:
+
+![Esempio di utilizzo di pattern strategy](../img/strategy.png)
+
 
 ### Builder
-Il pattern builder è stato utilizzato per facilitare la creazione di `FireFighter`, la generazione della mappa nel `SimModel` e per comporre la funzione per il calcolo della probabilità di igniezione di una cella.
+Il pattern builder è stato utilizzato:
+ - Per facilitare la creazione di `FireFighter`
+ - Per facilitare la generazione della mappa nel `SimModel`
+ - Per comporre la funzione di calcolo della probabilità di ignizione di una cella
 
 ### Command
 Il pattern command è stato utilizzato nel controller per gestire la ricezione di input dalla view.
 
 ### Decorator
 Il pattern Decorator è stato utilizzato per estendere la strategia di base del calcolo della propagazione del fuoco, aggiungendo effetti supplementari.
-
-
 
 ## Organizzazione del codice
 Il codice è stato suddiviso in package raggruppando i sorgenti che implementano una stessa feature. La divisione scelta si può vedere nella figura sottostante.
