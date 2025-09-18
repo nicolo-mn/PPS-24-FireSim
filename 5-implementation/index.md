@@ -6,16 +6,60 @@ Inoltre, all’interno del codice è inclusa la documentazione Scaladoc, utile a
 ### Juri Guglielmi
 
 ### Riccardo Mazzi
-Ho implementato l'interfaccia Model e i suoi metodi in SimModel chiamati dal controller di cui i più importanti sono: `updateState` per far avanzare la simulazione e `generateMap` per generare la mappa con le dimensioni specificate dall'utente.
-Per gestire la mappa come matrice di celle, ho creato il tipo `Matrix` e l'enumerazione `CellType` insieme a Nicolò e Juri. `Matrix` è un vettore di vettori di celle, sfruttando l'immutabilità dei `Vector` di Scala ed evitando i _side effect_ di strutture dati mutabili.
-In `Matrix` abbiamo anche definito alcuni _extension methods_ utili a controllare indici interni alla matrice, a trovare i vicini di una cella, le posizioni di un certo tipo di celle, ecc.
+Ho implementato l’interfaccia `Model` e i suoi metodi nella classe `SimModel`, richiamati dal **controller**.
+I metodi principali sono:
 
-La generazione della mappa è stata separata dal SimModel e inserita nel package `map`, per evitare _god classes_.
-Ho utilizzato il pattern Strategy in `MapGenerationStrategy` per definire facilmente due tipi di generatori (base e base con fiumi) e per permettere in futuro di aggiungere facilmente altri algoritmi di generazione più o meno avanzati.
-Ho usato il pattern Builder in `MapBuilder` per poter costruire facilmente una mappa senza doverla salvare ad ogni step sequenziale.
-Ho implementato un DSL in `MapBuilderDSL` per rendere la costruzione della mappa ancora più intuitiva e vicina al linguaggio comune.
+- `updateState` che fa avanzare la simulazione di un tick.
+- `generateMap` che genera la mappa con le dimensioni specificate dall’utente.
 
-I diversi step di creazione e update della mappa vengono parallelizzati usando il `.par` della libreria _Parallel Collections_, ottenendo un miglioramento nelle performance della simulazione (verificato con test manuali).
+#### Rappresentazione della mappa
+
+Per gestire la mappa come matrice di celle, insieme a Nicolò e Juri ho introdotto:
+
+- **`Matrix`** come vettore di vettori di celle, basato sui `Vector` di Scala per sfruttarne l’immutabilità ed evitare _side effects_ dovuti a strutture dati mutabili.
+- **`CellType`** come enumerazione che rappresenta i diversi tipi di cella.
+
+All’interno di `Matrix` abbiamo definito anche alcuni **extension methods**, utili a:
+
+- controllare la validità degli indici
+- trovare i vicini di una cella
+- individuare tutte le posizioni di un certo tipo di celle
+
+#### Generazione della mappa
+
+La logica di generazione della mappa è stata separata dal `SimModel` e spostata nel package `map` per evitare il problema delle _god classes_.
+
+In particolare, ho utilizzato:
+
+- **Pattern Strategy** (`MapGenerationStrategy`)
+
+  - permette di definire facilmente diversi generatori di mappe (attualmente: *base* e *base con fiumi*)
+  - semplifica l’estensione futura con algoritmi di generazione più complessi
+
+- **Pattern Builder** (`MapBuilder`)
+
+  - consente di costruire una mappa passo dopo passo
+  - no variabili di salvataggio mappa ad ogni step intermedio
+
+- **DSL** (`MapBuilderDSL`)
+
+  - costruzione della mappa più intuitiva
+  - sintassi più vicina al linguaggio naturale
+
+La generazione della mappa nel SimModel diventa quindi intuitiva e facilmente personalizzabile:
+```scala
+matrix = buildMap(rows, cols, random):
+      withWater
+      withForests
+      withGrass
+      withStations
+      withFires
+```
+
+#### Parallelizzazione
+
+I vari step di creazione e aggiornamento della mappa vengono parallelizzati utilizzando `.par` della libreria **Parallel Collections**.
+Questa scelta ha portato a un miglioramento delle prestazioni della simulazione, verificato con test manuali.
 
 ### Nicolò Monaldini
 Mi sono occupato principalmente dell'implementazione dei vigili dei fuoco, in particolare:
