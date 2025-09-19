@@ -7,7 +7,7 @@ Inoltre, all’interno del codice è inclusa la documentazione Scaladoc, utile a
 Il mio contributo si è concentrato sul modulo di propagazione del fuoco, dove ho sviluppato le strategie per il calcolo della probabilità di ignizione e della durata della combustione, e ho progettato un’architettura estendibile che permette di arricchire il modello con effetti ambientali(vento, umidità, presenza di corpi idrici) tramite decoratori funzionali e un DSL basato sul Builder pattern.
 
 #### Scelte Tecniche e Adozione dello Strategy Pattern
-L'architettura del modulo adotta rigorosamente i principi della programmazione funzionale, privilegiando l'immutabilità dei dati e le funzioni pure. La griglia di simulazione, infatti, non viene mai modificata: la funzione fireSpread, nucleo della simulazione, riceve lo stato corrente e ne restituisce uno nuovo a ogni ciclo.
+L'architettura del modulo adotta i principi della programmazione funzionale, privilegiando l'immutabilità dei dati e le funzioni pure. La griglia di simulazione, infatti, non viene mai modificata: la funzione fireSpread, nucleo della simulazione, riceve lo stato corrente e ne restituisce uno nuovo a ogni ciclo.
 
 Questo approccio disaccoppia l'algoritmo principale dalle logiche specifiche di comportamento delle celle. Tali logiche sono implementate come tipi funzionali, realizzando concretamente lo Strategy Pattern e garantendo che diverse politiche di simulazione possano essere sostituite o combinate con la massima flessibilità.
 
@@ -39,9 +39,10 @@ def fireSpread(
 }
 ```
 È stata fornita un'implementazione di default per entrambe sia per la `ProbabilityCalc` che per la `BurnDurationPolicy`. La prima,  modella un comportamento di base del fuoco in funzione di parametri come l'infiammabilità della vegetazione, la temperatura, l'umidità e l'influenza delle celle vicine in fiamme, mentre per la seconda ogni cella infiammabile possiede un tempo di durata di combustione e controlla quando siamo arrivati al termine. 
+Per migliorare la leggibilità del codice sono stati introdotti alcuni extension method sul tipo CellType, che permettono di accedere direttamente alla vegetazione della cella o di verificarne proprietà rilevanti, come se sia infiammabile o stia bruciando.
 
 #### Modularità degli effetti ambientali
-Per modellare fenomeni ambientali complessi, come vento o umidità portata dal vento da celle di tipo `Water`, che modificano la probabilità di ignizione, è stato adottato un approccio ispirato al Decorator pattern, implementato in chiave funzionale. In questo contesto, i decoratori sono funzioni di ordine superiore che prendono una `ProbabilityCalc` come input e ne restituiscono una nuova arricchita con logiche aggiuntive, senza modificare lo stato originale.
+Per modellare fenomeni ambientali complessi che modificano la probabilità di ignizione, come vento o umidità portata dal vento da celle di tipo `Water`, è stato adottato un approccio ispirato al Decorator pattern, implementato in chiave funzionale. In questo contesto, i decoratori sono funzioni di ordine superiore che prendono una `ProbabilityCalc` come input e ne restituiscono una nuova arricchita con logiche aggiuntive, senza modificare lo stato originale.
 
 Ad esempio, la funzione `directionalWindProbabilityDynamic` agisce da decoratore. Prende in input una funzione di probabilità di base `(base: ProbabilityCalc)` e restituisce una nuova funzione che, prima di eseguire il calcolo di base, verifica la presenza di celle in fiamme dalla direzione da cui viene il vento e, in caso affermativo, applica un fattore di potenziamento(`windBoost`) alla probabilità calcolata.
 
@@ -279,13 +280,9 @@ Come mostrato nelle figure UML, SimController espone pubblicamente solo due meto
 
 ### `handleViewMessage` (Juri Guglielmi)
 
-Questo metodo permette alla View di inviare comandi al controller in modo disaccoppiato. La View crea un oggetto `ViewMessage` e lo passa al Controller, che ne invoca l’esecuzione tramite `msg.execute(this)`.In questo modo, la logica specifica del comando è delegata al messaggio stesso, anziché al controller.
+Il metodo `handleViewMessage` consente alla View di inviare comandi al Controller in modo disaccoppiato. La View crea un oggetto `ViewMessage` e lo passa al Controller, che ne invoca l’esecuzione tramite `msg.execute(this)`. In questo modo, la logica del comando è delegata al messaggio stesso, riducendo l’accoppiamento e facilitando l’aggiunta di nuove operazioni senza modificare la View o il Controller.
 
-Questo approccio utilizza il Command Pattern, che riduce l’accoppiamento tra View e Controller, migliora l’incapsulamento e rende più semplice aggiungere nuove operazioni senza modificare la View né la logica interna del controller.
-
-`ViewMessage` è un sealed trait che rappresenta un comando inviato dalla View al Controller. Ogni sottoclasse incapsula sia i dati necessari per l’operazione sia la logica di esecuzione attraverso il metodo `execute(controller: SimController)`.
-
-Grazie a questo meccanismo, la View non chiama direttamente i metodi del controller, ma si limita a creare e inviare un messaggio, lasciando al comando il compito di agire sul controller.
+ViewMessage è un `sealed trait` il cui insieme di sottoclassi incapsula sia i dati necessari sia la logica di esecuzione tramite il metodo `execute(controller: SimController)`, realizzando concretamente il Command Pattern.
 
 ### `loop` (Riccardo Mazzi)
 
