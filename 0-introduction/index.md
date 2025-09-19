@@ -10,7 +10,7 @@
 **Requisiti e funzionalità principali:**  
 Il progetto mira a realizzare un simulatore di incendi boschivi su mappa 2D, nel quale l’utente può definire i parametri riguardanti la propagazione e il contrasto degli incendi.
 
-La mappa viene creata da un algoritmo all’avvio del programma e contiene principalmente aree boschive e stazioni di pronto intervento. Diversi agenti partono da queste stazioni e contrastano gli incendi che si innescano (in modo casuale o a scelta dall’utente).
+La mappa viene creata da un algoritmo all’avvio del programma e contiene principalmente aree boschive e stazioni di pronto intervento. Diversi vigili del fuoco partono da queste stazioni e contrastano gli incendi che si innescano (in modo casuale o a scelta dall’utente).
 
 Gli incendi si propagano dalle celle in fiamme a quelle infiammabili adiacenti secondo regole probabilistiche influenzate dai parametri della simulazione (intensità e direzione del vento, temperatura e umidità dell’aria, ecc.).
 

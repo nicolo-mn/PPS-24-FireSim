@@ -1,10 +1,13 @@
 # Retrospettiva
 
 ## Avviamento
-In una prima fase ci si è concentrati sulla definizione dei requisiti e sulla produzione di diagrammi UML che definissero l'organizzazione delle principali classi e interfacce del progetto. Questi UML, dopo una serie di revisioni e correzioni sono stati inseriti nei capitoli di Architettura e Design. 
+In una prima fase ci si è concentrati sulla definizione dei requisiti e sulla produzione di diagrammi UML che definissero l'organizzazione delle principali classi e interfacce del progetto.
+Questi UML, dopo una serie di revisioni e correzioni sono stati inseriti nei capitoli di Architettura e Design. 
 
 ## Sprint 1
-Nella prima sprint ci si è concentrati sul bootstrap del progetto e sulla definizione delle classi e interfacce principali. Si è data priorità alla view per poter presentare al committente un prodotto già al termine della prima settimana, come le best practice di programmazione agile comandano. Si è, inoltre, implementata una prima versione dell'algoritmo di generazione della mappa da integrare con la view.
+Nella prima sprint ci si è concentrati sul bootstrap del progetto e sulla definizione delle classi e interfacce principali.
+Si è data priorità alla view per poter presentare al committente un prototipo già al termine della prima settimana, come le best practice di programmazione agile comandano.
+Si è, inoltre, implementata una prima versione dell'algoritmo di generazione della mappa da integrare con la view.
 
 | Title                                                                                              | Priority | Assignees | Size | Sprint   |
 |----------------------------------------------------------------------------------------------------|----------|-----------|------|----------|
@@ -17,7 +20,8 @@ Nella prima sprint ci si è concentrati sul bootstrap del progetto e sulla defin
 
 
 ## Sprint 2
-Nella seconda sprint si sono aggiunti i vigili del fuoco e l'algoritmo di diffusione del fuoco nella parte di model. Abbiamo ritenuto importante iniziare a implementare un loop della simulazione funzionante, per avere il prima possibile una prima versione eseguibile della simulazione.
+Nella seconda sprint si sono aggiunti i vigili del fuoco e l'algoritmo di diffusione del fuoco nella parte di model.
+Abbiamo implementato una versione minimale del loop della simulazione, per avere il prima possibile una prima versione eseguibile della simulazione.
 
 | Title                                                                                                                                    | Priority | Assignees | Size | Sprint   |
 |------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------|------|----------|
@@ -28,7 +32,8 @@ Nella seconda sprint si sono aggiunti i vigili del fuoco e l'algoritmo di diffus
 | Make SimParams and correct SimModel interface (with tests up to date)                                                                    | P0       | Guglielmi | S    | Sprint 2 |
 
 ## Sprint 3
-Nella terza sprint si è completata la logica del piazzamento delle celle, e si è deciso di svolgere un refactoring sulla struttura della matrice che rappresenta la mappa della simulazione, giungendo alla versione finale che consiste in una matrice di `CellType`. Sono state fatte migliorie anche alla view aggiungendo la possibilità di tracciare linee da due punti.
+Nella terza sprint si è completata la logica del piazzamento delle celle, e si è deciso di svolgere un refactoring sulla struttura della matrice che rappresenta la mappa della simulazione, giungendo alla versione finale che consiste in una matrice di `CellType`.
+Sono state fatte migliorie anche alla view aggiungendo la possibilità di tracciare linee da due punti.
 
 | Title                                                                                       | Priority | Assignees | Size | Sprint   |
 |---------------------------------------------------------------------------------------------|----------|-----------|------|----------|
@@ -40,7 +45,9 @@ Nella terza sprint si è completata la logica del piazzamento delle celle, e si 
 | Change SimParams types and update                                                           | P0       | Guglielmi | S    | Sprint 3 |
 
 ## Sprint 4
-La quarta sprint si è concentrata sull'aggiunta di ulteriori utility di view, quali il pennello per cambiare il tipo a più celle contemporaneamente. Si è deciso di fare alcuni raffinamenti nell'algoritmo di generazione mappa aggiungendo laghi e nel movimento dei vigili del fuoco per utilizzare movimenti realistici attraverso un algoritmo di rasterizzazione. È stata aggiunta anche la possibilità di modificare la velocità della simulazione.
+La quarta sprint si è concentrata sull'aggiunta di ulteriori utility di view, in particolare il pennello per cambiare il tipo a più celle contemporaneamente.
+Si è deciso di fare alcuni raffinamenti nell'algoritmo di generazione mappa aggiungendo laghi, nel movimento dei vigili del fuoco per utilizzare movimenti realistici attraverso un algoritmo di rasterizzazione e dell'impatto del vento nella diffusione del fuoco.
+È stata aggiunta anche la possibilità di modificare la velocità della simulazione.
 
 | Title                                                            | Priority | Assignees | Size | Sprint   |
 |------------------------------------------------------------------|----------|-----------|------|----------|
@@ -64,9 +71,9 @@ Tramite l'uso di `scala-parallel-collections` si è parallelizzato l'algoritmo d
 | Parallelize fire fighters                                                    | P2       | Monaldini | S    | Sprint 5 |
 | Change firefighter logic to improve performance                              | P2       | Monaldini | S    | Sprint 5 |
 
-<!-- TODO: altro da mettere nella sprint corrente? -->
 ## Sprint 6
-Alla luce di numerosi test manuali svolti sull'applicazione, si sono individuati alcuni bug riguardanti l'utilizzo degli strumenti di disegno e alcune modifiche minori per migliorare l'esperienza di utilizzo. 
+Alla luce di numerosi test manuali svolti sull'applicazione, si sono individuati alcuni bug riguardanti l'utilizzo degli strumenti di disegno e alcune modifiche minori per migliorare l'esperienza di utilizzo.
+Sono stati svolti dei refactoring per migliorare la modularità dei componenti e la qualità del codice.
 
 | Title                                                                                             | Priority | Assignees | Size | Sprint   |
 |---------------------------------------------------------------------------------------------------|----------|-----------|------|----------|
@@ -79,6 +86,11 @@ Alla luce di numerosi test manuali svolti sull'applicazione, si sono individuati
 | Refactor of map generation into package "map"                                                     | P2       | Mazzi     | M    | Sprint 6 |
 | Make FireFighter use a weighted average for target selection and make its strategy use a lazylist | P2       | Monaldini | S    | Sprint 6 |
 
-<!-- TODO: cambiare nomi github con nostri nomi -->
+## Commenti finali
+Complessivamente il team è soddisfatto del lavoro svolto.
+Nonostante le difficoltà incontrate durante lo sviluppo e l'utilizzo di tecnologie mai usate in un progetto prima d'ora, il team è riuscito a completare i requisiti stabiliti inizialmente.
+La simulazione risulta interattiva e verosimile, rendendo FireSim un ottimo strumento educativo.
+Come sviluppi futuri si potrà aumentare il realismo della logica e dell'interfaccia grafica.
+
 [Indice](../index.md) |
 [<](../6-testing/index.md)

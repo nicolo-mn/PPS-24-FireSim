@@ -34,7 +34,7 @@ Durante la simulazione, il controller:
 - innesca aggiornamenti del model ad intervalli regolari
 - riceve e mette in coda le modifiche alle celle effettuate dall’utente
 
-Le celle modificate vengono notificate al model **prima dell’aggiornamento successivo**, così da evitare **inconsistenze** mentre la simulazione avanza.
+Le celle modificate contenute nella coda vengono tutte notificate al model **prima dell’aggiornamento**, così da evitare **inconsistenze** mentre la simulazione avanza.
 
 La comunicazione con la view avviene utilizzando il trait `ViewMessage`.
 Grazie al `Command Pattern`, la view può gestire in modo uniforme diversi tipi di input, come pulsanti per mettere in pausa o resettare la simulazione, o modifiche dei parametri.

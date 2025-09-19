@@ -17,7 +17,7 @@
    Il dominio del sistema è composto dai seguenti concetti chiave:
 - Mappa: Una griglia 2D che rappresenta il territorio, composta da celle con tipi di terreno diversi.
 - Cella: L'unità atomica della mappa, rappresenta un tipo di terreno (foresta, prato, barriera, stazione, acqua, in fiamme, bruciato, roccia).
-- Agente di contrasto: Un'entità (es. squadra di pompieri) che si muove sulla mappa partendo da una stazione per estinguere le celle in fiamme più vicine.
+- Pompieri: Un'entità che si muove sulla mappa partendo da una stazione per estinguere le celle in fiamme più vicine.
 - Parametri di simulazione: L'insieme delle variabili che influenzano la simulazione, tra cui vento (intensità e direzione), umidità e temperatura.
 
 ## Requisiti funzionali
@@ -42,6 +42,7 @@
       2. Strumento "linea": modifica di più celle su una linea (orizzontale, verticale od obliqua) dopo averne selezionato i 2 estremi
       3. Strumento "pennello": modifica tutte le celle su cui passa il puntatore con il click del mouse tenuto premuto
    3. Quando l'utente seleziona uno strumento di disegno, gli altri devono essere disattivati e non selezionabili
+   4. L'utente può piazzare celle in fiamme solo su celle infiammabili (foresta o prato)
 5. Personalizzazione dei parametri prima dell'inizio e durante la simulazione (direzione e intensità del vento, umidità, temperatura)
    1. Ogni parametro avrà uno slider dedicato, con accanto indicato il valore selezionato, modificabile in qualsiasi momento dall'utente
 6. Controlli per gestire il flusso temporale della simulazione
@@ -50,10 +51,11 @@
    3. Un bottone per mettere in pausa e riprendere la simulazione, in cui cambierà il testo a seconda dello stato attuale
 7. Quando la simulazione non è stata ancora avviata, i tasti per fermare/riprendere la simulazione e il selettore di velocità devono essere disattivati
 8. Quando la simulazione è avviata, il tasto per avviare la simulazione deve essere disattivato
-9. Rappresentazione grafica della simulazione in griglia 2D
-   1. Rappresentazione dei diversi tipi di terreno con un determinato colore
-   2. I vigili di fuoco sono rappresentati anch'essi con uno specifico colore, che sovrascrive il colore della cella su cui è posizionato
-10. Rappresentazione della corretta diffusione del fuoco
+9. Il fuoco si espande solo su celle infiammabili (erba e foreste)
+10. Rappresentazione grafica della simulazione in griglia 2D
+    1. Rappresentazione dei diversi tipi di terreno con un determinato colore
+    2. I vigili di fuoco sono rappresentati anch'essi con uno specifico colore, che sovrascrive il colore della cella su cui è posizionato
+11. Rappresentazione della corretta diffusione del fuoco
     1. Solo i tipi di terreno infiammabili (boschivo, erboso) possono diventare _in fiamme_
     2. Una cella che diventa _in fiamme_ ha 3 stadi del fuoco
        1.  Si ha un primo stadio di ignizione in cui la probabilità di infuocare un'altra è abbastanza bassa
@@ -67,8 +69,8 @@
     5. All'aumentare dell'umidità, la diffusione sarà più lenta
     6. All'aumentare dei vicini in fiamme, aumentà la probabilità di prendere fuoco
     7. All'aumentare dell'intensità del vento, la diffusione del fuoco sarà maggiore nella direzione del vento
-11. Ogni cella stazione avrà un vigile del fuoco, adibito alla protezione dell'area circostante
-12. I vigili del fuoco:
+12. Ogni cella stazione avrà un vigile del fuoco, adibito alla protezione dell'area circostante
+13. I vigili del fuoco:
     1. Si muovono verso celle infuocate che hanno attorno celle erbose o foreste, con l'obiettivo di proteggerle, dando la priorità a quelle più vicine alla loro stazione
     2. Si muovono su tutta la mappa senza vincoli (come unità aeree), seguendo visivamente la diagonale tra il punto in cui si trovano e l'obiettivo 
     3. Si muovono indipendentemente, ognuno dando la priorità al terreno attorno alla sua stazione
@@ -98,8 +100,8 @@
 
 ## Requisiti non funzionali
 
-1. Performance: La simulazione deve essere fluida (almeno 30 TPS) su una mappa di dimensioni standard (almeno 100x100 celle) 
-con un numero moderato di agenti (requisiti minimi: 4GB di RAM, CPU Quad Core da 3.6 GHz).
+1. Performance: La simulazione deve essere fluida (almeno 30 TPS) su una mappa di almeno 100x100 celle 
+con 3 vigili del fuoco (requisiti minimi: 4GB di RAM, CPU Quad Core da 3.6 GHz).
 2. Usabilità: L'interfaccia grafica (GUI) sarà minimale 
 3. GUI intuitiva per cui l'utente potrà fin da subito capire facilmente tutte le funzionalità di controllo della simulazione
 4. GUI reattiva senza grossi lag o delay tra input dell'utente e output a schermo

@@ -8,7 +8,7 @@ Come mostrato in figura, le interfacce di `Model`, `View` e `Controller` permett
 - Model: viene interrogato dal controller e gestisce la logica della simulazione nella sua interezza
   - Generazione della mappa
   - Modello probabilistico nella distribuzione del fuoco
-  - Comportamento degli agenti di contrasto
+  - Comportamento dei vigili del fuoco
   - Controllo della correttezza nella richiesta di posizionare celle da parte dell'utente
 - Controller: gestisce il loop della simulazione e collega view e model
   - Gestione dei tempi di simulazione

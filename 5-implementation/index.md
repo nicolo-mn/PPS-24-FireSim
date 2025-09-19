@@ -195,7 +195,7 @@ ReaderState((e, s) =>
     case (s2, a) => f(a).apply(e, s2)
 )
 ```
-<!-- TODO: Diagramma? -->
+
 #### Aggiornamento di istanze `FireFighter`
 
 Per l'aggiornamento dei vigili del fuoco sono state utilizzate due operazioni monadiche:
