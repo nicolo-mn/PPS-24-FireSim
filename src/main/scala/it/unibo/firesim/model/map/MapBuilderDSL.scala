@@ -8,6 +8,8 @@ object MapBuilderDSL:
     *   the number of rows of the map
     * @param cols
     *   the number of columns of the map
+    * @param generationStrategy
+    *   the generation strategy to follow
     * @param random
     *   the initialized random class
     * @param instruction
@@ -18,9 +20,11 @@ object MapBuilderDSL:
   def buildMap(
       rows: Int,
       cols: Int,
+      generationStrategy: MapGenerationStrategy,
       random: Random = Random()
   )(instruction: MapBuilder ?=> Unit): Matrix =
-    given builder: MapBuilder = MapBuilder(rows, cols, random)
+    given builder: MapBuilder =
+      MapBuilder(rows, cols, generationStrategy, random)
     instruction(using builder)
     builder.build
 

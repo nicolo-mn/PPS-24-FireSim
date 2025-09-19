@@ -180,12 +180,11 @@ class BaseMapGeneration extends MapGenerationStrategy:
       roundedMeanMul(forestFireSeedFrequency, rows, cols) max 1
     val grassFireSeedsCount = roundedMeanMul(grassFireSeedFrequency, rows, cols)
 
-    def generateFires(toBurn: CellType, count: Int): Unit = toBurn match
-      case Forest | Grass => random.shuffle(m.positionsOf(toBurn)).take(count)
-          .foreach((r, c) =>
-            m = m.update(r, c, Burning(0, FireStage.Ignition, toBurn))
-          )
-      case _ =>
+    def generateFires(toBurn: CellType, count: Int): Unit =
+      random.shuffle(m.positionsOf(toBurn)).take(count)
+        .foreach((r, c) =>
+          m = m.update(r, c, Burning(0, FireStage.Ignition, toBurn))
+        )
 
     generateFires(Forest, forestFireSeedsCount)
     generateFires(Grass, grassFireSeedsCount)
