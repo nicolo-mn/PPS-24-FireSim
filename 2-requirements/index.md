@@ -7,18 +7,18 @@
    Il modello deve permettere l’osservazione dell’evoluzione semplificata ma verosimile di un incendio in una foresta, sotto l’influenza di parametri ambientali (come vento, temperatura, umidità).
    Inoltre deve considerare i meccanismi di contrasto quali i vigili del fuoco contro l’incendio e possibili linee di frangifuoco definite dall’utente.
 
-   La mappa generata dovrà essere personalizzabile prima dell'inizio della simulazione, per poter modellare determinati biomi.
+   La mappa generata dovrà essere totalmente personalizzabile prima dell'inizio della simulazione, per poter essere modellata a piacimento dell'utente.
    I parametri saranno modificabili anche durante la simulazione, per poter modellare il cambiamento di essi durante la propagazione dell'incendio.
-   Le linee di frangifuoco devono poter essere posizionate durante il corso della simulazione, così come ulteriori incendi, simulando incendi spontanei che appaiono gradualmente.
+   Le linee di frangifuoco devono poter essere posizionate anche durante il corso della simulazione, così come ulteriori incendi.
 
-   Nella fase iniziale è possibile posizionare delle stazioni dei vigili del fuoco in zone di interesse, ognuna dei quali avrà un'unità operativa con l'obiettivo di proteggere l'area circostante alla propria stazione.
+   Tra i diversi tipi di terreno, nella fase iniziale è possibile posizionare anche delle stazioni dei vigili del fuoco in zone di interesse, ognuna dei quali avrà un'unità operativa con l'obiettivo di proteggere l'area circostante alla propria stazione.
 
 ## Modello di dominio
    Il dominio del sistema è composto dai seguenti concetti chiave:
-- Mappa: Una griglia 2D che rappresenta il territorio, composta da celle con tipi di terreno diversi.
-- Cella: L'unità atomica della mappa, rappresenta un tipo di terreno (foresta, prato, barriera, stazione, acqua, in fiamme, bruciato, roccia).
-- Pompieri: Un'entità che si muove sulla mappa partendo da una stazione per estinguere le celle in fiamme più vicine.
-- Parametri di simulazione: L'insieme delle variabili che influenzano la simulazione, tra cui vento (intensità e direzione), umidità e temperatura.
+- **Mappa**: Una griglia 2D che rappresenta il territorio, composta da celle con tipi di terreno diversi.
+- **Cella**: L'unità atomica della mappa, rappresenta un tipo di terreno (foresta, prato, barriera, stazione, acqua, in fiamme, bruciato, roccia).
+- **Vigili del fuoco**: Entità che si muovono sulla mappa partendo da una stazione per estinguere le celle in fiamme più vicine.
+- **Parametri di simulazione**: L'insieme delle variabili che influenzano la simulazione, tra cui vento (intensità e direzione), umidità e temperatura.
 
 ## Requisiti funzionali
 ### Utente
@@ -82,10 +82,9 @@
 
 1. Generazione randomica della mappa a partire dalle dimensioni fornite
    1. Limite inferiore per garantire i vincoli della generazione (minimo 1 foresta, 1 stazione e 1 zona d'acqua)
-   2. Limite superiore per poter mostrare correttamente la mappa nella sua interezza
-   3. Generazione di seeds per i vari tipi di terreno e sparsi nella mappa
-   4. Crescita dei cluster probabilistica a partire dai seed
-   5. Algoritmi di path finding con modifica casuale di direzione e larghezza per costruire fiumi realistici
+   2. Generazione di seeds per i vari tipi di terreno e sparsi nella mappa
+   3. Crescita dei cluster probabilistica a partire dai seed
+   4. Algoritmo con modifica casuale di direzione e larghezza per costruire fiumi realistici
 2. Propagazione del fuoco basandosi su un modello probabilistico e controllando le celle adiacenti a quelle _in fiamme_
    1. Esclusione delle celle non infiammabili
    2. Modifica della probabilità a seconda del tipo di terreno

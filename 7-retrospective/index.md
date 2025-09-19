@@ -2,9 +2,9 @@
 
 ## Avviamento
 In una prima fase ci si è concentrati sulla definizione dei requisiti e sulla produzione di diagrammi UML che definissero l'organizzazione delle principali classi e interfacce del progetto.
-Questi UML, dopo una serie di revisioni e correzioni sono stati inseriti nei capitoli di Architettura e Design. 
+Questi UML, dopo una serie di revisioni e correzioni sono stati inseriti nei capitoli di Architettura e Design di dettaglio. 
 
-## Sprint 1
+## Sprint 1 (28/07-1/08)
 Nella prima sprint ci si è concentrati sul bootstrap del progetto e sulla definizione delle classi e interfacce principali.
 Si è data priorità alla view per poter presentare al committente un prototipo già al termine della prima settimana, come le best practice di programmazione agile comandano.
 Si è, inoltre, implementata una prima versione dell'algoritmo di generazione della mappa da integrare con la view.
@@ -19,7 +19,7 @@ Si è, inoltre, implementata una prima versione dell'algoritmo di generazione de
 | GUI parameter selectors buttons                                                                    | P1       | Monaldini | S    | Sprint 1 |
 
 
-## Sprint 2
+## Sprint 2 (04/08- 08/08)
 Nella seconda sprint si sono aggiunti i vigili del fuoco e l'algoritmo di diffusione del fuoco nella parte di model.
 Abbiamo implementato una versione minimale del loop della simulazione, per avere il prima possibile una prima versione eseguibile della simulazione.
 
@@ -31,7 +31,7 @@ Abbiamo implementato una versione minimale del loop della simulazione, per avere
 | Implement preliminary stages of SimController (e.g. map generation, fire placement, etc.), Add params management in view and controller  | P0       | Mazzi     | S    | Sprint 2 |
 | Make SimParams and correct SimModel interface (with tests up to date)                                                                    | P0       | Guglielmi | S    | Sprint 2 |
 
-## Sprint 3
+## Sprint 3 (11/08-15/08)
 Nella terza sprint si è completata la logica del piazzamento delle celle, e si è deciso di svolgere un refactoring sulla struttura della matrice che rappresenta la mappa della simulazione, giungendo alla versione finale che consiste in una matrice di `CellType`.
 Sono state fatte migliorie anche alla view aggiungendo la possibilità di tracciare linee da due punti.
 
@@ -44,7 +44,7 @@ Sono state fatte migliorie anche alla view aggiungendo la possibilità di tracci
 | Calculate barrier line from 2 points                                                        | P0       | Guglielmi | S    | Sprint 3 |
 | Change SimParams types and update                                                           | P0       | Guglielmi | S    | Sprint 3 |
 
-## Sprint 4
+## Sprint 4 (18/08- 22/08)
 La quarta sprint si è concentrata sull'aggiunta di ulteriori utility di view, in particolare il pennello per cambiare il tipo a più celle contemporaneamente.
 Si è deciso di fare alcuni raffinamenti nell'algoritmo di generazione mappa aggiungendo laghi, nel movimento dei vigili del fuoco per utilizzare movimenti realistici attraverso un algoritmo di rasterizzazione e dell'impatto del vento nella diffusione del fuoco.
 È stata aggiunta anche la possibilità di modificare la velocità della simulazione.
@@ -58,7 +58,7 @@ Si è deciso di fare alcuni raffinamenti nell'algoritmo di generazione mappa agg
 | Brush drawing in map                                             | P2       | Monaldini | S    | Sprint 4 |
 | Handle draw line button that works for every type of cell        | P2       | Guglielmi | M    | Sprint 4 |
 
-## Sprint 5
+## Sprint 5 (24/08-29/08)
 La quinta sprint si è concentrata sul refactoring della view, riducendo il numero di componenti Swing utilizzati evitando lag.
 Si è inoltre deciso di modificare la logica di movimento dei vigili del fuoco per dare la priorità alle celle più vicine alla propria stazione.
 Tramite l'uso di `scala-parallel-collections` si è parallelizzato l'algoritmo di map generation e l'aggiornamento dei vigili del fuoco, per rendere l'esperienza d'uso più fluida, permettendo di utilizzare mappe con dimensione maggiore senza lag.
@@ -71,7 +71,7 @@ Tramite l'uso di `scala-parallel-collections` si è parallelizzato l'algoritmo d
 | Parallelize fire fighters                                                    | P2       | Monaldini | S    | Sprint 5 |
 | Change firefighter logic to improve performance                              | P2       | Monaldini | S    | Sprint 5 |
 
-## Sprint 6
+## Sprint 6 (08/09-12/09)
 Alla luce di numerosi test manuali svolti sull'applicazione, si sono individuati alcuni bug riguardanti l'utilizzo degli strumenti di disegno e alcune modifiche minori per migliorare l'esperienza di utilizzo.
 Sono stati svolti dei refactoring per migliorare la modularità dei componenti e la qualità del codice.
 

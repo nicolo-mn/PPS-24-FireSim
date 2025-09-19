@@ -45,21 +45,22 @@ it should "throw an exception if stationed in negative coordinates" in {
 ```
 
 ```scala
-  "BaseMapGeneration" should "be able to add fires to the matrix, only on forests or grass" in {
+"BaseMapGeneration" should "be able to add fires to the matrix, only on forests or grass" in {
     val noFires = BaseMapGeneration().addFires(allRocks, new Random())
     val withFires = BaseMapGeneration().addFires(allForests, new Random())
-  
+    
     noFires.positionsOfBurning() shouldEqual Seq.empty
     withFires.positionsOfBurning().length should be > 0
-  }
+}
 
-  it should "be able to add custom terrain, only if in bounds" in {
+it should "be able to add custom terrain, only if in bounds" in {
     val noCustomTerrain = BaseMapGeneration().addCustomTerrain(allForests, -1, -1, Rock)
     val withCustomTerrain = BaseMapGeneration().addCustomTerrain(allForests, 0, 0, Rock)
-
+    
     noCustomTerrain.positionsOf(Rock) shouldEqual Seq.empty
     noCustomTerrain shouldEqual allForests
     withCustomTerrain.positionsOf(Rock) shouldEqual Seq((0, 0))
+}
 ```
 [Indice](../index.md) |
 [<](../5-implementation/index.md) |

@@ -42,7 +42,7 @@ In questo modo, la view non chiama direttamente i metodi del controller, garante
 
 ## Model
 La mappa della simulazione è rappresentata attraverso una matrice di `CellType`.
-Quando l'utente sceglie le dimensioni della mappa questa viene generata casualmente, inserendo aree boschive, rocciose, erbose, ma anche laghi, fiumi e stazioni dei pompieri.
+Quando l'utente sceglie le dimensioni della mappa questa viene generata casualmente, inserendo aree boschive, rocciose, erbose, ma anche laghi, fiumi e stazioni dei vigili del fuoco.
 L'algoritmo di generazione della mappa è definito nella classe `MapBuilder`, che attraverso il pattern builder permette di generare la mappa dividendo le varie fasi dell'algoritmo (come la generazione di laghi, foreste ed aree erbose) ed evitando di avere un unico metodo monolitico. 
 Per ogni stazione presente nella mappa generata, vengono creati i vigili del fuoco specificando il raggio di azione e la stazione in cui sono posizionati separatamente, seguendo il pattern builder.
 
@@ -51,7 +51,7 @@ Ogni ciclo di aggiornamento del model consiste in svariati passaggi:
 - Aggiornamento delle celle infuocate e autonomamente spente tramite l'algoritmo di diffusione del fuoco
 - Aggiornamento della posizione dei vigili del fuoco e delle eventuali celle infuocate da loro spente
 
-I pompieri sono modellati come record immutabili tramite la case class `FireFighter`, che vengono aggiornati sulla base delle celle infuocate correnti.
+I vigili del fuoco sono modellati come record immutabili tramite la case class `FireFighter`, e vengono aggiornati sulla base delle celle infuocate correnti.
 Vi è la possibilità che una cella infuocata sia circondata da altre celle che non possono prendere fuoco (come celle già bruciate); in questi casi i vigili del fuoco dovrebbero ignorarle per dirigersi verso celle circondate da altre a rischio di incendio.
 `SimModel` aggiorna le istanze di `FireFighter` attraverso una computazione monadica che prende in input le celle infuocate, e restituisce in output le celle spente al passo corrente.
 
@@ -70,8 +70,8 @@ L'interfaccia grafica mostra la mappa della simulazione aggiornata in tempo real
 - Verde chiaro per le aree erbose
 - Azzurro per i laghi
 - Grigio per le celle bruciate
-- Giallo per le stazioni dei pompieri
-- Bordeaux per i pompieri
+- Giallo per le stazioni dei vigili del fuoco
+- Bordeaux per i vigili del fuoco
 
 L'utente ha a disposizione vari controlli per gestire lo stato di avanzamento della simulazione, come i pulsanti per resettare, iniziare, fermare e riprendere una simulazione, e slider che permettono di modificare i parametri.
 

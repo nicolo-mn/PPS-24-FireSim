@@ -1,7 +1,7 @@
 # 🔥🚁 FireSim
 Un simulatore su sviluppo e contrasto di incendi boschivi.
 
-## Sommario:
+## Indice:
 - [Introduzione](0-introduction/index.md)
 - [Processo di sviluppo](1-development-process/index.md)
 - [Requisiti](2-requirements/index.md)
@@ -10,5 +10,3 @@ Un simulatore su sviluppo e contrasto di incendi boschivi.
 - [Implementazione](5-implementation/index.md)
 - [Testing](6-testing/index.md)
 - [Retrospettiva](7-retrospective/index.md)
-
-La documentazione relativa alla metodologia di sviluppo è disponibile [qui](1-development-process/index.md).

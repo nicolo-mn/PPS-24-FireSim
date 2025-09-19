@@ -158,12 +158,12 @@ Mi sono occupato principalmente dell'implementazione dei vigili dei fuoco, in pa
 I vigili del fuoco sono stati pensati come dei record immutabili, per questo motivo sono stati implementati con una case class.
 ```scala
 case class FireFighter(
-    station: Position,
-    neighborsInRay: Set[Offset],
-    target: Position,
-    loaded: Boolean,
-    steps: LazyList[Position],
-    moveStrategy: (Position, Position) => LazyList[Position]
+  station: Position,
+  neighborsInRay: Set[Offset],
+  target: Position,
+  loaded: Boolean,
+  steps: LazyList[Position],
+  moveStrategy: (Position, Position) => LazyList[Position]
 )
 ```
 
@@ -292,7 +292,7 @@ Il controller salva i millisecondi da aspettare tra un tick e l'altro passati co
 Tenendo traccia dei valori attuali e originali si potrà poi cambiare la velocità della simulazione a seconda della scelta dell'utente.
 
 Sia il main thread che il thread della view accederanno ad alcune variabili condivise, principalmente flag booleani ma anche le dimensioni della mappa scelte dall'utente e i millisecondi della velocità di simulazione citati prima.
-Queste variabili sono dichiarate con il tag `volatile` per un accesso thread safe.
+Queste variabili sono dichiarate `volatile` per un accesso thread safe.
 
 Si usa una variabile `lock` per sincronizzare i due thread e permettere al main thread di lasciare le risorse mentre la mappa non è stata ancora generata.
 
@@ -316,8 +316,6 @@ I controlli sono organizzati in righe attraverso l'uso di ulteriori `BoxPanel`. 
 Le varie tipologie di celle sono identificate da un `enum` chiamato `CellViewType`. Le istanze di questa enumerazione sono ricevute dal controller per aggiornare la griglia, e sono utilizzate dalla view per associare un colore a ogni cella.
 
 Uno `SplitPane` è utilizzato per dividere l'area dei controlli dall'area contenente la griglia. Quest'ultima è responsive, e reagisce al ridimensionamento della finestra e al movimento del divisorio dello `SplitPane`. Questa proprietà è ottenuta tramite un metodo `gridGeometry` chiamato all'interno del metodo `paintComponent` del `Panel` contenente la griglia, che utilizza la sua dimensione per calcolare la dimensione e l'offset che la griglia deve avere. 
-
-Le possibili operazioni lunghe e potenzialmente bloccanti, come l'avvio della simulazione o il calcolo per il posizionamento di una linea, vengono eseguite in background in modo da poter mantenere la View reattiva.
 
 La View è disaccoppiata dalla logica di simulazione: essa si limita a tradurre le interazioni utente in ViewMessage inviati al Controller, seguendo il pattern architetturale MVC.
 
