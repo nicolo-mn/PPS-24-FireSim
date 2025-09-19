@@ -7,14 +7,17 @@ import org.scalatest.matchers.should.Matchers
 
 class MatrixTest extends AnyFlatSpec with Matchers:
 
+  private val emptyMatrix = Vector.empty
   private val matrix = Vector.tabulate(3, 3)((row, col) => Forest)
 
   "Matrix" should "return correct number of rows" in {
     matrix.rows should be(3)
+    emptyMatrix.rows should be(0)
   }
 
   it should "return correct number of cols" in {
     matrix.cols should be(3)
+    emptyMatrix.cols should be(0)
   }
 
   it should "return the correct cell for each position" in {
