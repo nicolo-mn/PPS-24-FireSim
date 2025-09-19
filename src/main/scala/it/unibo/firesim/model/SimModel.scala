@@ -9,7 +9,7 @@ import it.unibo.firesim.model.firefighters.FireFighter
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
 import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import it.unibo.firesim.model.map.MapBuilderDSL.*
-import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, Position, neighbors, positionsOf, update, positionsOfBurning}
+import it.unibo.firesim.model.map.{CellType, MapBuilder, MapGenerationWithRivers, Matrix, Position, neighbors, positionsOf, positionsOfBurning, update}
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.util.Random
@@ -56,7 +56,7 @@ class SimModel(
     this.rows = rows
     this.cols = cols
 
-    matrix = buildMap(rows, cols, random):
+    matrix = buildMap(rows, cols, random, MapGenerationWithRivers()):
       withWater
       withForests
       withGrass

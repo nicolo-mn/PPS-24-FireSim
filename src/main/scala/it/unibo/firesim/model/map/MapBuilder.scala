@@ -4,8 +4,12 @@ import CellType.*
 
 import scala.util.Random
 
-class MapBuilder(rows: Int, cols: Int, random: Random):
-  private val mapGenerator: MapGenerationStrategy = MapGenerationWithRivers()
+class MapBuilder(
+    rows: Int,
+    cols: Int,
+    random: Random,
+    generationStrategy: MapGenerationStrategy
+):
   private var matrix: Matrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
 
   /** Adds water generation to the map
@@ -13,7 +17,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     *   the builder
     */
   def withWater(): MapBuilder =
-    matrix = mapGenerator.addWater(matrix, random)
+    matrix = generationStrategy.addWater(matrix, random)
     this
 
   /** Adds forest generation to the map
@@ -21,7 +25,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     *   the builder
     */
   def withForests(): MapBuilder =
-    matrix = mapGenerator.addForests(matrix, random)
+    matrix = generationStrategy.addForests(matrix, random)
     this
 
   /** Adds grass generation to the map
@@ -29,7 +33,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     *   the builder
     */
   def withGrass(): MapBuilder =
-    matrix = mapGenerator.addGrass(matrix, random)
+    matrix = generationStrategy.addGrass(matrix, random)
     this
 
   /** Adds station placement to the map
@@ -37,7 +41,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     *   the builder
     */
   def withStations(): MapBuilder =
-    matrix = mapGenerator.addStations(matrix, random)
+    matrix = generationStrategy.addStations(matrix, random)
     this
 
   /** Adds station placement to the map
@@ -45,7 +49,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     *   the builder
     */
   def withFires(): MapBuilder =
-    matrix = mapGenerator.addFires(matrix, random)
+    matrix = generationStrategy.addFires(matrix, random)
     this
 
   /** Adds custom terrains to the map
@@ -56,7 +60,7 @@ class MapBuilder(rows: Int, cols: Int, random: Random):
     */
   def withCustomTerrain(positions: Seq[(Position, CellType)]): MapBuilder =
     positions.foreach { case ((r, c), cellType) =>
-      matrix = mapGenerator.addCustomTerrain(matrix, r, c, cellType)
+      matrix = generationStrategy.addCustomTerrain(matrix, r, c, cellType)
     }
     this
 

@@ -47,6 +47,9 @@ class MapBuilderTest extends AnyFlatSpec with Matchers:
   it should "build a matrix with custom terrain" in {
     val mapBuilder = MapBuilder(100, 100, Random(), MapGenerationWithRivers())
     val withCustomTerrain =
-      mapBuilder.withCustomTerrain(Seq(((0, 0), Forest), ((1, 1), Forest))).build
+      mapBuilder.withCustomTerrain(Seq(
+        ((0, 0), Forest),
+        ((1, 1), Forest)
+      )).build
     withCustomTerrain.positionsOf(Forest) shouldEqual Seq((0, 0), (1, 1))
   }
