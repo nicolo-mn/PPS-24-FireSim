@@ -41,7 +41,7 @@ object UIConfig:
   val fireSoilStr: String = "Fire\uD83D\uDD25"
   val grassSoilStr: String = "Grass\uD83C\uDF31"
   val forestSoilStr: String = "Forest\uD83C\uDF32"
-  val emptySoilStr: String = "Empty\uD83D\uDED1"
+  val emptySoilStr: String = "Barrier\uD83D\uDED1"
   val burntSoilStr: String = "Burnt"
   val stationSoilStr: String = "Station\uD83D\uDE81"
   val rockSoilStr: String = "Rock\u26F0"
