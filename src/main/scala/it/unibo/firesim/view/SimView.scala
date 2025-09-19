@@ -7,7 +7,6 @@ import scala.swing.*
 import scala.swing.event.{ButtonClicked, WindowClosing}
 import java.awt.Dimension
 import scala.annotation.tailrec
-import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.MenuBar.NoMenuBar.{listenTo, reactions}
 
 class SimView(private val simController: SimController) extends View:
@@ -132,6 +131,4 @@ class SimView(private val simController: SimController) extends View:
         firstClick = Some(pos)
       case Some(start) =>
         firstClick = None
-        Future {
-          simController.handleViewMessage(PlaceLine(start, pos, cellViewType))
-        }(ExecutionContext.global)
+        simController.handleViewMessage(PlaceLine(start, pos, cellViewType))

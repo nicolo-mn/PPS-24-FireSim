@@ -3,7 +3,6 @@ package it.unibo.firesim.view
 import it.unibo.firesim.config.UIConfig.*
 import it.unibo.firesim.controller.*
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.swing.*
 import scala.swing.event.{ButtonClicked, SelectionChanged, ValueChanged}
 
@@ -181,9 +180,7 @@ class ControlsPanel(simController: SimController)
       ComboBox.newConstantModel(inGameAvailableSoils)
     )
     soilTypeSelector.selection.item = fireSoilStr
-    Future { simController.handleViewMessage(StartSimulation) }(
-      ExecutionContext.global
-    )
+    simController.handleViewMessage(StartSimulation)
 
 trait ControlsLine(comps: Component*):
   panel: BoxPanel =>
