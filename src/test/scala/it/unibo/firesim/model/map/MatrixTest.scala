@@ -28,7 +28,7 @@ class MatrixTest extends AnyFlatSpec with Matchers:
 
   it should "get the positions of cells with a certain cell type" in {
     val updated = matrix
-      .update(0, 0,Station)
+      .update(0, 0, Station)
       .update(1, 1, Station)
       .update(2, 2, Station)
     updated.positionsOf(Station) should be(Seq((0, 0), (1, 1), (2, 2)))

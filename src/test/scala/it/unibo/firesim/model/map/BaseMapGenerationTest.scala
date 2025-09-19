@@ -11,23 +11,25 @@ class BaseMapGenerationTest extends AnyFlatSpec with Matchers:
 
   private val allForests =
     Vector.tabulate(100, 100)((row, col) => Forest)
-  private val noForests = Vector.tabulate(100, 100)((row, col) => Rock)
-  private val someForests = noForests.update(10, 10, Forest)
+
+  private val allRocks = Vector.tabulate(100, 100)((row, col) => Rock)
+  private val someForests = allRocks.update(10, 10, Forest)
 
   "BaseMapGeneration" should "be able to add lakes to the matrix" in {
-    val withWater = BaseMapGeneration().addWater(noForests, new Random())
+    val withWater = BaseMapGeneration().addWater(allRocks, new Random())
     withWater.positionsOf(Water).length should be > 0
   }
 
   it should "be able to add forests to the matrix" in {
-    val withForests = BaseMapGeneration().addForests(noForests, new Random())
+    val withForests = BaseMapGeneration().addForests(allRocks, new Random())
     withForests.positionsOf(Forest).length should be > 0
   }
 
   it should "be able to add grass to the matrix, only around some forests and on rocks" in {
     val noRockNoGrass = BaseMapGeneration().addGrass(allForests, new Random())
-    val noForestsNoGrass = BaseMapGeneration().addGrass(noForests, new Random())
-    val someForestsSomeGrass = BaseMapGeneration().addGrass(someForests, new Random())
+    val noForestsNoGrass = BaseMapGeneration().addGrass(allRocks, new Random())
+    val someForestsSomeGrass =
+      BaseMapGeneration().addGrass(someForests, new Random())
 
     noRockNoGrass.positionsOf(Grass) shouldEqual Seq.empty
     noForestsNoGrass.positionsOf(Grass) shouldEqual Seq.empty
@@ -41,13 +43,13 @@ class BaseMapGenerationTest extends AnyFlatSpec with Matchers:
 
   it should "be able to add fires to the matrix, only on forests or grass" in {
     val withFires = BaseMapGeneration().addFires(allForests, new Random())
-    val noFires = BaseMapGeneration().addFires(noForests, new Random())
+    val noFires = BaseMapGeneration().addFires(allRocks, new Random())
     withFires.positionsOfBurning().length should be > 0
     noFires.positionsOfBurning() shouldEqual Seq.empty
   }
 
   it should "be able to add custom terrain" in {
-    val withCustomTerrain = BaseMapGeneration().addCustomTerrain(allForests, 0, 0, Rock)
+    val withCustomTerrain =
+      BaseMapGeneration().addCustomTerrain(allForests, 0, 0, Rock)
     withCustomTerrain.positionsOf(Rock) shouldEqual Seq((0, 0))
   }
-
