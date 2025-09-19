@@ -47,8 +47,13 @@ class BaseMapGenerationTest extends AnyFlatSpec with Matchers:
     noFires.positionsOfBurning() shouldEqual Seq.empty
   }
 
-  it should "be able to add custom terrain" in {
+  it should "be able to add custom terrain, only if in bounds" in {
+    val noCustomTerrain =
+      BaseMapGeneration().addCustomTerrain(allForests, -1, -1, Rock)
     val withCustomTerrain =
       BaseMapGeneration().addCustomTerrain(allForests, 0, 0, Rock)
+
+    noCustomTerrain.positionsOf(Rock) shouldEqual Seq.empty
+    noCustomTerrain shouldEqual allForests
     withCustomTerrain.positionsOf(Rock) shouldEqual Seq((0, 0))
   }

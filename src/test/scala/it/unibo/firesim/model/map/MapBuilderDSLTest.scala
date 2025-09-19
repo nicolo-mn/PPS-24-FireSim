@@ -10,21 +10,21 @@ import scala.util.Random
 class MapBuilderDSLTest extends AnyFlatSpec with Matchers:
 
   "MapBuilderDSL" should "ease the build of a matrix with water" in {
-    val wWater = buildMap(100, 100, Random(), MapGenerationWithRivers()):
+    val wWater = buildMap(100, 100, MapGenerationWithRivers()):
       withWater
     wWater.positionsOf(Water).length should be > 0
   }
 
   it should "ease the build of a matrix with forests" in {
-    val wForests = buildMap(100, 100, Random(), MapGenerationWithRivers()):
+    val wForests = buildMap(100, 100, MapGenerationWithRivers()):
       withForests
     wForests.positionsOf(Forest).length should be > 0
   }
 
   it should "ease the build of a matrix with grass, only around some forests" in {
-    val noGrass = buildMap(100, 100, Random(), MapGenerationWithRivers()):
+    val noGrass = buildMap(100, 100, MapGenerationWithRivers()):
       withGrass
-    val wGrass = buildMap(100, 100, Random(), MapGenerationWithRivers()):
+    val wGrass = buildMap(100, 100, MapGenerationWithRivers()):
       withForests
       withGrass
 
@@ -33,15 +33,15 @@ class MapBuilderDSLTest extends AnyFlatSpec with Matchers:
   }
 
   it should "ease the build of a matrix with stations" in {
-    val wStations = buildMap(100, 100, Random(), MapGenerationWithRivers()):
+    val wStations = buildMap(100, 100, MapGenerationWithRivers()):
       withStations
     wStations.positionsOf(Station).length should be > 0
   }
 
   it should "ease the build of a matrix with fires, only on forests or grass" in {
-    val noFires = buildMap(100, 100, Random(), MapGenerationWithRivers()):
+    val noFires = buildMap(100, 100, MapGenerationWithRivers()):
       withFires
-    val wFires = buildMap(100, 100, Random(), MapGenerationWithRivers()):
+    val wFires = buildMap(100, 100, MapGenerationWithRivers()):
       withForests
       withFires
 
@@ -51,7 +51,7 @@ class MapBuilderDSLTest extends AnyFlatSpec with Matchers:
 
   it should "ease the build of a matrix with custom terrain" in {
     val wCustomTerrain =
-      buildMap(100, 100, Random(), MapGenerationWithRivers()):
+      buildMap(100, 100, MapGenerationWithRivers()):
         withCustomTerrain(Seq(
           ((0, 0), Forest),
           ((1, 1), Forest)

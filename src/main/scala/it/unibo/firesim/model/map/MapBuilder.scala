@@ -7,8 +7,8 @@ import scala.util.Random
 class MapBuilder(
     rows: Int,
     cols: Int,
-    random: Random,
-    generationStrategy: MapGenerationStrategy
+    generationStrategy: MapGenerationStrategy,
+    random: Random = Random()
 ):
   private var matrix: Matrix = Vector.tabulate(rows, cols) { (r, c) => Rock }
 

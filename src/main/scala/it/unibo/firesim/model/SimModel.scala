@@ -56,7 +56,7 @@ class SimModel(
     this.rows = rows
     this.cols = cols
 
-    matrix = buildMap(rows, cols, random, MapGenerationWithRivers()):
+    matrix = buildMap(rows, cols, MapGenerationWithRivers(), random):
       withWater
       withForests
       withGrass
