@@ -177,7 +177,7 @@ def next(x: Int, y: Int, err: Int): (Int, Int, Int) = ...
 LazyList.iterate((from._1, from._2, err))(next).map(e => (e._1, e._2))
 ```
 #### Monade ReaderState
-Per l'aggiornamento delle istanze `FireFighter`, che sono modellate come record, è stata utilizzata una versione modificata della monade `State` vista a lezione. 
+Per l'aggiornamento delle istanze `FireFighter` è stata utilizzata una versione modificata della monade `State` vista a lezione. 
 
 La necessità della modifica sorge dal fatto che i `FireFighter` devono essere aggiornati sulla base delle celle infuocate a ogni istante, mentre la monade `State` prevede l'aggiornamento di uno stato solamente a partire dallo stato stesso (il metodo `run`, infatti, prende come argomento solo uno stato `s`).
 
@@ -198,7 +198,7 @@ ReaderState((e, s) =>
 #### Aggiornamento di istanze `FireFighter`
 
 Per l'aggiornamento dei vigili del fuoco sono state utilizzate due operazioni monadiche:
-- `moveStep`: prende in input le celle infuocate ed un'istanza `FireFighter`, restituisce in output un'istanza con la posizione cambiata e un risultato di tipo `Unit`. Per scegliere la cella verso cui dirigersi viene utilizzata una funzione di scoring lower-is-better, che consiste nella media pesata tra la distanza dalla stazione e dalla posizione attuale del vigile del fuoco. Nel caso in cui la cella target precedente sia ancora valida, ovvero sia in fiamme e circondata da celle salvabili, si è scelto di richiedere che la nuova cella obiettivo abbia il valore della media pesata inferiore di almeno un decimo rispetto alla corrente, per evitare cambiamenti di obiettivo troppo frequenti.
+- `moveStep`: prende in input le celle infuocate ed un'istanza `FireFighter`, restituisce in output un'istanza con la posizione cambiata e un risultato di tipo `Unit`. Per scegliere la cella verso cui dirigersi viene utilizzata una funzione di scoring lower-is-better, che consiste nella media pesata tra la distanza dalla stazione e dalla posizione attuale del vigile del fuoco. Si è scelto di dare un peso maggiore alla distanza dalla stazione (0.6) rispetto alla distanza dalla posizione attuale (0.4) per dare la priorità alle celle più vicine alla stazione nel caso in cui la media aritmetica tra le due distanze sia uguale per più celle. Nel caso in cui la cella target precedente sia ancora valida, ovvero sia in fiamme e circondata da celle salvabili, si è scelto di richiedere che la nuova cella obiettivo abbia il valore della media pesata inferiore di almeno un decimo rispetto alla corrente, per evitare cambiamenti di obiettivo troppo frequenti.
 - `actionStep`: prende in input le celle infuocate e un'istanza `FireFighter`, effettua un'azione che può essere spegnere delle celle infuocate o ricaricare il carico del vigile del fuoco, restituisce in output un'istanza aggiornata ed un `Set` di posizioni di celle che sono state spente.
 
 Queste operazioni sono concatenate in un'unica computazione monadica:
@@ -251,13 +251,13 @@ def actionStep
 ```
 
 #### Builder e DSL
-Per la costruzione delle istanze `FireFighter` è stato utilizzato il pattern Builder. Sebbene nell'implementazione attuale non siano previsti molti campi da inizializzare, l'utilizzo del pattern Builder permette di costruire facilmente un piccolo DSL che lo usi, per sfruttare la significant indentation di Scala per creare istanze di `FireFighter` in modo dichiarativo, come mostrato di seguito:
+Per la costruzione delle istanze `FireFighter` è stato utilizzato il pattern Builder. Sebbene nell'implementazione attuale non siano previsti molti campi da inizializzare, l'utilizzo del pattern Builder permette di costruire facilmente un piccolo DSL che lo usi, per sfruttare la significant indentation di Scala per la creazione di istanze di `FireFighter` in modo dichiarativo, come mostrato di seguito:
 ```scala
 createFireFighter:
     withRay(r)
     stationedIn(s)
 ```
-La funzione `createFireFighter` utilizza il meccanismo given/using per prendere in input una context function che richiede un'istanza `given` di tipo `FireFighterBuilder`, che sarà composta da chiamate a funzioni del DSL. 
+La funzione `createFireFighter` utilizza il meccanismo given/using per prendere in input una context function che richiede un'istanza `given` di tipo `FireFighterBuilder` e che chiamerà funzioni del DSL. 
 ```scala
 def createFireFighter(instructions: FireFighterBuilder ?=> Unit)
     : FireFighter =

@@ -11,4 +11,4 @@ Un simulatore su sviluppo e contrasto di incendi boschivi.
 - [Testing](6-testing/index.md)
 - [Retrospettiva](7-retrospective/index.md)
 
-La documentazione relativa alla metodologia di sviluppo è disponibile [qui](process/index.md).
+La documentazione relativa alla metodologia di sviluppo è disponibile [qui](1-development-process/index.md).
