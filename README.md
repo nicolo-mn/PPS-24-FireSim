@@ -12,25 +12,20 @@ The project explores how environmental factors and human intervention influence 
 
 ---
 
-## Key Features
-- 🗺️ Procedural **map generation** (forests, rivers, lakes, stations, terrain)
-- 🔥 **Probabilistic fire spread** influenced by wind, temperature, humidity
-- 🚁 **Firefighting agents** with movement, extinguishing, and resupply behavior
-- ️🖌 **Interactive map editing** before and during simulation
-- ⏳ **Time controls** (pause, resume, adjustable speed)
-- 🎚 **Customizable parameters** in real-time
+## Features
+- Procedural **map generation** (forests, rivers, lakes, stations, terrain)
+- **Probabilistic fire spread** influenced by wind, temperature, humidity
+- **Firefighting agents** with movement, extinguishing, and resupply behavior
+- ️**Interactive map editing** before and during simulation
+- **Time controls** (pause, resume, adjustable speed)
+- **Customizable parameters** in real-time
 
 ---
 
-## Tech Stack
+## Built with
 - Scala + Swing
 - MVC architecture
-- Scalatest (TDD)
-- SCoverage, Scalafix, Formatter
-
----
-
-## Goal
-Provide a configurable and visual tool to analyze wildfire dynamics and firefighting strategies in a simplified, educational context.
+- TDD (using Scalatest)
+- SCoverage, Scalafix, Scalafmt
 
 ---
