@@ -21,15 +21,17 @@ Add lakes in map generation	P1	mRickk	Done		S	Sprint 4
 Changing the impact of wind direction	P1	juriGug	Done		S	Sprint 4
 Refactor view to use a single frame instead of a matrix of buttons	P1	juriGug	Done		M	Sprint 5
 Change firefighter behavior to prioritize cells closer to their fire station	P1	nicolo-mn	Done		S	Sprint 5
-Fix controller converting burning cells	P1	mRickk	Ready		XS	Sprint 6
+Fix controller converting burning cells	P1	mRickk	Done		XS	Sprint 6
 Simulation speed management	P2	mRickk	Done		S	Sprint 4
 Brush drawing in map	P2	nicolo-mn	Done		S	Sprint 4
 Handle draw line button that works for every type of cell	P2	juriGug	Done		M	Sprint 4
 Parallelize map generation	P2	mRickk	Done		S	Sprint 5
 Parallelize fire fighters	P2	nicolo-mn	Done		S	Sprint 5
 Change firefighter logic to improve performance	P2	nicolo-mn	Done		S	Sprint 5
-Handle minimum GUI window size	P2	nicolo-mn	Ready		XS	Sprint 6
-Set minimum and maximum map dimension	P2	nicolo-mn	Ready		XS	Sprint 6
-Fix application closing not working in GUI dialog	P2	juriGug	Ready		XS	Sprint 6
-Modify pause/resume button text depending on its state	P2	juriGug	Ready		XS	Sprint 6
-Handle conflicts when both brush and draw line are active	P2	nicolo-mn	Ready		XS	Sprint 6
+Handle minimum GUI window size	P2	nicolo-mn	Done		XS	Sprint 6
+Set minimum and maximum map dimension	P2	nicolo-mn	Done		XS	Sprint 6
+Fix application closing not working in GUI dialog	P2	juriGug	Done		XS	Sprint 6
+Modify pause/resume button text depending on its state	P2	juriGug	Done		XS	Sprint 6
+Handle conflicts when both brush and draw line are active	P2	nicolo-mn	Done		XS	Sprint 6
+Refactor of map generation into package "map"	P2	mRickk	Done		M	Sprint 6
+Make FireFighter use a weighted average for target selection and make its strategy use a lazylist	P2	nicolo-mn	Done		S	Sprint 6
