@@ -4,8 +4,6 @@ import it.unibo.firesim.model.map.CellType.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.util.Random
-
 class MapBuilderTest extends AnyFlatSpec with Matchers:
 
   "MapBuilder" should "build a matrix with water" in {

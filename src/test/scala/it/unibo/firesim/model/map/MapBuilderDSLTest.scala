@@ -5,8 +5,6 @@ import it.unibo.firesim.model.map.MapBuilderDSL.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.util.Random
-
 class MapBuilderDSLTest extends AnyFlatSpec with Matchers:
 
   "MapBuilderDSL" should "ease the build of a matrix with water" in {

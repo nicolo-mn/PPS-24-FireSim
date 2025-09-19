@@ -106,8 +106,9 @@ class SimModel(
     if cellType == oldCell then return
 
     cellType match
-      case Burning(_, _, _) if oldCell != Forest && oldCell != Grass => return
-      case _                                                         =>
+      case Burning(c, _, Forest) if oldCell != Forest | c < cycle => return
+      case Burning(c, _, Grass) if oldCell != Grass | c < cycle   => return
+      case _                                                      =>
         if oldCell == Station then
           firefighters = firefighters.filter(f => f.station != pos)
         if cellType == Station then
