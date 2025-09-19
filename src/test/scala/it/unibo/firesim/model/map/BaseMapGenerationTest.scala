@@ -1,6 +1,5 @@
 package it.unibo.firesim.model.map
 
-import it.unibo.firesim.model.fire.FireStage.Ignition
 import it.unibo.firesim.model.map.CellType.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
