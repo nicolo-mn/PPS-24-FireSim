@@ -68,7 +68,7 @@ class SimModelTest extends AnyFlatSpec with Matchers:
   }
 
   it should "place cells in matrix correctly, and not placing them again if already placed" in {
-    val matrix = model.generateMap(100, 100)
+    val matrix = model.generateMap(10, 10)
     matrix.positionsOf(Empty) should be(Seq.empty)
 
     val (updatedMatrix, _) =
@@ -80,7 +80,7 @@ class SimModelTest extends AnyFlatSpec with Matchers:
   }
 
   it should "place burning cells only if the cell in that position is Forest or Grass and with a valid start cycle" in {
-    model.generateMap(100, 100)
+    model.generateMap(10, 10)
     val (matrix, _) = model.placeCells(Seq(((0, 0), Empty)))
     val burningForest = Burning(0, Ignition, Forest)
     val burningGrass = Burning(0, Ignition, Grass)
@@ -109,7 +109,7 @@ class SimModelTest extends AnyFlatSpec with Matchers:
   }
 
   it should "add a new firefighter if a station is placed" in {
-    model.generateMap(100, 100)
+    model.generateMap(10, 10)
     val (matrix, firefighters) = model.placeCells(Seq(((0, 0), Empty)))
     val (updatedMatrix, updatedFirefighters) =
       model.placeCells(Seq(((0, 0), Station)))
@@ -118,7 +118,7 @@ class SimModelTest extends AnyFlatSpec with Matchers:
   }
 
   it should "remove a firefighter if a station is replaced with another cell" in {
-    model.generateMap(100, 100)
+    model.generateMap(10, 10)
     val (matrix, firefighters) = model.placeCells(Seq(((0, 0), Station)))
     val (updatedMatrix, updatedFirefighters) =
       model.placeCells(Seq(((0, 0), Empty)))

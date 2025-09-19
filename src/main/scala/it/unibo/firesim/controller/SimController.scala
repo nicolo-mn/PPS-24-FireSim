@@ -33,7 +33,7 @@ class SimController(
   @volatile private var tickMs: Int = 0
 
   private val simView: View = new SimView(this)
-  private val placeQueue = new LinkedBlockingQueue[(Position, CellType)]()
+  private val placeQueue = new LinkedBlockingQueue[(Position, CellViewType)]()
 
   /** Handles a message from the view by executing the corresponding action on
     * this controller.
@@ -110,11 +110,7 @@ class SimController(
   ): Unit =
     placeQueue.put(
       pos,
-      CellTypeConverter.toModel(
-        cellViewType,
-        matrix(pos._1)(pos._2),
-        currentGeneration
-      )
+      cellViewType
     )
 
   /** Makes model try to place a line of cells
@@ -196,9 +192,9 @@ class SimController(
       while mapGenerated do
         val t0 = System.currentTimeMillis()
 
-        if running then onTick()
-
+        currentGeneration = model.getCurrentCycle
         handleQueuedCells()
+        if running then onTick()
 
         val viewMatrix: Vector[Vector[CellViewType]] = matrix.map(row =>
           row.map(cT => CellTypeConverter.toView(cT))
@@ -214,12 +210,23 @@ class SimController(
         Thread.sleep(math.max(0, remaining))
 
   private def onTick(): Unit =
-    currentGeneration = model.getCurrentCycle
-    model.updateState()
+    val (newMatrix, newFirefighters) = model.updateState()
+    matrix = newMatrix
+    firefighters = newFirefighters
 
   private def handleQueuedCells(): Unit =
-    val buffer = new java.util.ArrayList[(Position, CellType)]
+    val buffer = new java.util.ArrayList[(Position, CellViewType)]
     placeQueue.drainTo(buffer)
-    val (newMatrix, newFirefighters) = model.placeCells(buffer.asScala.toSeq)
+    val (newMatrix, newFirefighters) = model.placeCells(buffer.asScala.toSeq
+      .map((pos, cwt) =>
+        (
+          pos,
+          CellTypeConverter.toModel(
+            cwt,
+            matrix(pos._1)(pos._2),
+            currentGeneration
+          )
+        )
+      ))
     matrix = newMatrix
     firefighters = newFirefighters

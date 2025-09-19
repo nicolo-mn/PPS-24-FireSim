@@ -103,12 +103,17 @@ class SimModel(
     val (r, c) = pos
     val oldCell = matrix(r)(c)
 
+    def canIgnite(from: CellType, to: CellType): Boolean =
+      (to, from) match
+        case (Burning(stage, _, Forest), Forest) => stage == cycle
+        case (Burning(stage, _, Grass), Grass)   => stage == cycle
+        case _                                   => false
+
     if cellType == oldCell then return
 
     cellType match
-      case Burning(c, _, Forest) if oldCell != Forest | c < cycle => return
-      case Burning(c, _, Grass) if oldCell != Grass | c < cycle   => return
-      case _                                                      =>
+      case b: Burning if !canIgnite(oldCell, b) => return
+      case _                                    =>
         if oldCell == Station then
           firefighters = firefighters.filter(f => f.station != pos)
         if cellType == Station then
