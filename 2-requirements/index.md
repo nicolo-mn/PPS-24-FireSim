@@ -4,7 +4,7 @@
    L'obiettivo è creare un simulatore configurabile e visivamente intuitivo per analizzare la dinamica degli incendi boschivi.
    Il software deve servire come strumento educativo e di analisi, permettendo di comprendere l'impatto di variabili ambientali e strategie di contrasto sulla propagazione di un incendio.
 
-   Il modello deve permettere l’osservazione dell’evoluzione semplificata di un incendio in una foresta, sotto l’influenza di parametri ambientali (come vento, temperatura, umidità).
+   Il modello deve permettere l’osservazione dell’evoluzione semplificata ma verosimile di un incendio in una foresta, sotto l’influenza di parametri ambientali (come vento, temperatura, umidità).
    Inoltre deve considerare i meccanismi di contrasto quali i vigili del fuoco contro l’incendio e possibili linee di frangifuoco definite dall’utente.
 
    La mappa generata dovrà essere personalizzabile prima dell'inizio della simulazione, per poter modellare determinati biomi.

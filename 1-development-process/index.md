@@ -17,8 +17,6 @@ L'organizzazione del team prevede i seguenti ruoli chiave:
 - **Scrum Master**: facilitatore del processo Scrum, responsabile della rimozione di ostacoli e del corretto svolgimento delle attività del team.  
   → Ricoperto da **Nicolò Monaldini**.
 
----
-
 ## Organizzazione degli Sprint
 Il ciclo di sviluppo è suddiviso in **Sprint** della durata di **5 giorni**.  
 Ogni sprint è scandito da una serie di meeting e attività pianificate:
@@ -28,22 +26,16 @@ Ogni sprint è scandito da una serie di meeting e attività pianificate:
 - **Sprint Review**: presentazione dell’incremento di prodotto al Product Owner e al Committente, con raccolta di feedback.
 - **Sprint Retrospective**: incontro conclusivo per riflettere sul processo e individuare possibili miglioramenti.
 
----
-
 ## Strumenti di Collaborazione
 Per garantire una comunicazione fluida e una gestione efficiente delle attività, il team utilizza:
 
-- **Discord**: piattaforma principale per le comunicazioni e i meeting pianificati (Planning, Daily, Review, Retrospective).
-- **GitHub Projects**: strumento scelto per la gestione dei task. Il Product Backlog consiste in una bacheca in stile **Kanban**, permettendo una visione chiara e condivisa dello stato di avanzamento.
-
----
+- Discord: piattaforma principale per le comunicazioni e i meeting pianificati (Planning, Daily, Review, Retrospective).
+- **GitHub Projects**: strumento scelto per la gestione dei task. Il Product Backlog consiste in una tabella divisa per priorità e con colonne quali dimensione e stato, permettendo una visione chiara e condivisa dello stato di avanzamento.
 
 ## Automazione
-Per automatizzare build, testing e gestione delle dipendeze è stato utilizzato *sbt*. *scalafmt* è stato utilizzato per mantenere una formattazione coerente all'interno del progetto.
+Per automatizzare build, testing e gestione delle dipendenze è stato utilizzato *sbt*. *scalafmt* è stato utilizzato per mantenere una formattazione coerente all'interno del progetto.
 
 Per la CI viene utilizzato **GitHub Actions**, che automatizza l’esecuzione dei test a ogni push.
-
----
 
 ## Versioning
 
