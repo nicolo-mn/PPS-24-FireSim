@@ -9,7 +9,7 @@ import it.unibo.firesim.model.firefighters.FireFighter
 import it.unibo.firesim.model.firefighters.builder.FireFighterDSL.*
 import it.unibo.firesim.model.firefighters.FireFighterUtils.*
 import it.unibo.firesim.model.map.MapBuilderDSL.*
-import it.unibo.firesim.model.map.{CellType, MapBuilder, Matrix, Position, neighbors, positionsOf, update}
+import it.unibo.firesim.model.map.{CellType, MapBuilder, MapGenerationWithRivers, Matrix, Position, neighbors, positionsOf, positionsOfBurning, update}
 
 import scala.collection.parallel.CollectionConverters.*
 import scala.util.Random
@@ -56,7 +56,7 @@ class SimModel(
     this.rows = rows
     this.cols = cols
 
-    matrix = buildMap(rows, cols, random):
+    matrix = buildMap(rows, cols, MapGenerationWithRivers(), random):
       withWater
       withForests
       withGrass
@@ -106,8 +106,9 @@ class SimModel(
     if cellType == oldCell then return
 
     cellType match
-      case Burning(_, _, _) if oldCell != Forest && oldCell != Grass => return
-      case _                                                         =>
+      case Burning(c, _, Forest) if oldCell != Forest | c < cycle => return
+      case Burning(c, _, Grass) if oldCell != Grass | c < cycle   => return
+      case _                                                      =>
         if oldCell == Station then
           firefighters = firefighters.filter(f => f.station != pos)
         if cellType == Station then
@@ -123,10 +124,7 @@ class SimModel(
     */
   def updateState(): (Matrix, Seq[Position]) =
     val simParams = this.getSimParams
-    val burningCells = matrix.positionsOf {
-      case Burning(_, _, _) => true
-      case _                => false
-    }.toSet
+    val burningCells = matrix.positionsOfBurning().toSet
     val (updatedMatrix, updatedBurningCells, nextRandoms) =
       fireSpread(matrix, burningCells, simParams, cycle, rng)
     matrix = updatedMatrix
